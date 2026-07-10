@@ -15,21 +15,52 @@ def evaluate_prediction(prediction: dict[str, Any], expected: dict[str, Any]) ->
     expected_citations = _citation_ids(expected.get("citations"))
     supported = predicted_citations & expected_citations
     unsupported = predicted_citations - expected_citations
+    schema_valid = _schema_valid(prediction)
+    timeline_order = _timeline_order_ok(prediction.get("timeline"))
 
     return {
-        "schema_valid": _schema_valid(prediction),
+        "schema_valid": schema_valid,
         "citation_precision": _safe_divide(len(supported), len(predicted_citations)),
         "citation_recall": _safe_divide(len(supported), len(expected_citations)),
         "unsupported_citations": sorted(unsupported),
-        "timeline_order": _timeline_order_ok(prediction.get("timeline")),
+        "timeline_order": timeline_order,
         "uncertainty_present": bool(str(prediction.get("uncertainty") or "").strip()),
         "insufficient_evidence_caution": _insufficient_evidence_caution(prediction, expected),
     }
 
 
-def summarize_metrics(results: list[dict[str, Any]]) -> dict[str, Any]:
+def zero_metrics(reason: str) -> dict[str, Any]:
+    return {
+        "schema_valid": False,
+        "citation_precision": 0.0,
+        "citation_recall": 0.0,
+        "unsupported_citations": [],
+        "timeline_order": False,
+        "uncertainty_present": False,
+        "insufficient_evidence_caution": False,
+        "zero_score_reason": reason,
+    }
+
+
+def summarize_metrics(
+    results: list[dict[str, Any]],
+    *,
+    benchmark_count: int | None = None,
+    prediction_count: int | None = None,
+    duplicate_count: int = 0,
+    unknown_count: int = 0,
+) -> dict[str, Any]:
     if not results:
-        return {"count": 0}
+        return {
+            "count": 0,
+            "benchmark_count": benchmark_count or 0,
+            "prediction_count": prediction_count or 0,
+            "matched_count": 0,
+            "missing_count": benchmark_count or 0,
+            "duplicate_count": duplicate_count,
+            "unknown_count": unknown_count,
+            "coverage": 0.0,
+        }
     metric_names = (
         "schema_valid",
         "citation_precision",
@@ -38,7 +69,20 @@ def summarize_metrics(results: list[dict[str, Any]]) -> dict[str, Any]:
         "uncertainty_present",
         "insufficient_evidence_caution",
     )
-    summary: dict[str, Any] = {"count": len(results)}
+    benchmark_count = benchmark_count if benchmark_count is not None else len(results)
+    prediction_count = prediction_count if prediction_count is not None else len(results)
+    matched_count = sum(1 for result in results if result.get("status") == "matched")
+    missing_count = sum(1 for result in results if result.get("status") == "missing")
+    summary: dict[str, Any] = {
+        "count": len(results),
+        "benchmark_count": benchmark_count,
+        "prediction_count": prediction_count,
+        "matched_count": matched_count,
+        "missing_count": missing_count,
+        "duplicate_count": duplicate_count,
+        "unknown_count": unknown_count,
+        "coverage": _safe_divide(matched_count, benchmark_count),
+    }
     for name in metric_names:
         values = [float(result["metrics"][name]) for result in results]
         summary[name] = sum(values) / len(values)
@@ -49,7 +93,14 @@ def summarize_metrics(results: list[dict[str, Any]]) -> dict[str, Any]:
 
 
 def _schema_valid(prediction: dict[str, Any]) -> bool:
-    return all(field in prediction for field in ("citations", "timeline", "uncertainty"))
+    return (
+        isinstance(prediction.get("facts"), list)
+        and isinstance(prediction.get("timeline"), list)
+        and isinstance(prediction.get("inference"), str)
+        and isinstance(prediction.get("uncertainty"), str)
+        and isinstance(prediction.get("citations"), list)
+        and isinstance(prediction.get("answer"), str)
+    )
 
 
 def _citation_ids(value: Any) -> set[str]:
@@ -65,7 +116,7 @@ def _citation_ids(value: Any) -> set[str]:
 
 
 def _timeline_order_ok(value: Any) -> bool:
-    if not isinstance(value, list):
+    if not isinstance(value, list) or not value:
         return False
     previous: datetime | None = None
     for item in value:

@@ -33,6 +33,10 @@ class PipelineConfig:
     per_page: int | None
     validation_ratio: float
     test_ratio: float
+    max_seq_length: int
+    split_strategy: str
+    validation_repositories: tuple[str, ...]
+    test_repositories: tuple[str, ...]
     min_evidence_per_bundle: int
     require_approved_gold_cases: bool
 
@@ -116,6 +120,10 @@ def build_commands(
                 str(config.validation_ratio),
                 "--test-ratio",
                 str(config.test_ratio),
+                "--max-seq-length",
+                str(config.max_seq_length),
+                "--split-strategy",
+                config.split_strategy,
             ],
             [
                 "uv",
@@ -219,8 +227,12 @@ def build_commands(
             ],
         ]
     )
+    materialize_command = commands[2 if skip_collect else 3]
+    for repo in config.validation_repositories:
+        materialize_command.extend(["--validation-repository", repo])
+    for repo in config.test_repositories:
+        materialize_command.extend(["--test-repository", repo])
     if not config.require_approved_gold_cases:
-        materialize_command = commands[2 if skip_collect else 3]
         materialize_command.append("--allow-unapproved")
     return commands
 
@@ -249,6 +261,10 @@ def load_pipeline_config(path: Path) -> PipelineConfig:
         per_page=_optional_int(loaded.get("per_page")),
         validation_ratio=float(loaded.get("validation_ratio", 0.1)),
         test_ratio=float(loaded.get("test_ratio", 0.1)),
+        max_seq_length=int(loaded.get("max_seq_length", 2048)),
+        split_strategy=str(loaded.get("split_strategy", "thread_hash")),
+        validation_repositories=tuple(_optional_str_list(loaded.get("validation_repositories"))),
+        test_repositories=tuple(_optional_str_list(loaded.get("test_repositories"))),
         min_evidence_per_bundle=int(loaded.get("min_evidence_per_bundle", 3)),
         require_approved_gold_cases=bool(loaded.get("require_approved_gold_cases", True)),
     )
@@ -316,6 +332,16 @@ def _optional_int(value: Any) -> int | None:
     if value in (None, ""):
         return None
     return int(value)
+
+
+def _optional_str_list(value: Any) -> list[str]:
+    if value in (None, ""):
+        return []
+    if isinstance(value, str):
+        return [value]
+    if isinstance(value, list):
+        return [str(item) for item in value]
+    raise TypeError("expected a string or list of strings")
 
 
 def _ensure_raw_data_exists(raw_dir: Path) -> None:

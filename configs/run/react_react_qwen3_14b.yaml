@@ -20,5 +20,8 @@ per_page: 50
 split_strategy: thread_hash
 validation_ratio: 0.1
 test_ratio: 0.1
+max_seq_length: 2048
+validation_repositories: []
+test_repositories: []
 min_evidence_per_bundle: 3
 require_approved_gold_cases: true

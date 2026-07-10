@@ -23,6 +23,7 @@ KIND_FILES = (
 )
 
 PR_PATTERN = re.compile(r"(?:pull request|PR)\s*#?(\d+)", re.IGNORECASE)
+SQUASH_PR_PATTERN = re.compile(r"\(#(\d+)\)")
 URL_NUMBER_PATTERN = re.compile(r"/(issues|pulls)/(\d+)(?:$|[/?#])")
 
 
@@ -243,7 +244,7 @@ def _number_from_url(value: Any) -> str | None:
 
 
 def _pr_number_from_text(value: str) -> str | None:
-    match = PR_PATTERN.search(value)
+    match = PR_PATTERN.search(value) or SQUASH_PR_PATTERN.search(value)
     return match.group(1) if match else None
 
 

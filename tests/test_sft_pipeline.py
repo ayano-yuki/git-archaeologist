@@ -33,6 +33,10 @@ def test_build_commands_can_skip_collect() -> None:
         per_page=10,
         validation_ratio=0.1,
         test_ratio=0.1,
+        max_seq_length=2048,
+        split_strategy="thread_hash",
+        validation_repositories=(),
+        test_repositories=(),
         min_evidence_per_bundle=3,
         require_approved_gold_cases=True,
     )
@@ -45,6 +49,8 @@ def test_build_commands_can_skip_collect() -> None:
     assert commands[1][6] == "validate"
     assert commands[2][5] == "llm_tuning_lab.data.gold_cases"
     assert commands[2][6] == "materialize"
+    assert "--max-seq-length" in commands[2]
+    assert "--split-strategy" in commands[2]
     assert commands[6][5] == "llm_tuning_lab.eval.run_eval"
     assert commands[-3][5] == "llm_tuning_lab.train.sft"
     assert "--preflight-only" in commands[-3]
@@ -58,6 +64,8 @@ def test_load_pipeline_config_reads_required_paths() -> None:
     assert config.model_config == Path("configs/model/base.yaml")
     assert config.train_file == Path("data/processed/train.jsonl")
     assert config.bundle_file == Path("data/interim/bundles/react-react.jsonl")
+    assert config.max_seq_length == 2048
+    assert config.split_strategy == "thread_hash"
 
 
 def test_resolve_preset_uses_alias() -> None:

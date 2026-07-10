@@ -16,6 +16,10 @@ SYSTEM_PROMPT = (
 )
 
 CONFIDENT_TERMS = ("proves", "definitely", "certainly", "明らか", "断定", "証明")
+REVIEW_STATUSES = {"draft", "approved", "rejected"}
+APPROVED_REVIEW_FIELDS = ("reviewer_id", "reviewed_at", "review_revision", "bundle_hash", "evidence_hash")
+OUTPUT_SCHEMA_VERSION = "git-archaeologist.answer.v1"
+APPROX_CHARS_PER_TOKEN = 4
 
 
 @dataclass(frozen=True)
@@ -50,21 +54,25 @@ def materialize_sft_records(
     cases: Iterable[dict[str, Any]],
     *,
     require_approved: bool = True,
+    max_seq_length: int | None = None,
 ) -> list[dict[str, Any]]:
     records: list[dict[str, Any]] = []
     for case in cases:
         if require_approved and case.get("review_status") != "approved":
             continue
         bundle = bundles[str(case["bundle_id"])]
-        records.append(
-            {
-                "messages": [
-                    {"role": "system", "content": SYSTEM_PROMPT},
-                    {"role": "user", "content": _user_content(bundle, case)},
-                    {"role": "assistant", "content": _assistant_content(case)},
-                ]
-            }
-        )
+        record = {
+            "messages": [
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": _user_content(bundle, case)},
+                {"role": "assistant", "content": _assistant_content(case)},
+            ]
+        }
+        if max_seq_length is not None:
+            errors = validate_sft_record_budget(record, case, max_seq_length=max_seq_length)
+            if errors:
+                raise ValueError("; ".join(errors))
+        records.append(record)
     return records
 
 
@@ -74,8 +82,31 @@ def split_gold_cases(
     *,
     validation_ratio: float = 0.1,
     test_ratio: float = 0.1,
+    split_strategy: str = "thread_hash",
+    validation_repositories: list[str] | None = None,
+    test_repositories: list[str] | None = None,
 ) -> dict[str, list[dict[str, Any]]]:
     splits = {"train": [], "validation": [], "test": []}
+    if split_strategy == "repository_holdout":
+        validation_set = set(validation_repositories or [])
+        test_set = set(test_repositories or [])
+        overlap = validation_set & test_set
+        if overlap:
+            raise ValueError(f"repositories cannot be in both validation and test: {sorted(overlap)}")
+        for case in cases:
+            bundle = bundles[str(case["bundle_id"])]
+            repo = str(bundle["repo"])
+            if repo in test_set:
+                split = "test"
+            elif repo in validation_set:
+                split = "validation"
+            else:
+                split = "train"
+            splits[split].append(case)
+        return splits
+    if split_strategy != "thread_hash":
+        raise ValueError(f"unknown split strategy: {split_strategy}")
+
     validation_ratio = _clamp_ratio(validation_ratio)
     test_ratio = _clamp_ratio(test_ratio)
     groups: dict[str, list[dict[str, Any]]] = {}
@@ -109,6 +140,10 @@ def write_materialized_splits(
     validation_ratio: float,
     test_ratio: float,
     require_approved: bool,
+    max_seq_length: int,
+    split_strategy: str = "thread_hash",
+    validation_repositories: list[str] | None = None,
+    test_repositories: list[str] | None = None,
 ) -> dict[str, int]:
     approved_cases = [
         case for case in cases if not require_approved or case.get("review_status") == "approved"
@@ -118,17 +153,64 @@ def write_materialized_splits(
         approved_cases,
         validation_ratio=validation_ratio,
         test_ratio=test_ratio,
+        split_strategy=split_strategy,
+        validation_repositories=validation_repositories,
+        test_repositories=test_repositories,
     )
     counts = {
-        "train": write_jsonl(train_output, materialize_sft_records(bundles, splits["train"])),
+        "train": write_jsonl(
+            train_output,
+            materialize_sft_records(bundles, splits["train"], max_seq_length=max_seq_length),
+        ),
         "validation": write_jsonl(
             validation_output,
-            materialize_sft_records(bundles, splits["validation"]),
+            materialize_sft_records(
+                bundles,
+                splits["validation"],
+                max_seq_length=max_seq_length,
+            ),
         ),
-        "test": write_jsonl(test_output, materialize_sft_records(bundles, splits["test"])),
+        "test": write_jsonl(
+            test_output,
+            materialize_sft_records(bundles, splits["test"], max_seq_length=max_seq_length),
+        ),
         "benchmark": write_jsonl(benchmark_output, _benchmark_records(bundles, splits["test"])),
     }
     return counts
+
+
+def bundle_hash(bundle: dict[str, Any]) -> str:
+    payload = {
+        "bundle_id": bundle.get("bundle_id"),
+        "repo": bundle.get("repo"),
+        "thread_key": bundle.get("thread_key"),
+        "evidence": bundle.get("evidence", []),
+    }
+    return _hash_json(payload)
+
+
+def evidence_hash(bundle: dict[str, Any]) -> str:
+    return _hash_json(bundle.get("evidence", []))
+
+
+def validate_sft_record_budget(
+    record: dict[str, Any],
+    case: dict[str, Any],
+    *,
+    max_seq_length: int,
+) -> list[str]:
+    errors: list[str] = []
+    content = "\n".join(message.get("content", "") for message in record.get("messages", []))
+    estimated_tokens = _estimate_tokens(content)
+    if estimated_tokens > max_seq_length:
+        errors.append(
+            f"case {case.get('bundle_id')}: estimated tokens {estimated_tokens} exceed max_seq_length {max_seq_length}"
+        )
+    user_content = record["messages"][1]["content"]
+    for citation in _citation_ids(case.get("citations")):
+        if citation not in user_content:
+            errors.append(f"case {case.get('bundle_id')}: cited evidence {citation} missing from SFT input")
+    return errors
 
 
 def _validate_gold_case(
@@ -166,6 +248,19 @@ def _validate_gold_case(
         errors.append(f"{prefix}: citations not found in bundle evidence: {', '.join(unknown)}")
     if not citations:
         errors.append(f"{prefix}: citations must not be empty")
+    review_status = case.get("review_status")
+    if review_status not in REVIEW_STATUSES:
+        errors.append(f"{prefix}: review_status must be one of {sorted(REVIEW_STATUSES)}")
+    if review_status == "approved":
+        for field in APPROVED_REVIEW_FIELDS:
+            if not str(case.get(field) or "").strip():
+                errors.append(f"{prefix}: approved case must define '{field}'")
+        if str(case.get("bundle_hash") or "") != bundle_hash(bundle):
+            errors.append(f"{prefix}: bundle_hash does not match current bundle")
+        if str(case.get("evidence_hash") or "") != evidence_hash(bundle):
+            errors.append(f"{prefix}: evidence_hash does not match current bundle evidence")
+        if _parse_datetime(case.get("reviewed_at")) is None:
+            errors.append(f"{prefix}: reviewed_at must be an ISO datetime")
 
     errors.extend(_validate_facts(prefix, case.get("facts"), evidence_ids))
     errors.extend(_validate_timeline(prefix, case.get("timeline"), evidence_ids))
@@ -184,6 +279,8 @@ def _validate_facts(prefix: str, facts: Any, evidence_ids: set[str]) -> list[str
         if not isinstance(fact, dict):
             errors.append(f"{prefix}: facts[{item_index}] must include text and citations")
             continue
+        if not str(fact.get("text") or "").strip():
+            errors.append(f"{prefix}: facts[{item_index}].text must not be empty")
         citations = _citation_ids(fact.get("citations"))
         if not citations:
             errors.append(f"{prefix}: facts[{item_index}] must cite evidence")
@@ -196,13 +293,19 @@ def _validate_facts(prefix: str, facts: Any, evidence_ids: set[str]) -> list[str
 def _validate_timeline(prefix: str, timeline: Any, evidence_ids: set[str]) -> list[str]:
     if not isinstance(timeline, list):
         return [f"{prefix}: timeline must be a list"]
+    if not timeline:
+        return [f"{prefix}: timeline must be a non-empty list"]
     errors: list[str] = []
     previous: datetime | None = None
     for item_index, item in enumerate(timeline, start=1):
         if not isinstance(item, dict):
             errors.append(f"{prefix}: timeline[{item_index}] must be an object")
             continue
+        if not str(item.get("text") or "").strip():
+            errors.append(f"{prefix}: timeline[{item_index}].text must not be empty")
         citations = _citation_ids(item.get("citations"))
+        if not citations:
+            errors.append(f"{prefix}: timeline[{item_index}] must cite evidence")
         if citations - evidence_ids:
             errors.append(f"{prefix}: timeline[{item_index}] cites unknown evidence")
         when = _parse_datetime(item.get("date") or item.get("created_at"))
@@ -226,9 +329,12 @@ def _benchmark_records(
             "bundle": bundle,
             "question": case["question"],
             "expected": {
+                "facts": case["facts"],
                 "citations": case["citations"],
                 "timeline": case["timeline"],
+                "inference": case["inference"],
                 "uncertainty": case["uncertainty"],
+                "answer": case["answer"],
             },
         }
 
@@ -249,13 +355,18 @@ def _user_content(bundle: dict[str, Any], case: dict[str, Any]) -> str:
 
 
 def _assistant_content(case: dict[str, Any]) -> str:
-    return (
-        f"Facts: {json.dumps(case['facts'], ensure_ascii=False)}\n\n"
-        f"Timeline: {json.dumps(case['timeline'], ensure_ascii=False)}\n\n"
-        f"Inference: {case['inference']}\n\n"
-        f"Uncertainty: {case['uncertainty']}\n\n"
-        f"Citations: {json.dumps(case['citations'], ensure_ascii=False)}\n\n"
-        f"Answer: {case['answer']}"
+    return json.dumps(
+        {
+            "schema_version": OUTPUT_SCHEMA_VERSION,
+            "facts": case["facts"],
+            "timeline": case["timeline"],
+            "inference": case["inference"],
+            "uncertainty": case["uncertainty"],
+            "citations": case["citations"],
+            "answer": case["answer"],
+        },
+        ensure_ascii=False,
+        sort_keys=True,
     )
 
 
@@ -291,6 +402,15 @@ def _parse_datetime(value: Any) -> datetime | None:
 def _hash_fraction(value: str) -> float:
     digest = hashlib.sha256(value.encode("utf-8")).hexdigest()
     return int(digest[:8], 16) / 0xFFFFFFFF
+
+
+def _hash_json(value: Any) -> str:
+    encoded = json.dumps(value, ensure_ascii=False, sort_keys=True).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
+
+
+def _estimate_tokens(value: str) -> int:
+    return max(1, (len(value) + APPROX_CHARS_PER_TOKEN - 1) // APPROX_CHARS_PER_TOKEN)
 
 
 def _clamp_ratio(value: float) -> float:
@@ -336,6 +456,14 @@ def main() -> int:
     materialize_parser.add_argument("--benchmark-output", type=Path, required=True)
     materialize_parser.add_argument("--validation-ratio", type=float, default=0.1)
     materialize_parser.add_argument("--test-ratio", type=float, default=0.1)
+    materialize_parser.add_argument("--max-seq-length", type=int, default=2048)
+    materialize_parser.add_argument(
+        "--split-strategy",
+        choices=("thread_hash", "repository_holdout"),
+        default="thread_hash",
+    )
+    materialize_parser.add_argument("--validation-repository", action="append", default=[])
+    materialize_parser.add_argument("--test-repository", action="append", default=[])
     materialize_parser.add_argument("--allow-unapproved", action="store_true")
     args = parser.parse_args()
 
@@ -360,6 +488,10 @@ def main() -> int:
         validation_ratio=args.validation_ratio,
         test_ratio=args.test_ratio,
         require_approved=not args.allow_unapproved,
+        max_seq_length=args.max_seq_length,
+        split_strategy=args.split_strategy,
+        validation_repositories=args.validation_repository,
+        test_repositories=args.test_repository,
     )
     for name, count in counts.items():
         print(f"{name}: {count}")

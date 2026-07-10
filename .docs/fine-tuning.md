@@ -122,6 +122,7 @@ uv run --system-certs --group dev python -m pytest
 uv run --system-certs --group dev python -m llm_tuning_lab.run.sft_pipeline --dry-run --skip-collect --preset react-react-qwen3-14b --include-sync-command
 uv run --system-certs --group dev python -m llm_tuning_lab.data.validate data/processed/train.jsonl
 uv run --system-certs --group dev python -m llm_tuning_lab.data.validate data/processed/validation.jsonl
+uv run --system-certs --group dev python -m llm_tuning_lab.train.sft --model-config configs/model/base.yaml --data-config configs/data/react_react_sft.yaml --train-config configs/train/sft.yaml --lora-config configs/train/lora.yaml --train-file data/processed/train.jsonl --validation-file data/processed/validation.jsonl --output-dir outputs/sft/react-react-qwen3-14b --preflight-only
 ```
 
 確認すること:
@@ -129,8 +130,11 @@ uv run --system-certs --group dev python -m llm_tuning_lab.data.validate data/pr
 - `data/processed/train.jsonl` と `validation.jsonl` が空ではない。
 - 各行が `messages` 形式で、`user` と `assistant` を含む。
 - `configs/model/base.yaml` が `Qwen/Qwen3-14B` を指している。
+- `configs/train/sft.yaml` が `assistant_only_loss: true` を持っている。
 - `outputs/sft/react-react-qwen3-14b` に書き込める。
 - `HF_HOME` が十分な容量のあるディスクを指している。
+
+SFT では conversational `messages` をなるべく保持します。`messages` を事前に1本の `text` へ潰すと、assistant の回答だけでなく user や system の文まで学習対象になりやすいためです。このリポジトリでは、根拠や質問を丸暗記させるのではなく、assistant の答え方、根拠の扱い方、不確実性の示し方を学ばせます。
 
 ## 7. 結果を保存する
 

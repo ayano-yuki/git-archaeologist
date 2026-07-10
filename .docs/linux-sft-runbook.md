@@ -35,7 +35,8 @@ bash scripts/run_sft_linux.sh --preset react-react-qwen3-14b
 2. `react/react` の GitHub evidence を `data/raw/github/react-react/` に収集
 3. raw evidence から `data/processed/train.jsonl` と `data/processed/validation.jsonl` を生成
 4. 生成した JSONL を検証
-5. `Qwen/Qwen3-14B` で LoRA SFT を起動
+5. `--preflight-only` で SFT 設定と空データを検証
+6. `Qwen/Qwen3-14B` で LoRA SFT を起動
 
 ## 実行前に確認する
 
@@ -43,6 +44,20 @@ SFT 本体を回さずにコマンド列を確認します。
 
 ```bash
 bash scripts/run_sft_linux.sh --dry-run --preset react-react-qwen3-14b
+```
+
+GPU を使わずに SFT 設定だけを検証する場合:
+
+```bash
+uv run --system-certs --group dev python -m llm_tuning_lab.train.sft \
+  --model-config configs/model/base.yaml \
+  --data-config configs/data/react_react_sft.yaml \
+  --train-config configs/train/sft.yaml \
+  --lora-config configs/train/lora.yaml \
+  --train-file data/processed/train.jsonl \
+  --validation-file data/processed/validation.jsonl \
+  --output-dir outputs/sft/react-react-qwen3-14b \
+  --preflight-only
 ```
 
 すでに `data/raw/github/react-react/` がある場合は、GitHub API 収集を飛ばせます。
@@ -77,8 +92,11 @@ outputs/sft/react-react-qwen3-14b  学習ログと checkpoint
 - `HF_HOME` が十分な容量のあるディスクを指しているか。
 - `data/processed/train.jsonl` と `validation.jsonl` が空でないか。
 - `configs/model/base.yaml` が `Qwen/Qwen3-14B` を指しているか。
+- `configs/train/sft.yaml` で `assistant_only_loss: true` になっているか。
 - `outputs/sft/react-react-qwen3-14b` に書き込み権限があるか。
 
 ## 方針
 
 GitHub 履歴そのものをモデルに暗記させるのではなく、raw evidence から「根拠を整理する」「事実と推論を分ける」「不確実性を明示する」会話形式のデータを作ります。事実検索は RAG に任せ、SFT では答え方と推論様式を学習させます。
+
+学習時は conversational `messages` を保持し、`assistant_only_loss: true` で assistant 応答を主な学習対象にします。user や system の文面までそのまま予測対象にすると、モデルが質問文や根拠文の丸暗記に寄りやすくなります。

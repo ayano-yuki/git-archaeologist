@@ -17,7 +17,7 @@
 
 コミット時の標準手順:
 
-- ユーザーがコミット、コミット分割、変更の確定を依頼したら、最終報告前に必ず短い post-implementation retrospective を行う。
+- ユーザーがコミット、コミット分割、変更の確定を依頼したら、最終報告前に必ず `post-implementation-retrospective` スキルを使う。
 - 振り返りでは `git status`、変更ファイル、直近コミット、実行した検証を確認し、同じ指示を次回も繰り返さないための改善点を探す。
 - 改善候補として、Skills、`.codex/rules/`、`AGENTS.md`、hooks、docs、templates、`.memory/fine-tuning/` を見直す。
 - ファインチューニングの知見や初学者向けに残すべき判断は、`fine-tuning-memory-writer` を使って `.memory/fine-tuning/` へ記録する。

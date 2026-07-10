@@ -8,7 +8,7 @@
 
 ## Context
 
-実際の学習環境は、石狩第一ゾーンの高火力 VRT/24Core-240GB-H100x1、Ubuntu Server 24.04.2 LTS 64bit、SSD 2TB前後を想定している。GPUはH100 1枚と見なし、VRAMは80GB級である前提で考える。
+実際の学習環境は、高火力 VRT/24Core-240GB-H100x1、Ubuntu Server 24.04.2 LTS 64bit、SSD 2TB前後を想定している。GPUはH100 1枚と見なし、VRAMは80GB級である前提で考える。
 
 このリポジトリの目的は、`react/react` のIssue、PR、Commit、Reviewなどを材料に、設計判断、原因分析、根拠引用、レビュー思考を説明できるモデルを作ること。GitHub履歴そのものはRAGで扱い、Fine-tuningでは推論様式を学ばせる。
 

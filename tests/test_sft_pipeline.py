@@ -30,6 +30,8 @@ def test_build_commands_can_skip_collect() -> None:
 
     assert all("llm_tuning_lab.collect.github" not in command for command in commands)
     assert commands[0][5] == "llm_tuning_lab.data.prepare"
+    assert commands[-2][5] == "llm_tuning_lab.train.sft"
+    assert "--preflight-only" in commands[-2]
     assert commands[-1][5] == "llm_tuning_lab.train.sft"
     assert "--output-dir" in commands[-1]
 

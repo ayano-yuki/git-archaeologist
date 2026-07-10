@@ -27,11 +27,10 @@ def validate_sft_inputs(
         raise ValueError("model config must define model_name_or_path")
     if not data_config.get("train_file"):
         raise ValueError("data config must define train_file")
-    if not Path(str(data_config["train_file"])).exists():
-        raise FileNotFoundError(f"train_file does not exist: {data_config['train_file']}")
+    _validate_nonempty_jsonl(Path(str(data_config["train_file"])), "train_file")
     validation_file = data_config.get("validation_file")
-    if validation_file and not Path(str(validation_file)).exists():
-        raise FileNotFoundError(f"validation_file does not exist: {validation_file}")
+    if validation_file:
+        _validate_nonempty_jsonl(Path(str(validation_file)), "validation_file")
     if not train_config.get("output_dir"):
         raise ValueError("train config must define output_dir")
 
@@ -41,9 +40,8 @@ def load_training_dependencies() -> dict[str, Any]:
         import torch
         from datasets import load_dataset
         from peft import LoraConfig
-        from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
-        from transformers import TrainingArguments
-        from trl import SFTTrainer
+        from transformers import BitsAndBytesConfig
+        from trl import SFTConfig, SFTTrainer
     except ImportError as exc:
         raise RuntimeError(
             "Training dependencies are missing. Install them with: "
@@ -51,12 +49,10 @@ def load_training_dependencies() -> dict[str, Any]:
         ) from exc
 
     return {
-        "AutoModelForCausalLM": AutoModelForCausalLM,
-        "AutoTokenizer": AutoTokenizer,
         "BitsAndBytesConfig": BitsAndBytesConfig,
         "LoraConfig": LoraConfig,
+        "SFTConfig": SFTConfig,
         "SFTTrainer": SFTTrainer,
-        "TrainingArguments": TrainingArguments,
         "load_dataset": load_dataset,
         "torch": torch,
     }
@@ -68,18 +64,11 @@ def torch_dtype(torch_module: Any, name: str | None) -> Any:
     return getattr(torch_module, name)
 
 
-def render_chat_dataset(dataset: Any, tokenizer: Any) -> Any:
-    def render_record(record: dict[str, Any]) -> dict[str, str]:
-        return {
-            "text": tokenizer.apply_chat_template(
-                record["messages"],
-                tokenize=False,
-                add_generation_prompt=False,
-            )
-        }
-
-    return dataset.map(render_record)
-
-
-def path_exists(path_value: str | None) -> bool:
-    return bool(path_value and Path(path_value).exists())
+def _validate_nonempty_jsonl(path: Path, label: str) -> None:
+    if not path.exists():
+        raise FileNotFoundError(f"{label} does not exist: {path}")
+    if not path.is_file():
+        raise ValueError(f"{label} must be a file: {path}")
+    with path.open(encoding="utf-8") as handle:
+        if not any(line.strip() for line in handle):
+            raise ValueError(f"{label} must contain at least one JSONL record: {path}")

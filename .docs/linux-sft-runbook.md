@@ -111,6 +111,7 @@ outputs/sft/react-react-qwen3-14b  学習ログと checkpoint
 - `data/processed/train.jsonl`、`validation.jsonl`、`test.jsonl` が空でないか。
 - materialize時の `--max-seq-length` が学習設定と一致しているか。
 - baseline / post-train prediction JSONL が benchmark 全件を含むか。
+- `run_eval` の `coverage`、`fact_recall`、`answer_similarity`、`timeline_event_recall` が実験の最低閾値を満たしているか。
 - `configs/model/base.yaml` が `Qwen/Qwen3-14B` を指しているか。
 - `configs/train/sft.yaml` で `assistant_only_loss: true` になっているか。
 - `outputs/sft/react-react-qwen3-14b` に書き込み権限があるか。

@@ -200,9 +200,27 @@ uv run --system-certs python -m llm_tuning_lab.eval.run_eval \
   --output evals/results/base_rag_metrics.json
 ```
 
-採点では、citation precision / recall、unsupported citation、timeline order、schema validity、不確実性の有無を確認します。
+採点では、citation precision / recall、unsupported citation、timeline order、schema validity、不確実性の有無に加えて、fact-level precision / recall、fact citation precision / recall、timeline event precision / recall、answer similarity、inference similarity、unsupported claim count を確認します。
 
 評価はbenchmark全件を基準にします。predictionが欠落したcaseは0点、重複IDと未知IDは `invalid_predictions` としてsummaryに記録します。summaryには `benchmark_count`, `prediction_count`, `matched_count`, `missing_count`, `duplicate_count`, `unknown_count`, `coverage` が含まれます。
+
+CI や実験ゲートでは、strict mode と閾値を使います。
+
+```bash
+uv run --system-certs python -m llm_tuning_lab.eval.run_eval \
+  --benchmark evals/benchmarks/react-react.jsonl \
+  --predictions evals/results/sft_rag_predictions.jsonl \
+  --output evals/results/sft_rag_metrics.json \
+  --strict \
+  --min-coverage 1.0 \
+  --min-fact-recall 0.7 \
+  --min-answer-similarity 0.5 \
+  --min-timeline-event-recall 0.6
+```
+
+exit code は、正常評価が0、入力不正が1、predictionファイル欠損が2、coverage閾値未達が3、metric閾値未達が4です。
+
+意味評価は、外部LLM judgeではなく固定benchmarkで再現できる近似指標です。高いスコアは「主要語・イベント・引用の一致が多い」ことを示しますが、完全な意味理解やcitation supportを証明するものではありません。
 
 未知repositoryへの一般化を測る場合は、run presetでrepository holdoutを使います。
 

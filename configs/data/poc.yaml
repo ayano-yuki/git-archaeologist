@@ -1,0 +1,6 @@
+train_file: data/samples/react_react_poc.jsonl
+validation_file:
+format: messages
+required_roles:
+  - user
+  - assistant

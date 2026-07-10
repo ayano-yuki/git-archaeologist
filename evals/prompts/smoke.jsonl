@@ -1,0 +1,2 @@
+{"id":"why_sync_auth","messages":[{"role":"user","content":"Issue #42 と PR #57 の根拠から、Auth API が同期実装のまま残った理由を説明してください。"}]}
+{"id":"risk_cache_change","messages":[{"role":"user","content":"過去レビューで rollback の難しさが指摘されたキャッシュ追加を、今変更するリスクを説明してください。"}]}

@@ -1,0 +1,42 @@
+.env
+.venv/
+*.egg-info/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+
+# Large or sensitive data should not live in git.
+data/raw/*
+!data/raw/.gitkeep
+data/interim/*
+!data/interim/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+!data/samples/
+!data/samples/**/*.jsonl
+!data/samples/**/*.md
+
+# Training and evaluation artifacts.
+outputs/*
+!outputs/.gitkeep
+models/*
+!models/.gitkeep
+evals/results/*
+!evals/results/.gitkeep
+wandb/
+mlruns/
+
+# Model weights and checkpoints.
+*.safetensors
+*.bin
+*.pt
+*.pth
+*.ckpt
+*.gguf
+
+# Local editor and OS files.
+.DS_Store
+Thumbs.db

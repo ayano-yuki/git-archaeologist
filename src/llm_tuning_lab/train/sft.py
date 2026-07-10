@@ -9,6 +9,7 @@ from llm_tuning_lab.train.sft_runtime import (
     load_training_dependencies,
     render_chat_dataset,
     torch_dtype,
+    validate_sft_inputs,
 )
 
 
@@ -18,6 +19,7 @@ def run_sft(
     train_config: dict,
     lora_config: dict,
 ) -> None:
+    validate_sft_inputs(model_config, data_config, train_config)
     deps = load_training_dependencies()
     torch = deps["torch"]
 
@@ -56,6 +58,7 @@ def run_sft(
         logging_steps=train_config.get("logging_steps", 10),
         save_steps=train_config.get("save_steps", 100),
         bf16=train_config.get("bf16", False),
+        seed=train_config.get("seed", 42),
     )
 
     trainer = deps["SFTTrainer"](
@@ -80,16 +83,19 @@ def main() -> int:
     parser.add_argument("--lora-config", type=Path, default=Path("configs/train/lora.yaml"))
     parser.add_argument("--train-file", type=str, help="Override train_file from data config.")
     parser.add_argument("--validation-file", type=str, help="Override validation_file from data config.")
+    parser.add_argument("--output-dir", type=str, help="Override output_dir from train config.")
     args = parser.parse_args()
 
     data_config = load_yaml(args.data_config)
+    train_config = load_yaml(args.train_config)
     override_if_set(data_config, "train_file", args.train_file)
     override_if_set(data_config, "validation_file", args.validation_file)
+    override_if_set(train_config, "output_dir", args.output_dir)
 
     run_sft(
         model_config=load_yaml(args.model_config),
         data_config=data_config,
-        train_config=load_yaml(args.train_config),
+        train_config=train_config,
         lora_config=load_yaml(args.lora_config),
     )
     return 0

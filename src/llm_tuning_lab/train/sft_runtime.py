@@ -18,6 +18,24 @@ def build_data_files(data_config: dict[str, Any]) -> dict[str, str]:
     return data_files
 
 
+def validate_sft_inputs(
+    model_config: dict[str, Any],
+    data_config: dict[str, Any],
+    train_config: dict[str, Any],
+) -> None:
+    if not model_config.get("model_name_or_path"):
+        raise ValueError("model config must define model_name_or_path")
+    if not data_config.get("train_file"):
+        raise ValueError("data config must define train_file")
+    if not Path(str(data_config["train_file"])).exists():
+        raise FileNotFoundError(f"train_file does not exist: {data_config['train_file']}")
+    validation_file = data_config.get("validation_file")
+    if validation_file and not Path(str(validation_file)).exists():
+        raise FileNotFoundError(f"validation_file does not exist: {validation_file}")
+    if not train_config.get("output_dir"):
+        raise ValueError("train config must define output_dir")
+
+
 def load_training_dependencies() -> dict[str, Any]:
     try:
         import torch

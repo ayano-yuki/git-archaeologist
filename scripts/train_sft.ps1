@@ -4,7 +4,8 @@ param(
   [string]$TrainConfig = "configs/train/sft.yaml",
   [string]$LoraConfig = "configs/train/lora.yaml",
   [string]$TrainFile = "",
-  [string]$ValidationFile = ""
+  [string]$ValidationFile = "",
+  [string]$OutputDir = ""
 )
 
 $arguments = @(
@@ -21,6 +22,10 @@ if ($TrainFile -ne "") {
 
 if ($ValidationFile -ne "") {
   $arguments += @("--validation-file", $ValidationFile)
+}
+
+if ($OutputDir -ne "") {
+  $arguments += @("--output-dir", $OutputDir)
 }
 
 uv run --system-certs python @arguments

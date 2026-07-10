@@ -1,0 +1,12 @@
+collect_config: configs/collect/react_react.yaml
+raw_dir: data/raw/github/react-react
+data_config: configs/data/react_react_sft.yaml
+model_config: configs/model/base.yaml
+train_config: configs/train/sft.yaml
+lora_config: configs/train/lora.yaml
+train_file: data/processed/train.jsonl
+validation_file: data/processed/validation.jsonl
+output_dir: outputs/sft/react-react-qwen3-14b
+max_pages: 2
+per_page: 50
+validation_ratio: 0.2

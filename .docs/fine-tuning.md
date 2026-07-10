@@ -70,7 +70,20 @@ required_roles:
 
 別のデータで試す場合は `train_file` を差し替えるか、実行時に `-TrainFile` を指定します。
 
-## 5. 学習を実行する
+## 5. モデル設定を確認する
+
+既定のモデル設定は `configs/model/base.yaml` です。
+
+```yaml
+model_name_or_path: Qwen/Qwen3-14B
+trust_remote_code: false
+torch_dtype: bfloat16
+load_in_4bit: true
+```
+
+まず `Qwen/Qwen3-14B` でデータ形式、LoRA設定、checkpoint保存、評価の流れを確認します。本命実験では、同じ入口のまま `model_name_or_path` を `Qwen/Qwen2.5-Coder-32B-Instruct` などに切り替えます。
+
+## 6. 学習を実行する
 
 ```powershell
 .\scripts\train_sft.ps1 -DataConfig configs/data/poc.yaml
@@ -82,11 +95,11 @@ required_roles:
 .\scripts\train_sft.ps1 -DataConfig configs/data/poc.yaml -TrainFile data\samples\your_sample.jsonl
 ```
 
-## 6. 結果を保存する
+## 7. 結果を保存する
 
 学習ログや checkpoint は `outputs/`、adapter やモデル成果物は `models/` に置きます。これらは大きくなりやすいため、原則 Git 管理しません。
 
-## 7. 知見をMemoryに残す
+## 8. 知見をMemoryに残す
 
 実験中に分かったことは `.memory/fine-tuning/entries/` に残します。
 

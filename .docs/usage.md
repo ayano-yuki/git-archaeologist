@@ -34,6 +34,7 @@ uv run --system-certs pytest
 ## よく使うコマンド
 
 ```powershell
+.\scripts\collect_react_github.ps1 -MaxPages 1 -PerPage 10
 .\scripts\validate_data.ps1 -Path data\samples\react_react_poc.jsonl
 .\scripts\train_sft.ps1 -DataConfig configs/data/poc.yaml
 .\scripts\eval_model.ps1

@@ -33,6 +33,7 @@ uv run --system-certs pytest
 PoC 用のサンプル設定で学習する場合は、データを差し替えてから同じ入口を使います。
 
 ```powershell
+.\scripts\collect_react_github.ps1 -MaxPages 1 -PerPage 10
 .\scripts\validate_data.ps1 -Path data/samples/react_react_poc.jsonl
 .\scripts\train_sft.ps1 -DataConfig configs/data/poc.yaml
 ```

@@ -1,4 +1,4 @@
 interface:
   display_name: "Post Implementation Retrospective"
-  short_description: "Improve repo assistance after implementation."
-  default_prompt: "Use $post-implementation-retrospective to review this session and suggest approved workflow improvements."
+  short_description: "Capture lessons after implementation work."
+  default_prompt: "Use $post-implementation-retrospective to review this session and propose approved docs, memory, skill, or workflow updates."

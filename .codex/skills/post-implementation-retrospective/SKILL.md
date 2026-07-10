@@ -1,13 +1,13 @@
 ---
 name: post-implementation-retrospective
-description: Review a completed implementation session and propose improvements to repository assistance, agent instructions, skills, rules, hooks, docs, or workflow automation. Use after implementation work is done, especially before or after commits, when lessons from the session could improve future development quality or instruction clarity. Ask for approval before editing or creating any support files.
+description: Review a completed implementation session and propose or apply approved improvements to repository assistance, agent instructions, skills, rules, hooks, docs, memory notes, or workflow automation. Use after implementation work is done, especially before or after commits, when lessons from the session, unclear terms, repeated questions, implementation reasoning, failures, or verification gaps could improve future development quality or instruction clarity. Ask for approval before editing or creating support files unless the user explicitly requested that exact retrospective update.
 ---
 
 # Post Implementation Retrospective
 
 ## Overview
 
-Use this skill to turn friction from a completed implementation session into durable repository improvements. The goal is not to keep changing code forever; it is to notice repeatable problems and improve the support system around future work.
+Use this skill to turn friction, questions, and implementation reasoning from a completed session into durable repository improvements. The goal is not to keep changing code forever; it is to notice repeatable problems and improve the support system around future work.
 
 ## Workflow
 
@@ -15,6 +15,8 @@ Use this skill to turn friction from a completed implementation session into dur
    - Inspect `git status --short`, recent commits, changed files, and relevant test results.
    - Review the user's explicit instructions from the session when available.
    - Identify what was confusing, repetitive, error-prone, blocked by permissions, or easy to forget.
+   - Capture unclear terms and beginner questions, such as "Is SFT the same as fine-tuning?"
+   - Capture important implementation reasoning: why an approach was chosen, rejected, or deferred.
 
 2. Identify improvement candidates.
    - Skills: create or update when a repeatable workflow needs procedural guidance.
@@ -22,15 +24,19 @@ Use this skill to turn friction from a completed implementation session into dur
    - `.codex/rules/`: update when a stable repository rule should be enforced for future agents.
    - Hooks or scripts: propose when a repeatable check can be automated before commit or run.
    - Docs or templates: propose when humans need a clearer runbook or checklist.
+   - `.docs/`: update when usage, runbooks, setup, or troubleshooting became clearer.
+   - `.memory/`: update when a lesson, term explanation, warning, failure, or successful pattern should be preserved for beginners.
 
 3. Decide whether a change is worth proposing.
    - Prefer changes that prevent a repeated mistake, reduce future prompts, clarify approvals, or improve verification.
+   - Prefer memory notes for detailed thinking, term definitions, failed assumptions, and "why we decided this" context.
+   - Prefer docs for stable procedures that a human should follow later.
    - Avoid adding process for one-off issues, personal preference, or speculative future needs.
    - Keep proposed changes small and scoped to the observed session.
 
 4. Ask for approval before mutating support files.
    - Present each proposed edit with target file, reason, expected benefit, and risk.
-   - Wait for user approval before editing or creating Skills, `AGENTS.md`, rules, hooks, scripts, or docs.
+   - Wait for user approval before editing or creating Skills, `AGENTS.md`, rules, hooks, scripts, docs, or memory notes.
    - If the user already explicitly requested a specific retrospective change, that request counts as approval for that change only.
 
 5. Implement approved changes.
@@ -38,6 +44,8 @@ Use this skill to turn friction from a completed implementation session into dur
    - Keep hand-authored files under 500 lines.
    - For new skills, include clear frontmatter triggers and concise body instructions.
    - For hooks or scripts, add tests or a dry-run path when practical.
+   - For memory notes, write for beginners and separate observed facts from interpretation.
+   - For docs, keep commands copy-pasteable and avoid embedding secrets or local-only artifacts.
 
 6. Validate and report.
    - Run `quick_validate.py` for new or changed skills when available.
@@ -68,4 +76,5 @@ Approval needed:
 - Do not add hooks that block commits without explaining the failure mode and bypass path.
 - Do not create broad rules from a single ambiguous incident.
 - Do not store secrets, private data, large logs, datasets, or model artifacts in retrospective outputs.
+- Do not hide unresolved uncertainty; write down what is still unknown.
 - Do not conflate product code fixes with process improvements; commit them separately when both are needed.

@@ -15,6 +15,15 @@
 - Memory は初学者に説明するつもりで、背景、観測事実、重要性、次に取る行動を分けて詳しく書く。
 - 変更時は、必要に応じて `tests/` に小さな検証を追加する。
 
+コミット時の標準手順:
+
+- ユーザーがコミット、コミット分割、変更の確定を依頼したら、最終報告前に必ず短い post-implementation retrospective を行う。
+- 振り返りでは `git status`、変更ファイル、直近コミット、実行した検証を確認し、同じ指示を次回も繰り返さないための改善点を探す。
+- 改善候補として、Skills、`.codex/rules/`、`AGENTS.md`、hooks、docs、templates、`.memory/fine-tuning/` を見直す。
+- ファインチューニングの知見や初学者向けに残すべき判断は、`fine-tuning-memory-writer` を使って `.memory/fine-tuning/` へ記録する。
+- 変更の意図が複数ある場合は semantic commit splitter の考え方で分割し、プロダクト変更と振り返り由来の支援ファイル変更は可能な範囲で別コミットにする。
+- 広いプロセス変更を黙って追加しない。ユーザーが明示した振り返り改善、または承認された提案だけを実装する。
+
 Git Archaeologist の方針:
 
 - GitHub 履歴そのものをモデルに記憶させない。

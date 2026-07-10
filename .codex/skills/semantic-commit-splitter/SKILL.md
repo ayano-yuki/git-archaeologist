@@ -17,9 +17,10 @@ For detailed grouping criteria, read `references/grouping-rubric.md` when the di
 2. Identify intent-level groups, not just file-extension groups.
 3. Keep generated artifacts, formatting-only changes, docs, tests, config, and product behavior separate when they can stand alone.
 4. Check whether each group builds on a previous group. If so, order commits from foundation to dependent change.
-5. Stage only the files or hunks for the current group. Avoid broad `git add .` unless every changed file belongs to that group.
-6. Use concise commit messages that describe the intent, not the mechanics.
-7. After each commit, re-check `git status --short` before staging the next group.
+5. Run a brief post-implementation retrospective before finalizing commits: review changed files, verification, and whether skills, rules, docs, hooks, templates, or memory notes should be proposed or updated for future sessions.
+6. Stage only the files or hunks for the current group. Avoid broad `git add .` unless every changed file belongs to that group.
+7. Use concise commit messages that describe the intent, not the mechanics.
+8. After each commit, re-check `git status --short` before staging the next group.
 
 ## Grouping Rules
 
@@ -27,6 +28,7 @@ For detailed grouping criteria, read `references/grouping-rubric.md` when the di
 - Separate scaffolding from behavior when both are present.
 - Separate tests from implementation only when the tests are useful as an independent review unit; otherwise keep them with the behavior they verify.
 - Keep repository rules, documentation, and generated app code separate if they serve different audiences.
+- Keep retrospective support-file changes separate from product changes when practical.
 - Never include secrets, large datasets, checkpoints, or local-only artifacts in a commit.
 - If a file contains unrelated hunks, use patch staging or ask before committing.
 

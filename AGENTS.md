@@ -46,3 +46,10 @@ This repository is for LLM fine-tuning experiments for Git Archaeologist, a loca
 - Keep scripts thin; shared behavior belongs in `src/llm_tuning_lab/`.
 - Add focused tests for data formatting, prompt templating, and config assumptions.
 - Avoid broad refactors unless they directly support the tuning workflow.
+
+## Commit Workflow
+
+- When the user asks to commit, always run a brief post-implementation retrospective before finalizing: inspect status, changed files, recent commits, and verification results.
+- During that retrospective, check whether skills, `.codex/rules/`, `AGENTS.md`, hooks, docs, templates, or `.memory/fine-tuning/` should be proposed or updated so the same prompt is not needed again.
+- Use the semantic commit splitter workflow when changes span multiple intentions, and keep product changes separate from retrospective support-file changes when practical.
+- Do not silently add broad process changes; implement only explicitly requested retrospective improvements or approved proposals.

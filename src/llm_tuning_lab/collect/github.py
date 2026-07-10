@@ -133,6 +133,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--max-pages", type=int, help="Override number of pages per endpoint.")
     parser.add_argument("--per-page", type=int, help="Override GitHub API page size.")
     parser.add_argument("--since", help="Only collect records updated after this ISO timestamp.")
+    parser.add_argument(
+        "--insecure-ssl",
+        action="store_true",
+        help="Disable TLS verification. Use only when a trusted network proxy breaks validation.",
+    )
     return parser.parse_args()
 
 
@@ -145,7 +150,11 @@ def main() -> int:
     override_if_set(config, "per_page", args.per_page)
     override_if_set(config, "since", args.since)
 
-    manifest = collect_repo(config, GitHubClient.from_env())
+    client = GitHubClient.from_env()
+    if args.insecure_ssl:
+        client = GitHubClient(token=client.token, verify_ssl=False)
+
+    manifest = collect_repo(config, client)
     for name, count in manifest["counts"].items():
         print(f"{name}: {count}")
     print(f"manifest: {Path(manifest['output_dir']) / 'manifest.json'}")

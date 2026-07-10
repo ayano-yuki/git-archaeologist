@@ -4,7 +4,8 @@ param(
   [string]$OutputDir = "",
   [int]$MaxPages = 0,
   [int]$PerPage = 0,
-  [string]$Since = ""
+  [string]$Since = "",
+  [switch]$InsecureSsl
 )
 
 $arguments = @("-m", "llm_tuning_lab.collect.github", "--config", $Config)
@@ -29,4 +30,9 @@ if ($Since -ne "") {
   $arguments += @("--since", $Since)
 }
 
+if ($InsecureSsl) {
+  $arguments += @("--insecure-ssl")
+}
+
 uv run --system-certs python @arguments
+exit $LASTEXITCODE

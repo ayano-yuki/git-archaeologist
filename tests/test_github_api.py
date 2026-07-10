@@ -13,3 +13,10 @@ def test_headers_include_token_when_present() -> None:
     client = GitHubClient(token="secret")
 
     assert client._headers()["Authorization"] == "Bearer secret"
+
+
+def test_ssl_context_can_disable_verification() -> None:
+    client = GitHubClient(verify_ssl=False)
+    context = client._ssl_context()
+
+    assert context.check_hostname is False

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import ssl
 from dataclasses import dataclass
 from typing import Any
 from urllib.error import HTTPError
@@ -14,10 +15,12 @@ class GitHubClient:
     base_url: str = "https://api.github.com"
     token: str | None = None
     user_agent: str = "llm-tuning-lab"
+    verify_ssl: bool = True
 
     @classmethod
     def from_env(cls) -> "GitHubClient":
-        return cls(token=os.environ.get("GITHUB_TOKEN"))
+        insecure = os.environ.get("GITHUB_INSECURE_SSL", "").lower() in {"1", "true", "yes"}
+        return cls(token=os.environ.get("GITHUB_TOKEN"), verify_ssl=not insecure)
 
     def build_url(self, path: str, params: dict[str, Any] | None = None) -> str:
         clean_path = path if path.startswith("/") else f"/{path}"
@@ -30,7 +33,7 @@ class GitHubClient:
     def get_json(self, path: str, params: dict[str, Any] | None = None) -> Any:
         request = Request(self.build_url(path, params), headers=self._headers())
         try:
-            with urlopen(request, timeout=30) as response:
+            with urlopen(request, timeout=30, context=self._ssl_context()) as response:
                 return json.loads(response.read().decode("utf-8"))
         except HTTPError as exc:
             detail = exc.read().decode("utf-8", errors="replace")
@@ -65,3 +68,17 @@ class GitHubClient:
         if self.token:
             headers["Authorization"] = f"Bearer {self.token}"
         return headers
+
+    def _ssl_context(self) -> ssl.SSLContext:
+        if not self.verify_ssl:
+            context = ssl.create_default_context()
+            context.check_hostname = False
+            context.verify_mode = ssl.CERT_NONE
+            return context
+
+        try:
+            import certifi
+
+            return ssl.create_default_context(cafile=certifi.where())
+        except ImportError:
+            return ssl.create_default_context()

@@ -4,6 +4,8 @@
 
 ファインチューニングでは、モデルに「答え方」や「推論様式」を学ばせます。このリポジトリでは、GitHub履歴の事実そのものは RAG で参照し、Fine-tuning では根拠の使い方、設計判断の説明、原因分析、レビュー思考を学ばせる方針です。
 
+手法の分類、SFT / LoRA / QLoRA / DPO / RAFT / GRPO などの違いは `.docs/fine-tuning-types.md` にまとめています。
+
 ## 1. 小さいPoCデータを作る
 
 最初から大きなデータを使わず、`data/samples/` に小さな JSONL を作ります。

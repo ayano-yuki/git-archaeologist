@@ -95,6 +95,43 @@ load_in_4bit: true
 .\scripts\train_sft.ps1 -DataConfig configs/data/poc.yaml -TrainFile data\samples\your_sample.jsonl
 ```
 
+Linux の H100 環境で `react/react` の収集、変換、検証、SFT 起動までをまとめて行う場合:
+
+```bash
+bash scripts/run_sft_linux.sh --preset react-react-qwen3-14b
+```
+
+SFT 本体を起動せず、事前に実行予定コマンドだけ確認する場合:
+
+```bash
+bash scripts/run_sft_linux.sh --dry-run --preset react-react-qwen3-14b
+```
+
+既に `data/raw/github/react-react/` がある場合は、収集を飛ばして変換と検証から始めます。
+
+```bash
+bash scripts/run_sft_linux.sh --skip-collect --preset react-react-qwen3-14b
+```
+
+## 6.5 実行前チェック
+
+H100 で SFT を回す前に、GPU を使わずに潰せる問題を先に潰します。
+
+```bash
+uv run --system-certs --group dev python -m pytest
+uv run --system-certs --group dev python -m llm_tuning_lab.run.sft_pipeline --dry-run --skip-collect --preset react-react-qwen3-14b --include-sync-command
+uv run --system-certs --group dev python -m llm_tuning_lab.data.validate data/processed/train.jsonl
+uv run --system-certs --group dev python -m llm_tuning_lab.data.validate data/processed/validation.jsonl
+```
+
+確認すること:
+
+- `data/processed/train.jsonl` と `validation.jsonl` が空ではない。
+- 各行が `messages` 形式で、`user` と `assistant` を含む。
+- `configs/model/base.yaml` が `Qwen/Qwen3-14B` を指している。
+- `outputs/sft/react-react-qwen3-14b` に書き込める。
+- `HF_HOME` が十分な容量のあるディスクを指している。
+
 ## 7. 結果を保存する
 
 学習ログや checkpoint は `outputs/`、adapter やモデル成果物は `models/` に置きます。これらは大きくなりやすいため、原則 Git 管理しません。

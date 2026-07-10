@@ -30,6 +30,18 @@ uv run --system-certs python -m llm_tuning_lab.data.validate data/samples/sft_sa
 uv run --system-certs pytest
 ```
 
+Linux の H100 環境で `react/react` の収集から SFT 起動までをまとめて確認する場合:
+
+```bash
+bash scripts/run_sft_linux.sh --preset react-react-qwen3-14b
+```
+
+SFT 本体を起動せずに実行予定コマンドだけ確認する場合:
+
+```bash
+bash scripts/run_sft_linux.sh --dry-run --preset react-react-qwen3-14b
+```
+
 PoC 用のサンプル設定で学習する場合は、データを差し替えてから同じ入口を使います。
 
 ```powershell
@@ -75,6 +87,7 @@ Supervised fine-tuning data is JSONL. Each line should use a `messages` array.
 新しい知見を書くときは、初学者に説明するつもりで背景から書きます。何が起きたか、なぜ重要か、次にどうすればよいかを分けて残します。
 
 詳しい使い方は `.docs/usage.md`、ファインチューニング手順は `.docs/fine-tuning.md` にまとめています。
+Linux 実環境での1コマンド実行手順は `.docs/linux-sft-runbook.md` にまとめています。
 
 ## Notes
 

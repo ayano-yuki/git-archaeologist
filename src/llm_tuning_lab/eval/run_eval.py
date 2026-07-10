@@ -13,6 +13,12 @@ def main() -> int:
     parser.add_argument("--benchmark", type=Path, default=Path("evals/benchmarks/smoke.jsonl"))
     parser.add_argument("--predictions", type=Path, required=True)
     parser.add_argument("--output", type=Path, default=Path("evals/results/metrics.json"))
+    parser.add_argument("--strict", action="store_true")
+    parser.add_argument("--fail-on-invalid", action="store_true")
+    parser.add_argument("--min-coverage", type=float)
+    parser.add_argument("--min-answer-similarity", type=float)
+    parser.add_argument("--min-fact-recall", type=float)
+    parser.add_argument("--min-timeline-event-recall", type=float)
     args = parser.parse_args()
 
     benchmark_records = list(read_jsonl(args.benchmark))
@@ -39,7 +45,7 @@ def main() -> int:
             },
         )
         print(f"missing predictions: {args.predictions}")
-        return 0
+        return 2 if args.strict else 0
 
     predictions = list(read_jsonl(args.predictions))
     prediction_by_id: dict[str, dict] = {}
@@ -88,24 +94,52 @@ def main() -> int:
         )
 
     status = "ok" if not duplicate_ids and not unknown_ids else "invalid_predictions"
+    summary = summarize_metrics(
+        results,
+        benchmark_count=len(benchmark_records),
+        prediction_count=len(predictions),
+        duplicate_count=duplicate_count,
+        unknown_count=len(unknown_ids),
+    )
+    threshold_failures = _threshold_failures(args, summary)
+    if threshold_failures:
+        status = "threshold_failed"
     _write_json(
         args.output,
         {
             "status": status,
-            "summary": summarize_metrics(
-                results,
-                benchmark_count=len(benchmark_records),
-                prediction_count=len(predictions),
-                duplicate_count=duplicate_count,
-                unknown_count=len(unknown_ids),
-            ),
+            "summary": summary,
+            "threshold_failures": threshold_failures,
             "duplicate_ids": sorted(duplicate_ids),
             "unknown_ids": unknown_ids,
             "results": results,
         },
     )
     print(f"metrics: {args.output}")
+    if (args.strict or args.fail_on_invalid) and (duplicate_ids or unknown_ids):
+        return 1
+    if threshold_failures:
+        if any(failure["metric"] == "coverage" for failure in threshold_failures):
+            return 3
+        return 4
     return 0
+
+
+def _threshold_failures(args: argparse.Namespace, summary: dict) -> list[dict]:
+    checks = {
+        "coverage": args.min_coverage,
+        "answer_similarity": args.min_answer_similarity,
+        "fact_recall": args.min_fact_recall,
+        "timeline_event_recall": args.min_timeline_event_recall,
+    }
+    failures = []
+    for metric, minimum in checks.items():
+        if minimum is None:
+            continue
+        actual = float(summary.get(metric, 0.0))
+        if actual < minimum:
+            failures.append({"metric": metric, "minimum": minimum, "actual": actual})
+    return failures
 
 
 def _write_json(path: Path, payload: dict) -> None:

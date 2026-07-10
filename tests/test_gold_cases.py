@@ -108,6 +108,25 @@ def test_repository_holdout_split_keeps_unknown_repo_for_test() -> None:
     assert splits["test"] == [cases[1]]
 
 
+def test_repository_holdout_rejects_missing_test_repository() -> None:
+    bundles = {
+        "bundle-a": _bundle("bundle-a", "pull:1", ["e1", "e2"], repo="train/repo"),
+    }
+    cases = [_case(bundles["bundle-a"], ["e1", "e2"])]
+
+    try:
+        split_gold_cases(
+            bundles,
+            cases,
+            split_strategy="repository_holdout",
+            test_repositories=["missing/repo"],
+        )
+    except ValueError as exc:
+        assert "not found" in str(exc)
+    else:
+        raise AssertionError("expected repository holdout to reject missing repository")
+
+
 def test_sft_record_budget_rejects_overflow() -> None:
     bundle = _bundle("bundle-a", "pull:1", ["e1", "e2"])
     case = _case(bundle, ["e1", "e2"])

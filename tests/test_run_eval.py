@@ -42,6 +42,32 @@ def test_run_eval_scores_missing_predictions_against_benchmark(tmp_path: Path, m
     assert result["summary"]["coverage"] == 0.5
 
 
+def test_run_eval_strict_fails_when_predictions_are_missing(tmp_path: Path, monkeypatch) -> None:
+    benchmark = tmp_path / "benchmark.jsonl"
+    predictions = tmp_path / "missing.jsonl"
+    output = tmp_path / "metrics.json"
+    benchmark.write_text(
+        json.dumps({"id": "case-1", "expected": _expected()}, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "run_eval",
+            "--benchmark",
+            str(benchmark),
+            "--predictions",
+            str(predictions),
+            "--output",
+            str(output),
+            "--strict",
+        ],
+    )
+
+    assert main() == 2
+
+
 def test_run_eval_reports_duplicate_and_unknown_ids(tmp_path: Path, monkeypatch) -> None:
     benchmark = tmp_path / "benchmark.jsonl"
     predictions = tmp_path / "predictions.jsonl"
@@ -80,6 +106,42 @@ def test_run_eval_reports_duplicate_and_unknown_ids(tmp_path: Path, monkeypatch)
     assert result["unknown_ids"] == ["unknown"]
 
 
+def test_run_eval_threshold_failure_returns_nonzero(tmp_path: Path, monkeypatch) -> None:
+    benchmark = tmp_path / "benchmark.jsonl"
+    predictions = tmp_path / "predictions.jsonl"
+    output = tmp_path / "metrics.json"
+    benchmark.write_text(
+        json.dumps({"id": "case-1", "expected": _expected()}, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+    )
+    prediction = _prediction()
+    prediction["answer"] = "Preference."
+    predictions.write_text(
+        json.dumps({"id": "case-1", "prediction": prediction}, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "run_eval",
+            "--benchmark",
+            str(benchmark),
+            "--predictions",
+            str(predictions),
+            "--output",
+            str(output),
+            "--min-answer-similarity",
+            "0.9",
+        ],
+    )
+
+    assert main() == 4
+    result = json.loads(output.read_text(encoding="utf-8"))
+    assert result["status"] == "threshold_failed"
+    assert result["threshold_failures"][0]["metric"] == "answer_similarity"
+
+
 def _expected() -> dict:
     return {
         "facts": [{"text": "Fact", "citations": ["e1"]}],
@@ -93,6 +155,7 @@ def _expected() -> dict:
 
 def _prediction() -> dict:
     return {
+        "schema_version": "git-archaeologist.answer.v1",
         "facts": [{"text": "Fact", "citations": ["e1"]}],
         "citations": ["e1"],
         "timeline": [{"date": "2026-01-01T00:00:00Z", "text": "Event", "citations": ["e1"]}],

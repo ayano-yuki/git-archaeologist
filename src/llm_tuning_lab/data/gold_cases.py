@@ -90,9 +90,15 @@ def split_gold_cases(
     if split_strategy == "repository_holdout":
         validation_set = set(validation_repositories or [])
         test_set = set(test_repositories or [])
+        if not test_set:
+            raise ValueError("repository_holdout requires at least one test repository")
         overlap = validation_set & test_set
         if overlap:
             raise ValueError(f"repositories cannot be in both validation and test: {sorted(overlap)}")
+        available_repos = {str(bundles[str(case["bundle_id"])]["repo"]) for case in cases}
+        missing_repos = sorted((validation_set | test_set) - available_repos)
+        if missing_repos:
+            raise ValueError(f"holdout repositories not found in cases: {missing_repos}")
         for case in cases:
             bundle = bundles[str(case["bundle_id"])]
             repo = str(bundle["repo"])
@@ -103,6 +109,12 @@ def split_gold_cases(
             else:
                 split = "train"
             splits[split].append(case)
+        if not splits["train"]:
+            raise ValueError("repository_holdout produced an empty train split")
+        if validation_set and not splits["validation"]:
+            raise ValueError("repository_holdout produced an empty validation split")
+        if not splits["test"]:
+            raise ValueError("repository_holdout produced an empty test split")
         return splits
     if split_strategy != "thread_hash":
         raise ValueError(f"unknown split strategy: {split_strategy}")
@@ -310,6 +322,7 @@ def _validate_timeline(prefix: str, timeline: Any, evidence_ids: set[str]) -> li
             errors.append(f"{prefix}: timeline[{item_index}] cites unknown evidence")
         when = _parse_datetime(item.get("date") or item.get("created_at"))
         if when is None:
+            errors.append(f"{prefix}: timeline[{item_index}] must include an ISO date or created_at")
             continue
         if previous is not None and when < previous:
             errors.append(f"{prefix}: timeline is not chronological")

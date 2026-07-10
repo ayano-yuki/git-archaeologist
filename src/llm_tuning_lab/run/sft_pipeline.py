@@ -20,10 +20,21 @@ class PipelineConfig:
     lora_config: Path
     train_file: Path
     validation_file: Path
+    test_file: Path
+    bundle_file: Path
+    gold_cases_file: Path
+    benchmark_file: Path
+    baseline_predictions: Path
+    post_train_predictions: Path
+    baseline_metrics: Path
+    post_train_metrics: Path
     output_dir: Path
     max_pages: int | None
     per_page: int | None
     validation_ratio: float
+    test_ratio: float
+    min_evidence_per_bundle: int
+    require_approved_gold_cases: bool
 
 
 def build_commands(
@@ -60,15 +71,51 @@ def build_commands(
                 "--system-certs",
                 "python",
                 "-m",
-                "llm_tuning_lab.data.prepare",
+                "llm_tuning_lab.data.bundles",
                 "--input",
                 _command_path(config.raw_dir),
+                "--output",
+                _command_path(config.bundle_file),
+                "--min-evidence-per-bundle",
+                str(config.min_evidence_per_bundle),
+            ],
+            [
+                "uv",
+                "run",
+                "--system-certs",
+                "python",
+                "-m",
+                "llm_tuning_lab.data.gold_cases",
+                "validate",
+                "--bundles",
+                _command_path(config.bundle_file),
+                "--gold-cases",
+                _command_path(config.gold_cases_file),
+            ],
+            [
+                "uv",
+                "run",
+                "--system-certs",
+                "python",
+                "-m",
+                "llm_tuning_lab.data.gold_cases",
+                "materialize",
+                "--bundles",
+                _command_path(config.bundle_file),
+                "--gold-cases",
+                _command_path(config.gold_cases_file),
                 "--train-output",
                 _command_path(config.train_file),
                 "--validation-output",
                 _command_path(config.validation_file),
+                "--test-output",
+                _command_path(config.test_file),
+                "--benchmark-output",
+                _command_path(config.benchmark_file),
                 "--validation-ratio",
                 str(config.validation_ratio),
+                "--test-ratio",
+                str(config.test_ratio),
             ],
             [
                 "uv",
@@ -87,6 +134,29 @@ def build_commands(
                 "-m",
                 "llm_tuning_lab.data.validate",
                 _command_path(config.validation_file),
+            ],
+            [
+                "uv",
+                "run",
+                "--system-certs",
+                "python",
+                "-m",
+                "llm_tuning_lab.data.validate",
+                _command_path(config.test_file),
+            ],
+            [
+                "uv",
+                "run",
+                "--system-certs",
+                "python",
+                "-m",
+                "llm_tuning_lab.eval.run_eval",
+                "--benchmark",
+                _command_path(config.benchmark_file),
+                "--predictions",
+                _command_path(config.baseline_predictions),
+                "--output",
+                _command_path(config.baseline_metrics),
             ],
             [
                 "uv",
@@ -133,8 +203,25 @@ def build_commands(
                 "--output-dir",
                 _command_path(config.output_dir),
             ],
+            [
+                "uv",
+                "run",
+                "--system-certs",
+                "python",
+                "-m",
+                "llm_tuning_lab.eval.run_eval",
+                "--benchmark",
+                _command_path(config.benchmark_file),
+                "--predictions",
+                _command_path(config.post_train_predictions),
+                "--output",
+                _command_path(config.post_train_metrics),
+            ],
         ]
     )
+    if not config.require_approved_gold_cases:
+        materialize_command = commands[2 if skip_collect else 3]
+        materialize_command.append("--allow-unapproved")
     return commands
 
 
@@ -149,10 +236,21 @@ def load_pipeline_config(path: Path) -> PipelineConfig:
         lora_config=Path(_required(loaded, "lora_config")),
         train_file=Path(_required(loaded, "train_file")),
         validation_file=Path(_required(loaded, "validation_file")),
+        test_file=Path(_required(loaded, "test_file")),
+        bundle_file=Path(_required(loaded, "bundle_file")),
+        gold_cases_file=Path(_required(loaded, "gold_cases_file")),
+        benchmark_file=Path(_required(loaded, "benchmark_file")),
+        baseline_predictions=Path(_required(loaded, "baseline_predictions")),
+        post_train_predictions=Path(_required(loaded, "post_train_predictions")),
+        baseline_metrics=Path(_required(loaded, "baseline_metrics")),
+        post_train_metrics=Path(_required(loaded, "post_train_metrics")),
         output_dir=Path(_required(loaded, "output_dir")),
         max_pages=_optional_int(loaded.get("max_pages")),
         per_page=_optional_int(loaded.get("per_page")),
-        validation_ratio=float(loaded.get("validation_ratio", 0.2)),
+        validation_ratio=float(loaded.get("validation_ratio", 0.1)),
+        test_ratio=float(loaded.get("test_ratio", 0.1)),
+        min_evidence_per_bundle=int(loaded.get("min_evidence_per_bundle", 3)),
+        require_approved_gold_cases=bool(loaded.get("require_approved_gold_cases", True)),
     )
 
 

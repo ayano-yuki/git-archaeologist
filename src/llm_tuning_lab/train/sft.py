@@ -4,6 +4,7 @@ import argparse
 from pathlib import Path
 
 from llm_tuning_lab.config import load_yaml, override_if_set
+from llm_tuning_lab.train.manifest import write_training_manifest
 from llm_tuning_lab.train.sft_runtime import (
     build_data_files,
     load_training_dependencies,
@@ -72,6 +73,12 @@ def run_sft(
     )
     trainer.train()
     trainer.save_model(train_config.get("output_dir", "outputs/sft"))
+    write_training_manifest(
+        Path(str(train_config.get("output_dir", "outputs/sft"))),
+        model_config=model_config,
+        data_config=data_config,
+        train_config=train_config,
+    )
 
 
 def main() -> int:

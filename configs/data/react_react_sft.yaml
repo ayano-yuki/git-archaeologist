@@ -1,5 +1,6 @@
 train_file: data/processed/train.jsonl
 validation_file: data/processed/validation.jsonl
+test_file: data/processed/test.jsonl
 format: messages
 required_roles:
   - user

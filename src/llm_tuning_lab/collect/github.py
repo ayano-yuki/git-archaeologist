@@ -51,6 +51,57 @@ def collect_repo(config: dict[str, Any], client: GitHubClient) -> dict[str, Any]
     manifest["counts"]["issues"] = write_jsonl(output_dir / "issues.jsonl", issues)
     manifest["counts"]["commits"] = write_jsonl(output_dir / "commits.jsonl", commits)
 
+    if config.get("include_pull_details", False):
+        detail_records = _collect_pull_details(client, repo, pulls, config)
+        manifest["counts"]["pull_details"] = write_jsonl(
+            output_dir / "pull_details.jsonl",
+            detail_records,
+        )
+
+    if config.get("include_pull_commits", False):
+        pull_commit_records = _collect_pull_children(
+            client,
+            repo,
+            pulls,
+            config,
+            per_page,
+            kind="pull_commit",
+            suffix="commits",
+        )
+        manifest["counts"]["pull_commits"] = write_jsonl(
+            output_dir / "pull_commits.jsonl",
+            pull_commit_records,
+        )
+
+    if config.get("include_pull_files", False):
+        pull_file_records = _collect_pull_children(
+            client,
+            repo,
+            pulls,
+            config,
+            per_page,
+            kind="pull_file",
+            suffix="files",
+        )
+        manifest["counts"]["pull_files"] = write_jsonl(
+            output_dir / "pull_files.jsonl",
+            pull_file_records,
+        )
+
+    if config.get("include_commit_details", False):
+        commit_detail_records = _collect_commit_details(client, repo, commits, config)
+        manifest["counts"]["commit_details"] = write_jsonl(
+            output_dir / "commit_details.jsonl",
+            commit_detail_records,
+        )
+
+    if config.get("include_check_runs", False):
+        check_run_records = _collect_check_runs(client, repo, commits, config)
+        manifest["counts"]["check_runs"] = write_jsonl(
+            output_dir / "check_runs.jsonl",
+            check_run_records,
+        )
+
     if config.get("include_issue_comments", False):
         comments = _collect_endpoint(
             client,
@@ -99,6 +150,100 @@ def _collect_endpoint(
     return [wrap_github_record(repo, kind, payload) for payload in payloads]
 
 
+def _collect_pull_details(
+    client: GitHubClient,
+    repo: str,
+    pulls: list[dict[str, Any]],
+    config: dict[str, Any],
+) -> list[dict[str, Any]]:
+    if not hasattr(client, "get_json"):
+        return []
+    max_detail_items = int(config.get("max_detail_items", 25))
+    records: list[dict[str, Any]] = []
+    for pull in pulls[:max_detail_items]:
+        number = pull.get("number")
+        if number is None:
+            continue
+        detail = client.get_json(f"/repos/{repo}/pulls/{number}")
+        if isinstance(detail, dict):
+            detail["_parent_pull_number"] = number
+            records.append(wrap_github_record(repo, "pull_detail", detail))
+    return records
+
+
+def _collect_pull_children(
+    client: GitHubClient,
+    repo: str,
+    pulls: list[dict[str, Any]],
+    config: dict[str, Any],
+    per_page: int,
+    *,
+    kind: str,
+    suffix: str,
+) -> list[dict[str, Any]]:
+    max_detail_items = int(config.get("max_detail_items", 25))
+    max_pages = int(config.get("max_detail_pages", 1))
+    records: list[dict[str, Any]] = []
+    for pull in pulls[:max_detail_items]:
+        number = pull.get("number")
+        if number is None:
+            continue
+        payloads = client.paginate(
+            f"/repos/{repo}/pulls/{number}/{suffix}",
+            {},
+            max_pages=max_pages,
+            per_page=per_page,
+        )
+        for payload in payloads:
+            payload["_parent_pull_number"] = number
+            records.append(wrap_github_record(repo, kind, payload))
+    return records
+
+
+def _collect_commit_details(
+    client: GitHubClient,
+    repo: str,
+    commits: list[dict[str, Any]],
+    config: dict[str, Any],
+) -> list[dict[str, Any]]:
+    if not hasattr(client, "get_json"):
+        return []
+    max_detail_items = int(config.get("max_detail_items", 25))
+    records: list[dict[str, Any]] = []
+    for commit in commits[:max_detail_items]:
+        sha = commit.get("github_id") or commit.get("data", {}).get("sha")
+        if not sha:
+            continue
+        detail = client.get_json(f"/repos/{repo}/commits/{sha}")
+        if isinstance(detail, dict):
+            records.append(wrap_github_record(repo, "commit_detail", detail))
+    return records
+
+
+def _collect_check_runs(
+    client: GitHubClient,
+    repo: str,
+    commits: list[dict[str, Any]],
+    config: dict[str, Any],
+) -> list[dict[str, Any]]:
+    if not hasattr(client, "get_json"):
+        return []
+    max_detail_items = int(config.get("max_detail_items", 25))
+    records: list[dict[str, Any]] = []
+    for commit in commits[:max_detail_items]:
+        sha = commit.get("github_id") or commit.get("data", {}).get("sha")
+        if not sha:
+            continue
+        payload = client.get_json(f"/repos/{repo}/commits/{sha}/check-runs")
+        check_runs = payload.get("check_runs") if isinstance(payload, dict) else None
+        if not isinstance(check_runs, list):
+            continue
+        for check_run in check_runs:
+            check_run["head_sha"] = sha
+            records.append(wrap_github_record(repo, "check_run", check_run))
+    return records
+
+
 def _collect_pull_reviews(
     client: GitHubClient,
     repo: str,
@@ -120,7 +265,9 @@ def _collect_pull_reviews(
             max_pages=max_pages,
             per_page=per_page,
         )
-        records.extend(wrap_github_record(repo, "pull_review", review) for review in reviews)
+        for review in reviews:
+            review["_parent_pull_number"] = number
+            records.append(wrap_github_record(repo, "pull_review", review))
 
     return records
 

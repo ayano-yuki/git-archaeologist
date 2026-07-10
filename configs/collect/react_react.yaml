@@ -8,4 +8,10 @@ direction: desc
 include_issue_comments: true
 include_pull_review_comments: true
 include_pull_reviews: true
+include_pull_details: true
+include_pull_commits: true
+include_pull_files: true
+include_commit_details: true
+include_check_runs: true
 max_detail_items: 25
+max_detail_pages: 1

@@ -79,9 +79,9 @@ PoC の小さな `messages` JSONL はそのまま `scripts/train_sft.ps1` で学
 1. GitHub evidence を `data/raw/github/<repo>/` に収集する。
 2. `llm_tuning_lab.data.bundles` で Issue / PR / Commit / Review / Diff / CI を `EvidenceBundle` にまとめる。
 3. 人間作成または外部作成済みの `GoldCase` を `data/interim/gold_cases/` に置く。教師モデルによる回答生成は行わない。
-4. `llm_tuning_lab.data.gold_cases validate` で引用、時系列、不確実性、承認状態を検証する。
+4. `llm_tuning_lab.data.gold_cases validate` で引用、時系列、不確実性、レビューmetadata、bundle/evidence hashを検証する。
 5. `review_status: approved` の case だけを train / validation / test と benchmark に materialize する。
-6. benchmark に対する base / RAG / SFT / SFT+RAG の予測 JSONL を `llm_tuning_lab.eval.run_eval` で採点する。
+6. benchmark に対する base / RAG / SFT / SFT+RAG の予測 JSONL を `llm_tuning_lab.eval.run_eval` で採点する。missing predictionは0点としてcoverageに反映する。
 7. `outputs/` に学習成果物と `training_manifest.json` を保存し、Git にはコミットしない。
 
 ## Memory

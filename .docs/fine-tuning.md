@@ -62,10 +62,10 @@ uv run --system-certs python -m llm_tuning_lab.data.bundles \
 
 SFT 用の assistant 回答は教師モデルで生成しません。人間作成または外部作成済みの gold case を `data/interim/gold_cases/react-react.jsonl` に置き、SFT に使う行は `review_status: approved` にします。
 
-gold case は最低限、次の情報を持ちます。
+gold case は最低限、次の情報を持ちます。`review_status: approved` の case では、`reviewer_id`, `reviewed_at`, `review_revision`, `bundle_hash`, `evidence_hash` も必須です。hashは、レビュー時点の bundle と evidence が学習時に差し替わっていないことを確認するために使います。
 
 ```json
-{"bundle_id":"...","question":"Why was this design chosen?","answer":"...","facts":[{"text":"...","citations":["evidence-id"]}],"timeline":[{"date":"2026-01-01T00:00:00Z","text":"...","citations":["evidence-id"]}],"inference":"...","uncertainty":"...","citations":["evidence-id"],"review_status":"approved"}
+{"bundle_id":"...","question":"Why was this design chosen?","answer":"...","facts":[{"text":"...","citations":["evidence-id"]}],"timeline":[{"date":"2026-01-01T00:00:00Z","text":"...","citations":["evidence-id"]}],"inference":"...","uncertainty":"...","citations":["evidence-id"],"review_status":"approved","reviewer_id":"reviewer-1","reviewed_at":"2026-01-02T00:00:00Z","review_revision":"1","bundle_hash":"...","evidence_hash":"..."}
 ```
 
 検証と materialize:
@@ -83,10 +83,19 @@ uv run --system-certs python -m llm_tuning_lab.data.gold_cases materialize \
   --test-output data/processed/test.jsonl \
   --benchmark-output evals/benchmarks/react-react.jsonl \
   --validation-ratio 0.1 \
-  --test-ratio 0.1
+  --test-ratio 0.1 \
+  --max-seq-length 2048
 ```
 
-検証では、存在しない evidence ID の引用、引用なし facts、時系列逆転、空の uncertainty、単一証拠だけの断定回答を reject します。
+検証では、存在しない evidence ID の引用、引用なし facts、空の fact/timeline text、時系列逆転、空の uncertainty、単一証拠だけの断定回答、review metadata不足、bundle/evidence hash不一致を reject します。
+
+materialize時はassistant応答を厳密なJSON文字列にします。評価側も同じJSON構造を期待します。
+
+```json
+{"schema_version":"git-archaeologist.answer.v1","facts":[],"timeline":[],"inference":"","uncertainty":"","citations":[],"answer":""}
+```
+
+`--max-seq-length` は近似token budgetの事前ゲートです。tokenizerによる厳密測定ではありませんが、長すぎるbundleや、citation対象evidenceがSFT入力から欠落する危険を学習前に止めます。
 
 ## 4. データ形式を検証する
 
@@ -192,6 +201,18 @@ uv run --system-certs python -m llm_tuning_lab.eval.run_eval \
 ```
 
 採点では、citation precision / recall、unsupported citation、timeline order、schema validity、不確実性の有無を確認します。
+
+評価はbenchmark全件を基準にします。predictionが欠落したcaseは0点、重複IDと未知IDは `invalid_predictions` としてsummaryに記録します。summaryには `benchmark_count`, `prediction_count`, `matched_count`, `missing_count`, `duplicate_count`, `unknown_count`, `coverage` が含まれます。
+
+未知repositoryへの一般化を測る場合は、run presetでrepository holdoutを使います。
+
+```yaml
+split_strategy: repository_holdout
+validation_repositories:
+  - owner/validation-repo
+test_repositories:
+  - owner/test-repo
+```
 
 ## 9. 結果を保存する
 

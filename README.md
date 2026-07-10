@@ -74,11 +74,15 @@ Supervised fine-tuning data is JSONL. Each line should use a `messages` array.
 
 ## Fine-tuning Flow
 
-1. JSONL データを `messages` 形式で用意する。
-2. `scripts/validate_data.ps1` で形式を検証する。
-3. `configs/data/*.yaml` の `train_file` を差し替えるか、`scripts/train_sft.ps1 -TrainFile ...` を指定する。
-4. `configs/model/base.yaml`, `configs/train/sft.yaml`, `configs/train/lora.yaml` を調整する。
-5. `outputs/` に学習成果物を保存し、Git にはコミットしない。
+PoC の小さな `messages` JSONL はそのまま `scripts/train_sft.ps1` で学習できます。本命の Git Archaeologist データでは、GitHub の raw record を直接 SFT にせず、調査ケース単位に変換します。
+
+1. GitHub evidence を `data/raw/github/<repo>/` に収集する。
+2. `llm_tuning_lab.data.bundles` で Issue / PR / Commit / Review / Diff / CI を `EvidenceBundle` にまとめる。
+3. 人間作成または外部作成済みの `GoldCase` を `data/interim/gold_cases/` に置く。教師モデルによる回答生成は行わない。
+4. `llm_tuning_lab.data.gold_cases validate` で引用、時系列、不確実性、承認状態を検証する。
+5. `review_status: approved` の case だけを train / validation / test と benchmark に materialize する。
+6. benchmark に対する base / RAG / SFT / SFT+RAG の予測 JSONL を `llm_tuning_lab.eval.run_eval` で採点する。
+7. `outputs/` に学習成果物と `training_manifest.json` を保存し、Git にはコミットしない。
 
 ## Memory
 

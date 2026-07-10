@@ -49,7 +49,46 @@ data/raw/github/react-react/
 
 `data/raw/` はGit管理しません。収集した履歴をそのまま学習データとしてコミットしないでください。
 
-## 3. データ形式を検証する
+## 3. Evidence bundle と gold case を作る
+
+Git Archaeologist 用の本命データでは、raw record 1件をそのまま SFT 例にしません。Issue、PR、Commit、Review、Diff、CI を調査ケース単位の `EvidenceBundle` にまとめます。
+
+```bash
+uv run --system-certs python -m llm_tuning_lab.data.bundles \
+  --input data/raw/github/react-react \
+  --output data/interim/bundles/react-react.jsonl \
+  --min-evidence-per-bundle 3
+```
+
+SFT 用の assistant 回答は教師モデルで生成しません。人間作成または外部作成済みの gold case を `data/interim/gold_cases/react-react.jsonl` に置き、SFT に使う行は `review_status: approved` にします。
+
+gold case は最低限、次の情報を持ちます。
+
+```json
+{"bundle_id":"...","question":"Why was this design chosen?","answer":"...","facts":[{"text":"...","citations":["evidence-id"]}],"timeline":[{"date":"2026-01-01T00:00:00Z","text":"...","citations":["evidence-id"]}],"inference":"...","uncertainty":"...","citations":["evidence-id"],"review_status":"approved"}
+```
+
+検証と materialize:
+
+```bash
+uv run --system-certs python -m llm_tuning_lab.data.gold_cases validate \
+  --bundles data/interim/bundles/react-react.jsonl \
+  --gold-cases data/interim/gold_cases/react-react.jsonl
+
+uv run --system-certs python -m llm_tuning_lab.data.gold_cases materialize \
+  --bundles data/interim/bundles/react-react.jsonl \
+  --gold-cases data/interim/gold_cases/react-react.jsonl \
+  --train-output data/processed/train.jsonl \
+  --validation-output data/processed/validation.jsonl \
+  --test-output data/processed/test.jsonl \
+  --benchmark-output evals/benchmarks/react-react.jsonl \
+  --validation-ratio 0.1 \
+  --test-ratio 0.1
+```
+
+検証では、存在しない evidence ID の引用、引用なし facts、時系列逆転、空の uncertainty、単一証拠だけの断定回答を reject します。
+
+## 4. データ形式を検証する
 
 ```powershell
 .\scripts\validate_data.ps1 -Path data\samples\react_react_poc.jsonl
@@ -57,7 +96,7 @@ data/raw/github/react-react/
 
 この検証では、各行が JSON object であること、`messages` があること、`user` と `assistant` が含まれることを確認します。
 
-## 4. データ設定を差し替える
+## 5. データ設定を差し替える
 
 PoC用設定は `configs/data/poc.yaml` です。
 
@@ -72,7 +111,7 @@ required_roles:
 
 別のデータで試す場合は `train_file` を差し替えるか、実行時に `-TrainFile` を指定します。
 
-## 5. モデル設定を確認する
+## 6. モデル設定を確認する
 
 既定のモデル設定は `configs/model/base.yaml` です。
 
@@ -85,7 +124,7 @@ load_in_4bit: true
 
 まず `Qwen/Qwen3-14B` でデータ形式、LoRA設定、checkpoint保存、評価の流れを確認します。本命実験では、同じ入口のまま `model_name_or_path` を `Qwen/Qwen2.5-Coder-32B-Instruct` などに切り替えます。
 
-## 6. 学習を実行する
+## 7. 学習を実行する
 
 ```powershell
 .\scripts\train_sft.ps1 -DataConfig configs/data/poc.yaml
@@ -115,21 +154,24 @@ bash scripts/run_sft_linux.sh --dry-run --preset react-react-qwen3-14b
 bash scripts/run_sft_linux.sh --skip-collect --preset react-react-qwen3-14b
 ```
 
-## 6.5 実行前チェック
+## 7.5 実行前チェック
 
 H100 で SFT を回す前に、GPU を使わずに潰せる問題を先に潰します。
 
 ```bash
 uv run --system-certs --group dev python -m pytest
 uv run --system-certs --group dev python -m llm_tuning_lab.run.sft_pipeline --dry-run --skip-collect --preset react-react-qwen3-14b --include-sync-command
+uv run --system-certs --group dev python -m llm_tuning_lab.data.gold_cases validate --bundles data/interim/bundles/react-react.jsonl --gold-cases data/interim/gold_cases/react-react.jsonl
 uv run --system-certs --group dev python -m llm_tuning_lab.data.validate data/processed/train.jsonl
 uv run --system-certs --group dev python -m llm_tuning_lab.data.validate data/processed/validation.jsonl
+uv run --system-certs --group dev python -m llm_tuning_lab.data.validate data/processed/test.jsonl
 uv run --system-certs --group dev python -m llm_tuning_lab.train.sft --model-config configs/model/base.yaml --data-config configs/data/react_react_sft.yaml --train-config configs/train/sft.yaml --lora-config configs/train/lora.yaml --train-file data/processed/train.jsonl --validation-file data/processed/validation.jsonl --output-dir outputs/sft/react-react-qwen3-14b --preflight-only
 ```
 
 確認すること:
 
-- `data/processed/train.jsonl` と `validation.jsonl` が空ではない。
+- `data/interim/gold_cases/react-react.jsonl` に `review_status: approved` の case がある。
+- `data/processed/train.jsonl`、`validation.jsonl`、`test.jsonl` が空ではない。
 - 各行が `messages` 形式で、`user` と `assistant` を含む。
 - `configs/model/base.yaml` が `Qwen/Qwen3-14B` を指している。
 - `configs/train/sft.yaml` が `assistant_only_loss: true` を持っている。
@@ -138,11 +180,26 @@ uv run --system-certs --group dev python -m llm_tuning_lab.train.sft --model-con
 
 SFT では conversational `messages` をなるべく保持します。`messages` を事前に1本の `text` へ潰すと、assistant の回答だけでなく user や system の文まで学習対象になりやすいためです。このリポジトリでは、根拠や質問を丸暗記させるのではなく、assistant の答え方、根拠の扱い方、不確実性の示し方を学ばせます。
 
-## 7. 結果を保存する
+## 8. 評価する
+
+評価は、固定 benchmark と各方式の予測 JSONL を比較します。推論バックエンド自体はこのリポジトリに固定せず、`evals/results/*_predictions.jsonl` を採点対象にします。
+
+```bash
+uv run --system-certs python -m llm_tuning_lab.eval.run_eval \
+  --benchmark evals/benchmarks/react-react.jsonl \
+  --predictions evals/results/base_rag_predictions.jsonl \
+  --output evals/results/base_rag_metrics.json
+```
+
+採点では、citation precision / recall、unsupported citation、timeline order、schema validity、不確実性の有無を確認します。
+
+## 9. 結果を保存する
 
 学習ログや checkpoint は `outputs/`、adapter やモデル成果物は `models/` に置きます。これらは大きくなりやすいため、原則 Git 管理しません。
 
-## 8. 知見をMemoryに残す
+SFT 実行後は `outputs/sft/.../training_manifest.json` に dataset hash、config hash、git commit、主要依存バージョン、CUDA/GPU情報、split件数を保存します。
+
+## 10. 知見をMemoryに残す
 
 実験中に分かったことは `.memory/fine-tuning/entries/` に残します。
 

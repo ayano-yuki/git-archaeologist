@@ -1,0 +1,4 @@
+interface:
+  display_name: "Semantic Commit Splitter"
+  short_description: "Split local changes into meaningful commits."
+  default_prompt: "Review my local changes and propose semantic commit groups."

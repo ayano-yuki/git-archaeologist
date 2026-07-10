@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fine-tuning Memory Writer"
+  short_description: "Write fine-tuning lessons for beginners."
+  default_prompt: "Record this fine-tuning lesson as repository memory."

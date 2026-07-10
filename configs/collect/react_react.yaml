@@ -1,0 +1,11 @@
+repo: react/react
+output_dir: data/raw/github/react-react
+per_page: 50
+max_pages: 2
+state: all
+sort: updated
+direction: desc
+include_issue_comments: true
+include_pull_review_comments: true
+include_pull_reviews: true
+max_detail_items: 25

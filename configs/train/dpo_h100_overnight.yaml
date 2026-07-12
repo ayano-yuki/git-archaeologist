@@ -1,0 +1,16 @@
+seed: 42
+output_dir: outputs/dpo-h100-overnight
+max_steps: 1000
+per_device_train_batch_size: 1
+gradient_accumulation_steps: 16
+learning_rate: 0.000005
+beta: 0.1
+warmup_ratio: 0.03
+logging_steps: 10
+eval_steps: 100
+save_steps: 250
+save_total_limit: 4
+bf16: true
+max_length: 4096
+max_prompt_length: 2048
+gradient_checkpointing: true

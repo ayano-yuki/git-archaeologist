@@ -1,0 +1,6 @@
+model_name_or_path: Qwen/Qwen2.5-Coder-32B-Instruct
+model_tier: h100_80gb
+trust_remote_code: false
+torch_dtype: bfloat16
+load_in_4bit: true
+device_map: auto

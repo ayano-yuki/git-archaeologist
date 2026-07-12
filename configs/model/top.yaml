@@ -1,0 +1,6 @@
+model_name_or_path: Qwen/Qwen3-Coder-480B-A35B-Instruct
+model_tier: top
+trust_remote_code: false
+torch_dtype: bfloat16
+load_in_4bit: true
+device_map: auto

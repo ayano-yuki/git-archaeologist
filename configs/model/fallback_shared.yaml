@@ -1,0 +1,6 @@
+model_name_or_path: Qwen/Qwen3-Coder-30B-A3B-Instruct
+model_tier: fallback_shared
+trust_remote_code: false
+torch_dtype: bfloat16
+load_in_4bit: true
+device_map: auto

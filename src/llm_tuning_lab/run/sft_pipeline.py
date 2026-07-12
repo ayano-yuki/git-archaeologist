@@ -8,6 +8,13 @@ from pathlib import Path
 from typing import Any
 
 from llm_tuning_lab.config import load_yaml
+from llm_tuning_lab.run.pipeline_commands import (
+    accounting_command,
+    append_predict_flags,
+    optional_raft_and_dpo_commands,
+    predict_command,
+    run_eval_command,
+)
 
 
 @dataclass(frozen=True)
@@ -39,6 +46,36 @@ class PipelineConfig:
     test_repositories: tuple[str, ...]
     min_evidence_per_bundle: int
     require_approved_gold_cases: bool
+    copy_expected_predictions: bool = False
+    strict_eval: bool = False
+    min_coverage: float | None = None
+    min_fact_recall: float | None = None
+    min_answer_similarity: float | None = None
+    min_timeline_event_recall: float | None = None
+    gpu_vram_gb: float | None = None
+    gpu_mode: str | None = None
+    model_tier: str | None = None
+    min_approved_gold_cases: int | None = None
+    min_train_target_tokens: int | None = None
+    tokenizer_mode: str = "whitespace"
+    per_device_train_batch_size: int = 1
+    gradient_accumulation_steps: int = 1
+    max_steps: int | None = None
+    num_train_epochs: int = 1
+    packing: bool = False
+    raft_data_config: Path | None = None
+    raft_train_file: Path | None = None
+    raft_validation_file: Path | None = None
+    raft_output_dir: Path | None = None
+    raft_predictions: Path | None = None
+    raft_metrics: Path | None = None
+    dpo_data_config: Path | None = None
+    dpo_train_config: Path | None = None
+    dpo_train_file: Path | None = None
+    dpo_validation_file: Path | None = None
+    dpo_output_dir: Path | None = None
+    dpo_predictions: Path | None = None
+    dpo_metrics: Path | None = None
 
 
 def build_commands(
@@ -152,20 +189,13 @@ def build_commands(
                 "llm_tuning_lab.data.validate",
                 _command_path(config.test_file),
             ],
-            [
-                "uv",
-                "run",
-                "--system-certs",
-                "python",
-                "-m",
-                "llm_tuning_lab.eval.run_eval",
-                "--benchmark",
-                _command_path(config.benchmark_file),
-                "--predictions",
-                _command_path(config.baseline_predictions),
-                "--output",
-                _command_path(config.baseline_metrics),
-            ],
+            accounting_command(config),
+            predict_command(config, adapter_path=None, output=config.baseline_predictions),
+            run_eval_command(
+                config,
+                predictions=config.baseline_predictions,
+                output=config.baseline_metrics,
+            ),
             [
                 "uv",
                 "run",
@@ -211,22 +241,16 @@ def build_commands(
                 "--output-dir",
                 _command_path(config.output_dir),
             ],
-            [
-                "uv",
-                "run",
-                "--system-certs",
-                "python",
-                "-m",
-                "llm_tuning_lab.eval.run_eval",
-                "--benchmark",
-                _command_path(config.benchmark_file),
-                "--predictions",
-                _command_path(config.post_train_predictions),
-                "--output",
-                _command_path(config.post_train_metrics),
-            ],
+            predict_command(config, adapter_path=config.output_dir, output=config.post_train_predictions),
+            run_eval_command(
+                config,
+                predictions=config.post_train_predictions,
+                output=config.post_train_metrics,
+            ),
         ]
     )
+    commands.extend(optional_raft_and_dpo_commands(config))
+    append_predict_flags(commands, config)
     materialize_command = commands[2 if skip_collect else 3]
     for repo in config.validation_repositories:
         materialize_command.extend(["--validation-repository", repo])
@@ -239,6 +263,7 @@ def build_commands(
 
 def load_pipeline_config(path: Path) -> PipelineConfig:
     loaded = load_yaml(path)
+    train_loaded = load_yaml(Path(_required(loaded, "train_config")))
     return PipelineConfig(
         collect_config=Path(_required(loaded, "collect_config")),
         raw_dir=Path(_required(loaded, "raw_dir")),
@@ -257,6 +282,36 @@ def load_pipeline_config(path: Path) -> PipelineConfig:
         baseline_metrics=Path(_required(loaded, "baseline_metrics")),
         post_train_metrics=Path(_required(loaded, "post_train_metrics")),
         output_dir=Path(_required(loaded, "output_dir")),
+        copy_expected_predictions=_optional_bool(loaded.get("copy_expected_predictions"), False),
+        strict_eval=_optional_bool(loaded.get("strict_eval"), False),
+        min_coverage=_optional_float(loaded.get("min_coverage")),
+        min_fact_recall=_optional_float(loaded.get("min_fact_recall")),
+        min_answer_similarity=_optional_float(loaded.get("min_answer_similarity")),
+        min_timeline_event_recall=_optional_float(loaded.get("min_timeline_event_recall")),
+        gpu_vram_gb=_optional_float(loaded.get("gpu_vram_gb")),
+        gpu_mode=str(loaded["gpu_mode"]) if loaded.get("gpu_mode") else None,
+        model_tier=str(loaded["model_tier"]) if loaded.get("model_tier") else None,
+        min_approved_gold_cases=_optional_int(loaded.get("min_approved_gold_cases")),
+        min_train_target_tokens=_optional_int(loaded.get("min_train_target_tokens")),
+        tokenizer_mode=str(loaded.get("tokenizer_mode", "whitespace")),
+        per_device_train_batch_size=int(train_loaded.get("per_device_train_batch_size", 1)),
+        gradient_accumulation_steps=int(train_loaded.get("gradient_accumulation_steps", 1)),
+        max_steps=_optional_int(train_loaded.get("max_steps")),
+        num_train_epochs=int(train_loaded.get("num_train_epochs", 1)),
+        packing=bool(train_loaded.get("packing", False)),
+        raft_data_config=_optional_path(loaded.get("raft_data_config")),
+        raft_train_file=_optional_path(loaded.get("raft_train_file")),
+        raft_validation_file=_optional_path(loaded.get("raft_validation_file")),
+        raft_output_dir=_optional_path(loaded.get("raft_output_dir")),
+        raft_predictions=_optional_path(loaded.get("raft_predictions")),
+        raft_metrics=_optional_path(loaded.get("raft_metrics")),
+        dpo_data_config=_optional_path(loaded.get("dpo_data_config")),
+        dpo_train_config=_optional_path(loaded.get("dpo_train_config")),
+        dpo_train_file=_optional_path(loaded.get("dpo_train_file")),
+        dpo_validation_file=_optional_path(loaded.get("dpo_validation_file")),
+        dpo_output_dir=_optional_path(loaded.get("dpo_output_dir")),
+        dpo_predictions=_optional_path(loaded.get("dpo_predictions")),
+        dpo_metrics=_optional_path(loaded.get("dpo_metrics")),
         max_pages=_optional_int(loaded.get("max_pages")),
         per_page=_optional_int(loaded.get("per_page")),
         validation_ratio=float(loaded.get("validation_ratio", 0.1)),
@@ -332,6 +387,32 @@ def _optional_int(value: Any) -> int | None:
     if value in (None, ""):
         return None
     return int(value)
+
+
+def _optional_float(value: Any) -> float | None:
+    if value in (None, ""):
+        return None
+    return float(value)
+
+
+def _optional_path(value: Any) -> Path | None:
+    if value in (None, ""):
+        return None
+    return Path(str(value))
+
+
+def _optional_bool(value: Any, default: bool) -> bool:
+    if value in (None, ""):
+        return default
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str):
+        lowered = value.lower()
+        if lowered in {"1", "true", "yes", "on"}:
+            return True
+        if lowered in {"0", "false", "no", "off"}:
+            return False
+    raise TypeError(f"expected a boolean value, got {value!r}")
 
 
 def _optional_str_list(value: Any) -> list[str]:

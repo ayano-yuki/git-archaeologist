@@ -39,7 +39,7 @@ def load_training_dependencies() -> dict[str, Any]:
     try:
         import torch
         from datasets import load_dataset
-        from peft import LoraConfig
+        from peft import AutoPeftModelForCausalLM, LoraConfig
         from transformers import BitsAndBytesConfig
         from trl import SFTConfig, SFTTrainer
     except ImportError as exc:
@@ -50,6 +50,7 @@ def load_training_dependencies() -> dict[str, Any]:
 
     return {
         "BitsAndBytesConfig": BitsAndBytesConfig,
+        "AutoPeftModelForCausalLM": AutoPeftModelForCausalLM,
         "LoraConfig": LoraConfig,
         "SFTConfig": SFTConfig,
         "SFTTrainer": SFTTrainer,

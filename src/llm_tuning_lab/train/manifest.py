@@ -15,20 +15,30 @@ def write_training_manifest(
     model_config: dict[str, Any],
     data_config: dict[str, Any],
     train_config: dict[str, Any],
+    lora_config: dict[str, Any] | None = None,
+    parent_sft_adapter: str | None = None,
+    parent_manifest_hash: str | None = None,
+    accounting: dict[str, Any] | None = None,
 ) -> Path:
     output_dir.mkdir(parents=True, exist_ok=True)
+    config_payload: dict[str, Any] = {
+        "model": model_config,
+        "data": data_config,
+        "train": train_config,
+    }
+    if lora_config is not None:
+        config_payload["lora"] = lora_config
+    if parent_sft_adapter is not None:
+        config_payload["parent_sft_adapter"] = parent_sft_adapter
+        config_payload["parent_manifest_hash"] = parent_manifest_hash
+
     manifest = {
+        "manifest_schema_version": 2,
         "base_model": model_config.get("model_name_or_path"),
         "model_revision": model_config.get("revision"),
         "dataset_hash": _dataset_hash(data_config),
         "git_commit": _git_commit(),
-        "config_hash": _hash_json(
-            {
-                "model": model_config,
-                "data": data_config,
-                "train": train_config,
-            }
-        ),
+        "config_hash": _hash_json(config_payload),
         "versions": _package_versions(
             "transformers",
             "trl",
@@ -45,12 +55,26 @@ def write_training_manifest(
         ),
         "splits": _split_counts(data_config),
     }
+    if lora_config is not None:
+        manifest["lora_config"] = lora_config
+    if parent_sft_adapter is not None:
+        manifest["parent_sft_adapter"] = parent_sft_adapter
+        manifest["parent_manifest_hash"] = parent_manifest_hash
+    if accounting is not None:
+        manifest["accounting"] = accounting
     path = output_dir / "training_manifest.json"
     path.write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
     )
     return path
+
+
+def training_manifest_hash(adapter_path: Path | str) -> str | None:
+    manifest_path = Path(adapter_path) / "training_manifest.json"
+    if not manifest_path.exists() or not manifest_path.is_file():
+        return None
+    return hashlib.sha256(manifest_path.read_bytes()).hexdigest()
 
 
 def _dataset_hash(data_config: dict[str, Any]) -> str:

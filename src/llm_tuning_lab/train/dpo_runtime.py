@@ -28,7 +28,7 @@ def load_dpo_dependencies() -> dict[str, Any]:
     try:
         import torch
         from datasets import load_dataset
-        from peft import LoraConfig
+        from peft import AutoPeftModelForCausalLM, LoraConfig
         from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
         from trl import DPOConfig, DPOTrainer
     except ImportError as exc:
@@ -39,6 +39,7 @@ def load_dpo_dependencies() -> dict[str, Any]:
 
     return {
         "AutoModelForCausalLM": AutoModelForCausalLM,
+        "AutoPeftModelForCausalLM": AutoPeftModelForCausalLM,
         "AutoTokenizer": AutoTokenizer,
         "BitsAndBytesConfig": BitsAndBytesConfig,
         "DPOConfig": DPOConfig,

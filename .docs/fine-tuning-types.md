@@ -362,6 +362,13 @@ Git Archaeologist での位置づけ:
 - assistant-only loss
 - GitHub evidence をそのまま暗記させない説明データ
 
+運用:
+
+```powershell
+.\scripts\validate_data.ps1 -Path data\samples\react_react_poc.jsonl
+.\scripts\train_sft.ps1 -DataConfig configs\data\poc.yaml
+```
+
 ### Phase 2: RAG-oriented SFT / RAFT style
 
 目的:
@@ -377,6 +384,22 @@ Git Archaeologist での位置づけ:
 - answer with citations
 - distractor evidence
 
+運用:
+
+```powershell
+.\scripts\materialize_roadmap_data.ps1 `
+  -Mode raft `
+  -TrainOutput data\processed\raft_train.jsonl `
+  -ValidationOutput data\processed\raft_validation.jsonl
+
+.\scripts\validate_data.ps1 -Path data\processed\raft_train.jsonl
+.\scripts\train_sft.ps1 `
+  -DataConfig configs\data\raft.yaml `
+  -TrainFile data\processed\raft_train.jsonl `
+  -ValidationFile data\processed\raft_validation.jsonl `
+  -OutputDir outputs\sft\react-react-raft
+```
+
 ### Phase 3: DPO
 
 目的:
@@ -389,6 +412,24 @@ Git Archaeologist での位置づけ:
 - prompt
 - chosen
 - rejected
+
+運用:
+
+```powershell
+.\scripts\materialize_roadmap_data.ps1 `
+  -Mode dpo `
+  -TrainOutput data\processed\dpo_train.jsonl `
+  -ValidationOutput data\processed\dpo_validation.jsonl
+
+.\scripts\validate_data.ps1 -Path data\processed\dpo_train.jsonl -Format dpo
+.\scripts\validate_data.ps1 -Path data\processed\dpo_validation.jsonl -Format dpo
+.\scripts\train_dpo.ps1 -DataConfig configs\data\dpo.yaml -PreflightOnly
+.\scripts\train_dpo.ps1 `
+  -DataConfig configs\data\dpo.yaml `
+  -TrainFile data\processed\dpo_train.jsonl `
+  -ValidationFile data\processed\dpo_validation.jsonl `
+  -OutputDir outputs\dpo\react-react-qwen3-14b
+```
 
 ### Phase 4: 評価と必要に応じた拡張
 

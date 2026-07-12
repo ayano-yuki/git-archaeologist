@@ -1,0 +1,6 @@
+train_file: data/processed/raft_train.jsonl
+validation_file: data/processed/raft_validation.jsonl
+format: messages
+required_roles:
+  - user
+  - assistant

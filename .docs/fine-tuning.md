@@ -189,6 +189,62 @@ uv run --system-certs --group dev python -m llm_tuning_lab.train.sft --model-con
 
 SFT では conversational `messages` をなるべく保持します。`messages` を事前に1本の `text` へ潰すと、assistant の回答だけでなく user や system の文まで学習対象になりやすいためです。このリポジトリでは、根拠や質問を丸暗記させるのではなく、assistant の答え方、根拠の扱い方、不確実性の示し方を学ばせます。
 
+## 7.6 Phase 2: RAFT style データを作る
+
+Phase 2 では、retrieval context に不要な evidence が混ざっていても、関連 evidence を選んで回答する練習をします。入力は引き続き `messages` JSONL ですが、user message には対象 bundle の evidence と、別 bundle から選んだ distractor evidence が入ります。
+
+```powershell
+.\scripts\materialize_roadmap_data.ps1 `
+  -Mode raft `
+  -TrainOutput data\processed\raft_train.jsonl `
+  -ValidationOutput data\processed\raft_validation.jsonl
+
+.\scripts\validate_data.ps1 -Path data\processed\raft_train.jsonl
+.\scripts\validate_data.ps1 -Path data\processed\raft_validation.jsonl
+```
+
+学習は SFT と同じ入口を使います。
+
+```powershell
+.\scripts\train_sft.ps1 `
+  -DataConfig configs\data\raft.yaml `
+  -TrainFile data\processed\raft_train.jsonl `
+  -ValidationFile data\processed\raft_validation.jsonl `
+  -OutputDir outputs\sft\react-react-raft
+```
+
+## 7.7 Phase 3: DPO データを作る
+
+Phase 3 では、同じ prompt に対して「良い Git Archaeologist 回答」と「避けたい回答」の差を学ばせます。DPO JSONL は `prompt`, `chosen`, `rejected` を持ちます。既定では `chosen` は gold case の JSON 回答、`rejected` は引用なし、断定的、uncertainty が空の synthetic bad answer です。gold case に `rejected` または `rejected_answer` がある場合はそれを使えます。
+
+```powershell
+.\scripts\materialize_roadmap_data.ps1 `
+  -Mode dpo `
+  -TrainOutput data\processed\dpo_train.jsonl `
+  -ValidationOutput data\processed\dpo_validation.jsonl
+
+.\scripts\validate_data.ps1 -Path data\processed\dpo_train.jsonl -Format dpo
+.\scripts\validate_data.ps1 -Path data\processed\dpo_validation.jsonl -Format dpo
+```
+
+実行前チェック:
+
+```powershell
+.\scripts\train_dpo.ps1 -DataConfig configs\data\dpo.yaml -PreflightOnly
+```
+
+DPO を実際に回す場合:
+
+```powershell
+.\scripts\train_dpo.ps1 `
+  -DataConfig configs\data\dpo.yaml `
+  -TrainFile data\processed\dpo_train.jsonl `
+  -ValidationFile data\processed\dpo_validation.jsonl `
+  -OutputDir outputs\dpo\react-react-qwen3-14b
+```
+
+DPO の `rejected` は「学ばせたい悪文」ではなく、`chosen` と比較して下げたい回答です。断定しすぎ、引用がない、retrieval context の不要 evidence に引っ張られる、古い事実を覚えたように話す、uncertainty を消す、といった失敗を入れます。
+
 ## 8. 評価する
 
 評価は、固定 benchmark と各方式の予測 JSONL を比較します。推論バックエンド自体はこのリポジトリに固定せず、`evals/results/*_predictions.jsonl` を採点対象にします。

@@ -6,6 +6,7 @@
 - `fine-tuning.md`: データ差し替えからSFT実行までの流れ
 - `fine-tuning-types.md`: ファインチューニング手法の分類、選び方、研究メモ
 - `linux-sft-runbook.md`: Linux/H100環境でSFTを1コマンド実行する手順
+- `download-trained-adapter.md`: 実環境サーバーから学習済みLoRA adapterをローカルへ落とす手順
 
 開発補助の文脈は dot ディレクトリに寄せます。
 

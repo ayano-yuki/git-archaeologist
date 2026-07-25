@@ -146,6 +146,14 @@ uv --system-certs run --extra training python -m git_archaeologist.evaluation.sy
 uv --system-certs run --extra training python -m git_archaeologist.evaluation.train_sft --dry-run
 ```
 
+学習後には post-FT 評価を実行し、adapter成果物、学習summary、closed-book漏洩契約、baseline / prompt / SFT 比較を保存する。
+
+```powershell
+uv --system-certs run python -m git_archaeologist.evaluation.post_sft_evaluation
+```
+
+評価レポートは `data/Qwen--Qwen2.5-Coder-7B-Instruct/eval/post-sft/answer-discipline-post-sft-report.json` に置く。
+
 ## 収集エラー時の人間連絡
 
 収集時に次のエラーが発生した場合は、人間へ連絡する。

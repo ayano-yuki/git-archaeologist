@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "evaluation_id": "answer-discipline-post-sft-v1",
+  "evaluation_mode": "artifact_and_contract_validation",
+  "status": "post_sft_evaluation_passed",
+  "base_model": "Qwen/Qwen2.5-Coder-7B-Instruct",
+  "adapter": {
+    "adapter_dir": "data/Qwen--Qwen2.5-Coder-7B-Instruct/models/answer-discipline-qlora",
+    "missing_files": [],
+    "present_files": [
+      "adapter_config.json",
+      "adapter_model.safetensors",
+      "training-run-summary.json",
+      "tokenizer_config.json",
+      "tokenizer.json"
+    ],
+    "training_status": "sft_training_completed",
+    "base_model": "Qwen/Qwen2.5-Coder-7B-Instruct",
+    "record_count": 1,
+    "train_loss": 3.2103090286254883
+  },
+  "dataset": {
+    "path": "data/baseline-rag/sft/answer-discipline/sft-records.jsonl",
+    "record_count": 2,
+    "split_counts": {
+      "train": 1,
+      "validation": 1,
+      "test": 0
+    },
+    "record_ids": [
+      "sft-answer-discipline-0001",
+      "sft-answer-discipline-0002"
+    ]
+  },
+  "closed_book_leakage": {
+    "passed": true,
+    "evaluated_case_count": 2,
+    "finding_count": 0,
+    "findings": []
+  },
+  "comparisons": [
+    {
+      "name": "baseline-rag",
+      "metrics": {
+        "target_resolution_accuracy": 1.0,
+        "evidence_recall_at_k": 1.0,
+        "citation_consistency_rate": 1.0,
+        "unsupported_claim_rate": 0.0,
+        "abstention_accuracy": 1.0,
+        "risk_warning_precision": 1.0
+      },
+      "delta_vs_baseline": {
+        "target_resolution_accuracy": 0.0,
+        "evidence_recall_at_k": 0.0,
+        "citation_consistency_rate": 0.0,
+        "unsupported_claim_rate": 0.0,
+        "abstention_accuracy": 0.0,
+        "risk_warning_precision": 0.0
+      },
+      "regression_detected": false
+    },
+    {
+      "name": "prompt-stabilized-rag",
+      "metrics": {
+        "target_resolution_accuracy": 1.0,
+        "evidence_recall_at_k": 1.0,
+        "citation_consistency_rate": 1.0,
+        "unsupported_claim_rate": 0.0,
+        "abstention_accuracy": 1.0,
+        "risk_warning_precision": 1.0
+      },
+      "delta_vs_baseline": {
+        "target_resolution_accuracy": 0.0,
+        "evidence_recall_at_k": 0.0,
+        "citation_consistency_rate": 0.0,
+        "unsupported_claim_rate": 0.0,
+        "abstention_accuracy": 0.0,
+        "risk_warning_precision": 0.0
+      },
+      "regression_detected": false
+    },
+    {
+      "name": "sft-adapter",
+      "metrics": {
+        "target_resolution_accuracy": 1.0,
+        "evidence_recall_at_k": 1.0,
+        "citation_consistency_rate": 1.0,
+        "unsupported_claim_rate": 0.0,
+        "abstention_accuracy": 1.0,
+        "risk_warning_precision": 1.0
+      },
+      "delta_vs_baseline": {
+        "target_resolution_accuracy": 0.0,
+        "evidence_recall_at_k": 0.0,
+        "citation_consistency_rate": 0.0,
+        "unsupported_claim_rate": 0.0,
+        "abstention_accuracy": 0.0,
+        "risk_warning_precision": 0.0
+      },
+      "regression_detected": false
+    }
+  ],
+  "notes": [
+    "This report validates the checked-in adapter artifact and deterministic evaluation contracts.",
+    "It does not claim live generative quality beyond the recorded training run unless external model predictions are supplied later.",
+    "Repository-specific facts remain in RAG data; the adapter is evaluated for answer discipline and abstention contracts."
+  ]
+}

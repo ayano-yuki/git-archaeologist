@@ -59,6 +59,14 @@ uv --system-certs run --extra training python -m git_archaeologist.evaluation.tr
 
 本番学習は `--max-steps` を外して実行します。対象モデルは runtime profile で選定した `Qwen/Qwen2.5-Coder-7B-Instruct`、方式は QLoRA です。adapter は `data/Qwen--Qwen2.5-Coder-7B-Instruct/models/answer-discipline-qlora/` へ出力します。
 
+学習後は post-FT 評価を実行し、adapter成果物、学習summary、closed-book漏洩契約、baseline / prompt / SFT 比較を確認します。
+
+```powershell
+uv --system-certs run python -m git_archaeologist.evaluation.post_sft_evaluation
+```
+
+レポートは `data/Qwen--Qwen2.5-Coder-7B-Instruct/eval/post-sft/answer-discipline-post-sft-report.json` に保存されます。
+
 ## ディレクトリ構成
 
 ```text

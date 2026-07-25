@@ -40,7 +40,7 @@ Qwen/Qwen2.5-Coder-7B-Instruct -> data/Qwen--Qwen2.5-Coder-7B-Instruct/
 
 ## MVP 評価データ
 
-MVP の入力形式と品質目標は `src/git_archaeologist/mvp_contracts.py` の
+MVP の入力形式と品質目標は `src/git_archaeologist/evaluation/mvp_contracts.py` の
 `mvp-input-quality-v1` を基準にする。評価対象の履歴は
 `react/react` 由来の GitHub / git 履歴を使う前提とし、対象 Repository
 固有の事実はモデルへ記憶させず、収集済みデータと Evidence Pack から参照する。

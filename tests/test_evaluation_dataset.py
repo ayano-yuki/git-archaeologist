@@ -3,7 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 import unittest
 
-from git_archaeologist.evaluation_dataset import (
+from git_archaeologist.evaluation.evaluation_dataset import (
     EVALUATION_DATASET_SCHEMA_VERSION,
     EvaluationDatasetViolation,
     EvaluationRecord,

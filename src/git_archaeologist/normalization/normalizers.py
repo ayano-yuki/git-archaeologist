@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from hashlib import sha256
 from typing import Any, Mapping, Protocol
 
-from git_archaeologist.common_events import (
+from git_archaeologist.normalization.common_events import (
     ArtifactReference,
     CommonEvent,
     EventFieldSet,

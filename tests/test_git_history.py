@@ -6,7 +6,7 @@ import subprocess
 from tempfile import TemporaryDirectory
 import unittest
 
-from git_archaeologist.git_history import (
+from git_archaeologist.collectors.git_history import (
     GitCommandResult,
     GitHistoryCollectionError,
     GitHistoryErrorType,

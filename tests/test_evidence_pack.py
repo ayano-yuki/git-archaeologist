@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 import json
 import unittest
 
-from git_archaeologist.evidence_pack import (
+from git_archaeologist.rag.evidence_pack import (
     EvidenceItem,
     EvidencePackViolation,
     EvidenceStrength,

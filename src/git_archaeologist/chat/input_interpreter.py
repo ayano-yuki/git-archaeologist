@@ -10,7 +10,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 from enum import StrEnum
 
-from git_archaeologist.mvp_contracts import (
+from git_archaeologist.evaluation.mvp_contracts import (
     InputDecision,
     MvpInputKind,
     StructuredMvpInput,

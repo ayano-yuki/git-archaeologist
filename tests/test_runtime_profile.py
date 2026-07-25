@@ -6,7 +6,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from git_archaeologist.runtime_profile import (
+from git_archaeologist.evaluation.runtime_profile import (
     GIB,
     GpuDevice,
     HardwareProfile,

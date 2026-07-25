@@ -3,18 +3,18 @@ from __future__ import annotations
 from datetime import datetime, timezone
 import unittest
 
-from git_archaeologist.answer_schema import (
+from git_archaeologist.rag.answer_schema import (
     AnswerClaim,
     AnswerVerdict,
     Citation,
     Confidence,
     StructuredAnswer,
 )
-from git_archaeologist.citation_verifier import (
+from git_archaeologist.rag.citation_verifier import (
     CitationVerificationStatus,
     verify_answer_citations,
 )
-from git_archaeologist.evidence_pack import (
+from git_archaeologist.rag.evidence_pack import (
     EvidenceItem,
     EvidencePack,
     EvidenceStrength,

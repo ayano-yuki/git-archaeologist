@@ -1,6 +1,6 @@
 """Git Archaeologist package."""
 
-from git_archaeologist.gh_access import (
+from git_archaeologist.collectors.gh_access import (
     GhCheckKind,
     GhCheckResult,
     GhCommandResult,
@@ -11,7 +11,7 @@ from git_archaeologist.gh_access import (
     classify_gh_error,
     run_gh_command,
 )
-from git_archaeologist.mvp_contracts import (
+from git_archaeologist.evaluation.mvp_contracts import (
     CONTRACT_VERSION,
     EVALUATION_CORPUS,
     FREEZE_POLICY,
@@ -30,7 +30,7 @@ from git_archaeologist.mvp_contracts import (
     load_mvp_quality_targets,
     structure_mvp_input,
 )
-from git_archaeologist.repository_config import (
+from git_archaeologist.config.repository_config import (
     ArtifactKind,
     ArtifactScope,
     ErrorReportingPolicy,
@@ -42,7 +42,7 @@ from git_archaeologist.repository_config import (
     load_repository_config,
     parse_repository_config,
 )
-from git_archaeologist.sft_data_policy import (
+from git_archaeologist.evaluation.sft_data_policy import (
     ALLOWED_TRAINING_CONTENT,
     COLLECTION_ERROR_CATEGORIES,
     EVAL_DATA_PATH_PATTERN,

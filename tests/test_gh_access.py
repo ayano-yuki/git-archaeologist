@@ -4,14 +4,14 @@ from collections.abc import Sequence
 from pathlib import Path
 import unittest
 
-from git_archaeologist.gh_access import (
+from git_archaeologist.collectors.gh_access import (
     GhCheckKind,
     GhCommandResult,
     GhErrorType,
     check_github_access,
     classify_gh_error,
 )
-from git_archaeologist.repository_config import load_builtin_repository_config
+from git_archaeologist.config.repository_config import load_builtin_repository_config
 
 
 FIXTURES = Path(__file__).parent / "fixtures" / "gh"

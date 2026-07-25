@@ -27,13 +27,13 @@ MVP はローカル実行を前提にし、外部サービスなしで Raw Archi
 保存先の構成はコードから確認できる。
 
 ```powershell
-uv run python -m git_archaeologist.storage_config
+uv run python -m git_archaeologist.config.storage_config
 ```
 
 Python API から空の保存先を作る。
 
 ```python
-from git_archaeologist.storage_config import ensure_storage_layout
+from git_archaeologist.config.storage_config import ensure_storage_layout
 
 ensure_storage_layout("data/local-runtime")
 ```

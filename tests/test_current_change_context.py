@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 import unittest
 
-from git_archaeologist.current_change_context import (
+from git_archaeologist.chat.current_change_context import (
     CurrentChangeFetchError,
     CurrentChangeStatus,
     PullRequestLocator,

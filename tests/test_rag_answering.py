@@ -3,14 +3,14 @@ from __future__ import annotations
 from datetime import datetime, timezone
 import unittest
 
-from git_archaeologist.evidence_pack import (
+from git_archaeologist.rag.evidence_pack import (
     EvidenceItem,
     EvidencePack,
     EvidenceStrength,
     TargetCodeContext,
     build_evidence_pack,
 )
-from git_archaeologist.rag_answering import (
+from git_archaeologist.rag.rag_answering import (
     RAG_SYSTEM_PROMPT_VERSION,
     RagModelConfig,
     answer_from_evidence_pack,

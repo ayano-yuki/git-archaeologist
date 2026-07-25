@@ -6,8 +6,8 @@ from dataclasses import dataclass
 from enum import StrEnum
 import re
 
-from git_archaeologist.answer_schema import AnswerClaim, StructuredAnswer
-from git_archaeologist.evidence_pack import EvidenceItem, EvidencePack
+from git_archaeologist.rag.answer_schema import AnswerClaim, StructuredAnswer
+from git_archaeologist.rag.evidence_pack import EvidenceItem, EvidencePack
 
 
 class CitationVerificationStatus(StrEnum):

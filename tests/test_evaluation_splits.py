@@ -3,7 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 import unittest
 
-from git_archaeologist.evaluation_splits import (
+from git_archaeologist.evaluation.evaluation_splits import (
     EvaluationSplit,
     EvaluationSplitManifest,
     SplitManifestViolation,
@@ -72,7 +72,7 @@ class EvaluationSplitTests(unittest.TestCase):
 
 
 def _entry(split, decision_ids, artifact_ids):
-    from git_archaeologist.evaluation_splits import DecisionSplit
+    from git_archaeologist.evaluation.evaluation_splits import DecisionSplit
 
     return DecisionSplit(
         split=split,

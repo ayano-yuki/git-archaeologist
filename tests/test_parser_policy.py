@@ -8,7 +8,7 @@ import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from git_archaeologist.parser_policy import (  # noqa: E402
+from git_archaeologist.search.parser_policy import (  # noqa: E402
     PARSER_POLICY_ID,
     TARGET_REPOSITORY_ID,
     ParserBackend,

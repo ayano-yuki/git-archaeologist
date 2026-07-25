@@ -7,7 +7,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from git_archaeologist.repository_config import (
+from git_archaeologist.config.repository_config import (
     ArtifactKind,
     load_builtin_repository_config,
     load_repository_config,

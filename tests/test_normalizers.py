@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import unittest
 
-from git_archaeologist.common_events import EventKind, EvidenceKind
-from git_archaeologist.normalizers import (
+from git_archaeologist.normalization.common_events import EventKind, EvidenceKind
+from git_archaeologist.normalization.normalizers import (
     NormalizationFailure,
     NormalizationSuccess,
     RawArtifactEnvelope,

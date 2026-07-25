@@ -3,14 +3,14 @@ from __future__ import annotations
 import unittest
 
 from git_archaeologist.demo_chat import run_demo_chat
-from git_archaeologist.evaluation_harness import (
+from git_archaeologist.evaluation.evaluation_harness import (
     AnswerEvaluation,
     FailureStage,
     RetrievalEvaluation,
     TargetResolutionEvaluation,
     build_evaluation_report,
 )
-from git_archaeologist.incremental_sync import (
+from git_archaeologist.ops.incremental_sync import (
     ArtifactSyncKind,
     ArtifactUpdate,
     SyncState,
@@ -18,23 +18,23 @@ from git_archaeologist.incremental_sync import (
     apply_sync_success,
     plan_incremental_sync,
 )
-from git_archaeologist.index_integrity import (
+from git_archaeologist.ops.index_integrity import (
     IndexGeneration,
     IndexTransaction,
     IndexTransactionStatus,
     ensure_answer_uses_published_index,
 )
 from git_archaeologist.phase2_smoke import run_phase2_smoke
-from git_archaeologist.quality_analysis import (
+from git_archaeologist.evaluation.quality_analysis import (
     ExperimentRun,
     FailureResponsibility,
     build_failure_taxonomy,
     compare_ablation,
     decide_sft_need,
 )
-from git_archaeologist.query_trace import InMemoryQueryTraceStore
-from git_archaeologist.resilience import FailureKind, classify_failure_message, decide_fallback
-from git_archaeologist.versioned_cache import CacheKey, CacheOperation, VersionedCache
+from git_archaeologist.ops.query_trace import InMemoryQueryTraceStore
+from git_archaeologist.ops.resilience import FailureKind, classify_failure_message, decide_fallback
+from git_archaeologist.ops.versioned_cache import CacheKey, CacheOperation, VersionedCache
 
 
 class Phase2StabilityTests(unittest.TestCase):

@@ -36,6 +36,31 @@ Qwen/Qwen2.5-Coder-7B-Instruct -> data/Qwen--Qwen2.5-Coder-7B-Instruct/
 - `eval/`: 評価データ、期待結果、評価レポート。
 - `runs/`: 実験ごとの出力、ログ、メトリクス。
 
+## MVP 評価データ
+
+MVP の入力形式と品質目標は `src/git_archaeologist/mvp_contracts.py` の
+`mvp-input-quality-v1` を基準にする。評価対象の履歴は
+`react/react` 由来の GitHub / git 履歴を使う前提とし、対象 Repository
+固有の事実はモデルへ記憶させず、収集済みデータと Evidence Pack から参照する。
+
+評価データは、使うモデルごとに次のように置く。
+
+```text
+data/
+  <model-name>/
+    eval/
+      mvp-input-quality/
+        input-examples.jsonl
+        quality-targets.json
+        evaluation-run.md
+```
+
+- `input-examples.jsonl`: PR URL + ファイル名または関数名、コード断片 + 自然言語質問の正常例、曖昧な例、不正な例。
+- `quality-targets.json`: 対象解決精度、根拠検索再現率、引用整合率、根拠のない主張率、リスク警告の適合率、回答時間の暫定目標。
+- `evaluation-run.md`: 評価前に固定した contract version、dataset version、evaluator version、実行日時、結果、変更しなかった基準。
+
+品質目標は評価前に固定する。評価結果を見たあとで都合よく基準値、対象例、採点方法を変更しない。変更が必要な場合は、新しい contract version と変更理由を先に記録してから次の評価を実行する。
+
 ## 注意
 
 - 生データ、教師データ、モデル出力、評価ログは原則 Git に含めない。

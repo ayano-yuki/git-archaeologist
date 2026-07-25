@@ -99,10 +99,10 @@ PR タイトルは次の形式にする。
 [機能] PR内容（#issue番号）
 ```
 
-PR 本文には次を含める。
+PR 本文には関連 Issue をリンク形式で含める。
 
 ```text
-- [issue] #123
+- [issue] [#123](https://github.com/ayano-yuki/ayano-yuki-pbi/issues/123)
 ```
 
 ## 開発配置

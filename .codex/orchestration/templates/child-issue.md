@@ -9,6 +9,7 @@
 ## 親 Issue
 
 - 親 Issue: ayano-yuki/ayano-yuki-pbi#58
+- GitHub sub-issue: #58 の sub-issue として作成する
 
 ## 背景
 

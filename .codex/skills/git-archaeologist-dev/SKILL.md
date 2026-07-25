@@ -34,12 +34,14 @@ Git Archaeologist を Issue 駆動で並列開発するための Skill。人間�
 2. `.codex/orchestration/templates/child-issue.md` を使って子 Issue 案を作る。
 3. 各 Issue を `collector`、`normalizer`、`search`、`rag`、`chat`、`evaluation` のいずれかへ分類する。
 4. `.codex/orchestration/templates/issue-batch-plan.md` を使って一括作成計画を作る。
-5. `gh issue create` の前に停止し、人間へ設計ズレ確認を依頼する。
-6. 承認後、`.codex/skills/git-archaeologist-dev/references/gh-commands.md` のコマンド例をもとに Issue 作成を準備または実行する。
-7. 子 Issue を Member Codex の worktree へ割り当てる。承認済みの並列作業は、各 Issue のコミット、push、PR 作成までを完了条件にする。
-8. 最終報告前に、push 済み feature ブランチと open PR の対応を確認する。PR がない push 済み feature ブランチは未完了として扱い、PR 作成まで進める。
-9. 人間レビュー前に、PR の範囲、受け入れ条件、明らかな問題、テスト、規約違反を一次レビューする。
-10. レビュー指摘が来たら、元 Member または別 Member へ再割り当てする。
+5. `gh issue create --parent 58` の前に停止し、人間へ設計ズレ確認を依頼する。
+6. 承認後、`.codex/skills/git-archaeologist-dev/references/gh-commands.md` のコマンド例をもとに Issue 作成を準備または実行する。子 Issue は必ず親 PBI #58 の GitHub sub-issue として作成する。
+7. 作成済み Issue が sub-issue になっていない場合は、`gh issue edit <issue-number> --parent 58` で修復する。
+8. Issue 作成または修復後、親 Issue #58 の `subIssues` または子 Issue の `parent` を確認する。
+9. 子 Issue を Member Codex の worktree へ割り当てる。承認済みの並列作業は、各 Issue のコミット、push、PR 作成までを完了条件にする。
+10. 最終報告前に、push 済み feature ブランチと open PR の対応を確認する。PR がない push 済み feature ブランチは未完了として扱い、PR 作成まで進める。
+11. 人間レビュー前に、PR の範囲、受け入れ条件、明らかな問題、テスト、規約違反を一次レビューする。
+12. レビュー指摘が来たら、元 Member または別 Member へ再割り当てする。
 
 ## Member ワークフロー
 
@@ -58,13 +60,13 @@ Git Archaeologist を Issue 駆動で並列開発するための Skill。人間�
 
 次の操作前には停止する。
 
-- 子 Issue の一括作成。
+- 子 Issue の一括作成または sub-issue 紐付けの修復。
 - PR 作成。
 - 依存関係の追加。
 - CI/CD、GitHub Actions、認証、秘密情報、データ保存先、ロードマップの変更。
 - 破壊的 git 操作または破壊的ファイル操作。
 
-停止時には、実行したい操作、理由、影響範囲、コマンド案、戻し方または代替案を提示する。
+停止時には、実行したい操作、理由、影響範囲、コマンド案、sub-issue 確認方法、戻し方または代替案を提示する。
 
 人間が明示的に PR 作成を依頼または承認した場合は、PR 作成前ゲートを通過したものとして扱い、feature ブランチの push と PR 作成まで完了する。Member に作業を投げる場合も、承認済みなら最終成果物を「コミット、push、PR 作成」まで含めて指示する。
 

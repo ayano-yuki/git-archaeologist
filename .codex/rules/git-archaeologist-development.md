@@ -5,6 +5,9 @@
 - 親 PBI Issue は `ayano-yuki/ayano-yuki-pbi#58` とする。
 - 子 Issue タイトルは `【git-archaeologist 】 <内容>` 形式にする。
 - 子 Issue は Manager Codex が一括で案を作り、人間が微調整してから `gh` で作成する。
+- 子 Issue は親 PBI #58 の GitHub sub-issue として作成する。`gh issue create` では `--parent 58` を必ず付ける。
+- 既存 Issue が sub-issue になっていない場合は、`gh issue edit <issue-number> --parent 58` で修復する。
+- Issue 作成または修復後は、親 Issue #58 の `subIssues` または子 Issue の `parent` を確認する。
 - 子 Issue は Member Codex が迷わず着手できる粒度にする。
 
 ## 開発環境とディレクトリ
@@ -24,6 +27,7 @@
 子 Issue には次を含める。
 
 - タイトル
+- 親 PBI #58 との sub-issue 関係
 - 背景
 - 実装内容
 - 受け入れ条件

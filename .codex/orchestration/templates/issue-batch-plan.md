@@ -3,6 +3,7 @@
 ## 親 Issue
 
 - 親 Issue: ayano-yuki/ayano-yuki-pbi#58
+- GitHub sub-issue: 作成する全 Issue を #58 の sub-issue にする
 
 ## 一括作成の目的
 
@@ -21,7 +22,12 @@
 - [ ] `docs/Todo.md` の必須タスクと対応している。
 - [ ] Issue が大きすぎない。
 - [ ] 依存関係が明確。
+- [ ] `gh issue create` コマンド案に `--parent 58` が含まれている。
 
 ## gh コマンド案
 
-人間確認後に実行する `gh issue create` コマンド案を書く。
+人間確認後に実行する `gh issue create --parent 58` コマンド案を書く。
+
+## 作成後確認
+
+作成後に親 Issue #58 の `subIssues` または各子 Issue の `parent` を確認するコマンド案を書く。

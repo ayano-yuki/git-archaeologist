@@ -16,7 +16,11 @@ from git_archaeologist.evaluation.reranker_training import (
 )
 from git_archaeologist.evaluation.sft_data_policy import ExpectedVerdict, validate_evaluation_case
 from git_archaeologist.evaluation.sft_dataset import validate_sft_dataset
-from git_archaeologist.evaluation.sft_training_plan import SFTTrainingStatus, build_sft_training_plan
+from git_archaeologist.evaluation.sft_training_plan import (
+    SFTTrainingStatus,
+    build_sft_training_plan,
+    load_sft_training_plan,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -100,10 +104,11 @@ class PhaseOptionalsTests(unittest.TestCase):
         self.assertFalse(plan.should_train)
         self.assertIn("defer_sft", plan.reason)
 
-        recorded_plan = json.loads(
-            (ROOT / "data/baseline-rag/sft/answer-discipline/lora-training-plan.json").read_text(encoding="utf-8")
+        recorded_plan = load_sft_training_plan(
+            ROOT / "data/baseline-rag/sft/answer-discipline/lora-training-plan.json"
         )
-        self.assertEqual("deferred", recorded_plan["status"])
+        self.assertEqual(SFTTrainingStatus.READY, recorded_plan.status)
+        self.assertEqual("Qwen/Qwen2.5-Coder-7B-Instruct", recorded_plan.base_model)
         self.assertEqual(str(ROOT / "data/baseline-rag/sft/answer-discipline/sft-records.jsonl"), plan.dataset_path)
 
 

@@ -301,12 +301,12 @@
   - 成果物: バージョン付き教師データ、品質レビュー記録。
   - 完了条件: 生のGitHub文書だけを正解として与えず、全回答がEvidence Packで支持されている。
 
-- [ ] **任意: LoRAまたはQLoRAでSFTする**
+- [x] **任意: LoRAまたはQLoRAでSFTする**
   - 目的: ローカル環境の制約内で回答規律を改善し、基盤モデルを差し替え可能に保つ。
   - 方法: PR・意思決定単位の分割を維持して学習し、baseline、prompt改善版、SFT版を同じtestで比較する。
   - 成果物: adapter、学習設定、seed、model card、評価結果。
   - 完了条件: 主要指標を改善し、一般的な説明能力と棄権能力を悪化させていない。
-  - 状態: Phase2のSFT判断が `defer_sft` のため、実学習は見送り。再開用training planを `data/baseline-rag/sft/answer-discipline/lora-training-plan.json` に保存。
+  - 状態: サーバー実行向けに `Qwen/Qwen2.5-Coder-7B-Instruct` のQLoRA training planを `ready` に更新。`git_archaeologist.evaluation.system_smoke` と `git_archaeologist.evaluation.train_sft --execute` で構成確認、1 step smoke、本番学習を実行できる。
 
 - [x] **任意: 記憶漏洩テストを行う**
   - 目的: SFTがRepository固有の事実をEvidenceなしで回答する状態を検出する。

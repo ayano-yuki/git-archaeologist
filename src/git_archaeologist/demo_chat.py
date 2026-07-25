@@ -17,6 +17,7 @@ from git_archaeologist.chat_flow import (
     run_chat_flow,
 )
 from git_archaeologist.input_interpreter import InterpretedInput
+from git_archaeologist.query_trace import QueryTraceStore
 
 
 DEMO_INPUT = (
@@ -26,7 +27,12 @@ DEMO_INPUT = (
 )
 
 
-def run_demo_chat(raw_input: str = DEMO_INPUT) -> ChatFlowResult:
+def run_demo_chat(
+    raw_input: str = DEMO_INPUT,
+    *,
+    trace_store: QueryTraceStore | None = None,
+    model_version: str = "demo-model-v1",
+) -> ChatFlowResult:
     """Run the smoke-test demo without external services."""
 
     return run_chat_flow(
@@ -36,6 +42,8 @@ def run_demo_chat(raw_input: str = DEMO_INPUT) -> ChatFlowResult:
         evidence_retriever=_DemoEvidenceRetriever(),
         answer_generator=_DemoAnswerGenerator(),
         citation_verifier=_DemoCitationVerifier(),
+        trace_store=trace_store,
+        model_version=model_version,
     )
 
 

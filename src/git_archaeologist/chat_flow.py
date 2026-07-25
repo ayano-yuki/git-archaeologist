@@ -13,6 +13,7 @@ from git_archaeologist.current_change_context import (
     build_current_change_context,
 )
 from git_archaeologist.input_interpreter import InterpretedInput, interpret_input
+from git_archaeologist.query_trace import QueryTrace, QueryTraceStore, start_query_trace
 
 
 class ChatFlowStatus(StrEnum):
@@ -158,6 +159,7 @@ class ChatFlowResult:
 
     status: ChatFlowStatus
     interpreted_input: InterpretedInput
+    trace_id: str | None = None
     answer: ChatAnswer | None = None
     target: ChatTarget | None = None
     evidence_pack: ChatEvidencePack | None = None
@@ -168,6 +170,7 @@ class ChatFlowResult:
     def to_dict(self) -> dict[str, object]:
         payload = {
             "status": self.status.value,
+            "trace_id": self.trace_id,
             "interpreted_input": self.interpreted_input.to_dict(),
             "answer": asdict(self.answer) if self.answer else None,
             "target": asdict(self.target) if self.target else None,
@@ -216,15 +219,41 @@ def run_chat_flow(
     answer_generator: AnswerGeneratorBackend,
     citation_verifier: CitationVerifierBackend,
     current_change_client: CurrentChangeClient | None = None,
+    trace_store: QueryTraceStore | None = None,
+    model_version: str = "unknown-model",
+    query_id: str | None = None,
 ) -> ChatFlowResult:
     """Run input interpretation, target resolution, retrieval, answer, and verification."""
 
+    trace = start_query_trace(
+        raw_input,
+        index_version=index_version,
+        model_version=model_version,
+        query_id=query_id,
+    )
     interpreted = interpret_input(raw_input)
+    trace = trace.add_step(
+        "input_interpretation",
+        "ok",
+        {
+            "kind": interpreted.kind.value if interpreted.kind else None,
+            "can_resolve_target": interpreted.can_resolve_target,
+            "repository": interpreted.repository,
+            "pull_request_number": interpreted.pull_request_number,
+            "file_path": interpreted.file_path,
+            "symbol_name": interpreted.symbol_name,
+        },
+    )
     if not interpreted.can_resolve_target:
-        return ChatFlowResult(
-            status=ChatFlowStatus.NEEDS_CLARIFICATION,
-            interpreted_input=interpreted,
-            message=interpreted.clarification_reason or "Target clarification is required before answering.",
+        return _finish_with_trace(
+            ChatFlowResult(
+                status=ChatFlowStatus.NEEDS_CLARIFICATION,
+                interpreted_input=interpreted,
+                trace_id=trace.query_id,
+                message=interpreted.clarification_reason or "Target clarification is required before answering.",
+            ),
+            trace=trace,
+            trace_store=trace_store,
         )
 
     current_change = _build_current_change(
@@ -232,28 +261,57 @@ def run_chat_flow(
         current_change_client=current_change_client,
         index_version=index_version,
     )
+    trace = trace.add_step(
+        "current_change_context",
+        "ok" if current_change is None else current_change.status.value,
+        {"status": current_change.status.value if current_change else "not_requested"},
+    )
     if current_change is not None and current_change.status is CurrentChangeStatus.FETCH_FAILED:
-        return ChatFlowResult(
-            status=ChatFlowStatus.FAILED,
-            interpreted_input=interpreted,
-            current_change=current_change,
-            message="最新PR情報を取得できなかったため、古い情報で変更リスクを断言しません。",
+        return _finish_with_trace(
+            ChatFlowResult(
+                status=ChatFlowStatus.FAILED,
+                interpreted_input=interpreted,
+                trace_id=trace.query_id,
+                current_change=current_change,
+                message="最新PR情報を取得できなかったため、古い情報で変更リスクを断言しません。",
+            ),
+            trace=trace,
+            trace_store=trace_store,
         )
 
     target_resolution = target_resolver.resolve(interpreted)
+    trace = trace.add_step(
+        "target_resolution",
+        target_resolution.state.value,
+        {
+            "candidate_ids": [candidate.target_id for candidate in target_resolution.candidates],
+            "selected_id": target_resolution.selected.target_id if target_resolution.selected else None,
+            "reason": target_resolution.reason,
+        },
+    )
     if target_resolution.state is TargetResolutionState.AMBIGUOUS:
-        return ChatFlowResult(
-            status=ChatFlowStatus.NEEDS_CLARIFICATION,
-            interpreted_input=interpreted,
-            current_change=current_change,
-            message=target_resolution.reason or "Multiple target candidates remain.",
+        return _finish_with_trace(
+            ChatFlowResult(
+                status=ChatFlowStatus.NEEDS_CLARIFICATION,
+                interpreted_input=interpreted,
+                trace_id=trace.query_id,
+                current_change=current_change,
+                message=target_resolution.reason or "Multiple target candidates remain.",
+            ),
+            trace=trace,
+            trace_store=trace_store,
         )
     if target_resolution.state is TargetResolutionState.UNRESOLVED or target_resolution.selected is None:
-        return ChatFlowResult(
-            status=ChatFlowStatus.FAILED,
-            interpreted_input=interpreted,
-            current_change=current_change,
-            message=target_resolution.reason or "Target could not be resolved.",
+        return _finish_with_trace(
+            ChatFlowResult(
+                status=ChatFlowStatus.FAILED,
+                interpreted_input=interpreted,
+                trace_id=trace.query_id,
+                current_change=current_change,
+                message=target_resolution.reason or "Target could not be resolved.",
+            ),
+            trace=trace,
+            trace_store=trace_store,
         )
 
     target = target_resolution.selected
@@ -264,19 +322,35 @@ def run_chat_flow(
             current_change=current_change,
         )
     )
+    trace = trace.add_step(
+        "evidence_retrieval",
+        "ok",
+        {
+            "search_query": interpreted.question,
+            "graph_expansion": "current_change" if current_change else "indexed_history",
+            "pack_id": evidence_pack.pack_id,
+            "index_version": evidence_pack.index_version,
+            "rerank_order": [item.source_id for item in evidence_pack.items],
+        },
+    )
     if not evidence_pack.items:
-        return ChatFlowResult(
-            status=ChatFlowStatus.INSUFFICIENT_EVIDENCE,
-            interpreted_input=interpreted,
-            target=target,
-            evidence_pack=evidence_pack,
-            current_change=current_change,
-            answer=ChatAnswer(
-                verdict="insufficient_evidence",
-                text="Evidence Packに根拠がないため、この質問には断言できません。",
-                missing_information=("supporting Evidence Pack items",),
+        return _finish_with_trace(
+            ChatFlowResult(
+                status=ChatFlowStatus.INSUFFICIENT_EVIDENCE,
+                interpreted_input=interpreted,
+                trace_id=trace.query_id,
+                target=target,
+                evidence_pack=evidence_pack,
+                current_change=current_change,
+                answer=ChatAnswer(
+                    verdict="insufficient_evidence",
+                    text="Evidence Packに根拠がないため、この質問には断言できません。",
+                    missing_information=("supporting Evidence Pack items",),
+                ),
+                message="Evidence Pack is empty; answer generation was skipped.",
             ),
-            message="Evidence Pack is empty; answer generation was skipped.",
+            trace=trace,
+            trace_store=trace_store,
         )
 
     answer = answer_generator.generate(
@@ -287,28 +361,48 @@ def run_chat_flow(
             current_change=current_change,
         )
     )
+    trace = trace.add_step(
+        "answer_generation",
+        "ok",
+        {"model_version": model_version, "verdict": answer.verdict, "citation_ids": [citation.source_id for citation in answer.citations]},
+    )
     verification = citation_verifier.verify(answer, evidence_pack)
+    trace = trace.add_step(
+        "citation_verification",
+        "ok" if verification.is_supported else "failed",
+        {"is_supported": verification.is_supported, "failures": list(verification.failures)},
+    )
     if not verification.is_supported:
-        return ChatFlowResult(
-            status=ChatFlowStatus.FAILED,
+        return _finish_with_trace(
+            ChatFlowResult(
+                status=ChatFlowStatus.FAILED,
+                interpreted_input=interpreted,
+                trace_id=trace.query_id,
+                target=target,
+                evidence_pack=evidence_pack,
+                current_change=current_change,
+                answer=answer,
+                verification=verification,
+                message="引用検証に失敗したため、回答を安全に表示できません。",
+            ),
+            trace=trace,
+            trace_store=trace_store,
+        )
+
+    return _finish_with_trace(
+        ChatFlowResult(
+            status=ChatFlowStatus.ANSWERED,
             interpreted_input=interpreted,
+            trace_id=trace.query_id,
             target=target,
             evidence_pack=evidence_pack,
             current_change=current_change,
             answer=answer,
             verification=verification,
-            message="引用検証に失敗したため、回答を安全に表示できません。",
-        )
-
-    return ChatFlowResult(
-        status=ChatFlowStatus.ANSWERED,
-        interpreted_input=interpreted,
-        target=target,
-        evidence_pack=evidence_pack,
-        current_change=current_change,
-        answer=answer,
-        verification=verification,
-        message="Answer generated and citations verified.",
+            message="Answer generated and citations verified.",
+        ),
+        trace=trace,
+        trace_store=trace_store,
     )
 
 
@@ -335,3 +429,15 @@ def _evidence_pack_to_dict(evidence_pack: ChatEvidencePack | None) -> dict[str, 
         "index_version": evidence_pack.index_version,
         "items": [asdict(item) for item in evidence_pack.items],
     }
+
+
+def _finish_with_trace(
+    result: ChatFlowResult,
+    *,
+    trace: QueryTrace,
+    trace_store: QueryTraceStore | None,
+) -> ChatFlowResult:
+    completed = trace.complete(result.status.value)
+    if trace_store is not None:
+        trace_store.save(completed)
+    return result

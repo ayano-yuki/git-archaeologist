@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "dataset_version": "phase2-stabilization-v1",
+  "model_name": "baseline-rag",
+  "repository_id": "react/react",
+  "review_status": "curated",
+  "index_version": "index-v2",
+  "metrics": {
+    "target_resolution_accuracy": 1.0,
+    "evidence_recall_at_k": 1.0,
+    "citation_consistency_rate": 1.0,
+    "unsupported_claim_rate": 0.0,
+    "abstention_accuracy": 1.0,
+    "risk_warning_precision": 1.0
+  },
+  "failure_taxonomy": {
+    "patterns": []
+  },
+  "rag_ablation": [
+    {
+      "name": "graph-expansion-window",
+      "changed_component": "graph_expansion",
+      "deltas": {
+        "evidence_recall_at_k": 0.0,
+        "citation_consistency_rate": 0.0
+      },
+      "verdict": "unchanged"
+    }
+  ],
+  "sft_decision": {
+    "decision": "defer_sft",
+    "reasons": [
+      "主要指標がPhase2の暫定品質目標を満たしており、現時点ではSFTを見送る。"
+    ]
+  },
+  "notes": "Reviewed synthetic Phase2 smoke data. It contains no raw GitHub artifacts, secrets, or private repository facts."
+}

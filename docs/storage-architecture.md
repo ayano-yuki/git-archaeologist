@@ -5,22 +5,23 @@ MVP はローカル実行を前提にし、外部サービスなしで Raw Archi
 ## 方針
 
 - アプリケーションは Python package と CLI を中心にする。
-- Runtime data は `data/local-runtime/` に置き、Git 管理対象にしない。
-- レビュー済みの SFT / eval データだけを `data/<model-name>/sft/` と `data/<model-name>/eval/` にコピーして Git 管理対象にする。
+- Runtime data は `data/local-runtime/` に置き、Git 管理対象にする。
+- SFT / eval データだけでなく、Raw Archive、processed index、Evidence Pack、run output も `data/` 配下に置いたものは Git 管理対象にする。
+- secret、token、認証ヘッダー、private key、private repository 由来 artifact、未 redaction の機微情報は `data/` に保存しない。
 - Raw Archive は不変データとして保存し、正規化や索引は再構築可能にする。
 
 ## 保存先
 
-| 役割 | Backend | Path | 再構築 |
-| --- | --- | --- | --- |
-| Raw Archive | content-addressed JSON files | `data/local-runtime/raw/<repository-id>/<artifact-kind>/<external-id>.json` | 不可 |
-| Manifest | SQLite | `data/local-runtime/processed/git-archaeologist.sqlite3` | 可 |
-| Event Store | SQLite | `data/local-runtime/processed/git-archaeologist.sqlite3` | 可 |
-| Full-text Index | SQLite FTS5 | `data/local-runtime/processed/git-archaeologist.sqlite3` | 可 |
-| Vector Index | SQLite-compatible sidecar | `data/local-runtime/processed/vector-index/` | 可 |
-| Graph Store | SQLite edge tables | `data/local-runtime/processed/git-archaeologist.sqlite3` | 可 |
-| Evidence Packs | JSONL | `data/local-runtime/evidence-packs/<query-id>.jsonl` | 可 |
-| Run Outputs | JSON / Markdown | `data/local-runtime/runs/<run-id>/` | 不可 |
+| 役割 | Backend | Path | 再構築 | Git 管理 |
+| --- | --- | --- | --- | --- |
+| Raw Archive | content-addressed JSON files | `data/local-runtime/raw/<repository-id>/<artifact-kind>/<external-id>.json` | 不可 | 可 |
+| Manifest | SQLite | `data/local-runtime/processed/git-archaeologist.sqlite3` | 可 | 可 |
+| Event Store | SQLite | `data/local-runtime/processed/git-archaeologist.sqlite3` | 可 | 可 |
+| Full-text Index | SQLite FTS5 | `data/local-runtime/processed/git-archaeologist.sqlite3` | 可 | 可 |
+| Vector Index | SQLite-compatible sidecar | `data/local-runtime/processed/vector-index/` | 可 | 可 |
+| Graph Store | SQLite edge tables | `data/local-runtime/processed/git-archaeologist.sqlite3` | 可 | 可 |
+| Evidence Packs | JSONL | `data/local-runtime/evidence-packs/<query-id>.jsonl` | 可 | 可 |
+| Run Outputs | JSON / Markdown | `data/local-runtime/runs/<run-id>/` | 不可 | 可 |
 
 ## 初期化
 
@@ -54,4 +55,4 @@ MVP 初期では vector backend を差し替え可能な sidecar として扱う
 6. FTS5 と vector index を作る。
 7. Evidence Pack と評価 run を生成する。
 
-Raw Archive と run outputs は再取得または再実行が必要なため、削除前に人間確認ゲートを通す。
+Raw Archive と run outputs は Git 管理対象だが、再取得または再実行が必要なため、削除前に人間確認ゲートを通す。

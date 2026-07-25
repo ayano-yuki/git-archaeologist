@@ -52,5 +52,5 @@ write_runtime_profile(profile, model_name="Qwen/Qwen2.5-Coder-7B-Instruct")
 - Reranker: frozen MVP 評価セットから 50 組の question / evidence pair を rerank し、warmup 後 5 秒以内を目標にする。
 - Answer / Judge LLM: 24k token の Evidence Pack から構造化回答を 1 件生成し、8 tokens/sec 以上、または回答 p95 30 秒以内を目標にする。
 
-実測結果は、対象モデルの `data/<model-name>/eval/runtime-profile/` に置く。レビュー済みで秘密情報を含まない評価レポートは Git 管理対象にできる。
-ローカル実行時の raw profile と benchmark report は `data/<model-name>/runs/runtime-profile/` に置き、Git 管理対象にしない。
+実測結果は、対象モデルの `data/<model-name>/eval/runtime-profile/` に置く。レビュー済みで秘密情報を含まない評価レポートは Git 管理対象にする。
+ローカル実行時の raw profile と benchmark report は `data/<model-name>/runs/runtime-profile/` に置き、secret や private 情報を含まないことを確認したうえで Git 管理対象にする。

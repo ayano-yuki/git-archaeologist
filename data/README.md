@@ -1,8 +1,8 @@
 # 学習用データ配置ルール
 
-`data/` には、学習・評価・実験に使うローカルデータを保存する。Repository 固有の履歴やモデル出力は大きくなりやすく、private 情報を含む可能性があるため、原則として Git にコミットしない。
+`data/` には、学習・評価・実験・本番動作確認に使うデータを保存する。サーバー上で同じ repository checkout から再現できるように、`data/` 配下は runtime raw archive、processed data、Evidence Pack、run output、SFT / eval データを含めて Git 管理対象にする。
 
-ただし、このプロジェクトでレビュー済みの SFT 教師データと評価データは Git 管理対象にする。対象は `data/<model-name>/sft/` と `data/<model-name>/eval/` 配下の、個人情報、secret、private repository 固有情報、未redactの生artifactを含まない小さなデータに限定する。
+Git 管理対象にする前提のため、`data/` には secret、token、認証ヘッダー、private key、private repository 由来 artifact、未 redaction の機微情報を置かない。private 情報を含む可能性があるデータは `data/` へ保存する前に除去または redaction する。
 
 ## 基本構造
 
@@ -65,8 +65,8 @@ data/
 
 ## 注意
 
-- 生データ、モデル出力、実験ログは原則 Git に含めない。
-- レビュー済みの SFT 教師データと評価データは Git に含める。個人情報、秘密情報、private repository 固有情報、未redactの生artifactを除去してから追加する。
+- `data/` 配下の生データ、モデル出力、実験ログ、runtime output は Git に含める。
+- 個人情報、秘密情報、private repository 固有情報、未redactの生artifactは `data/` に置かない。
 - モデル間でデータを混ぜない。共通データが必要な場合も、コピーまたは生成手順で再現できるようにする。
 
 ## FT / SFT データ方針

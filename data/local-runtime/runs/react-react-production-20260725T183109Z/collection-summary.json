@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "run_id": "react-react-production-20260725T183109Z",
+  "repository_id": "react/react",
+  "repository_url": "https://github.com/react/react",
+  "limit_per_root_request": 100,
+  "started_at": "2026-07-25T18:31:09.781921+00:00",
+  "finished_at": "2026-07-25T18:34:14.283763+00:00",
+  "passed": true,
+  "collected_artifact_count": 1416,
+  "saved_artifact_count": 1416,
+  "written_artifact_count": 1416,
+  "duplicate_artifact_count": 0,
+  "artifact_counts": {
+    "ci_job": 1316,
+    "ci_run": 100
+  },
+  "collection_failure_count": 0,
+  "storage_failure_count": 0,
+  "collection_failures": [],
+  "storage_failures": [],
+  "raw_root": "data\\local-runtime\\raw",
+  "manifest_path": "data\\local-runtime\\runs\\react-react-production-20260725T183109Z\\raw-manifest.jsonl"
+}

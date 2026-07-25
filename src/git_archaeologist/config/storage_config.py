@@ -75,7 +75,7 @@ def build_application_stack(data_root: str | Path = DEFAULT_DATA_ROOT) -> Applic
                 backend="content-addressed-json-files",
                 path=f"{root}/raw/<repository-id>/<artifact-kind>/<external-id>.json",
                 rebuildable=False,
-                git_tracked=False,
+                git_tracked=True,
                 purpose="Preserve fetched GitHub and git artifacts before normalization.",
             ),
             StorageComponent(
@@ -83,7 +83,7 @@ def build_application_stack(data_root: str | Path = DEFAULT_DATA_ROOT) -> Applic
                 backend="sqlite",
                 path=f"{root}/processed/git-archaeologist.sqlite3",
                 rebuildable=True,
-                git_tracked=False,
+                git_tracked=True,
                 purpose="Track raw artifact hashes, source URLs, schema versions, and collection state.",
             ),
             StorageComponent(
@@ -91,7 +91,7 @@ def build_application_stack(data_root: str | Path = DEFAULT_DATA_ROOT) -> Applic
                 backend="sqlite",
                 path=f"{root}/processed/git-archaeologist.sqlite3",
                 rebuildable=True,
-                git_tracked=False,
+                git_tracked=True,
                 purpose="Store normalized events, observed fields, inferred fields, and schema versions.",
             ),
             StorageComponent(
@@ -99,7 +99,7 @@ def build_application_stack(data_root: str | Path = DEFAULT_DATA_ROOT) -> Applic
                 backend="sqlite-fts5",
                 path=f"{root}/processed/git-archaeologist.sqlite3",
                 rebuildable=True,
-                git_tracked=False,
+                git_tracked=True,
                 purpose="Provide BM25-style keyword retrieval for identifiers, paths, logs, and exact phrases.",
             ),
             StorageComponent(
@@ -107,7 +107,7 @@ def build_application_stack(data_root: str | Path = DEFAULT_DATA_ROOT) -> Applic
                 backend="sqlite-compatible-vector-sidecar",
                 path=f"{root}/processed/vector-index/",
                 rebuildable=True,
-                git_tracked=False,
+                git_tracked=True,
                 purpose="Persist embedding vectors with model version and chunk IDs for semantic retrieval.",
             ),
             StorageComponent(
@@ -115,7 +115,7 @@ def build_application_stack(data_root: str | Path = DEFAULT_DATA_ROOT) -> Applic
                 backend="sqlite-edge-tables",
                 path=f"{root}/processed/git-archaeologist.sqlite3",
                 rebuildable=True,
-                git_tracked=False,
+                git_tracked=True,
                 purpose="Store event relationships with relation type, confidence, and supporting evidence.",
             ),
             StorageComponent(
@@ -123,7 +123,7 @@ def build_application_stack(data_root: str | Path = DEFAULT_DATA_ROOT) -> Applic
                 backend="jsonl",
                 path=f"{root}/evidence-packs/<query-id>.jsonl",
                 rebuildable=True,
-                git_tracked=False,
+                git_tracked=True,
                 purpose="Record generated Evidence Packs for reproducible answers and evaluation.",
             ),
             StorageComponent(
@@ -131,7 +131,7 @@ def build_application_stack(data_root: str | Path = DEFAULT_DATA_ROOT) -> Applic
                 backend="json-and-markdown",
                 path=f"{root}/runs/<run-id>/",
                 rebuildable=False,
-                git_tracked=False,
+                git_tracked=True,
                 purpose="Store local execution logs, benchmark reports, and evaluation outputs.",
             ),
         ),
@@ -139,7 +139,7 @@ def build_application_stack(data_root: str | Path = DEFAULT_DATA_ROOT) -> Applic
         notes=(
             "Raw Archive is immutable and not rebuildable unless GitHub or git artifacts are fetched again.",
             "SQLite is the MVP coordination store; vector storage remains sidecar-compatible so the backend can be swapped after benchmark results.",
-            "All runtime storage paths are ignored by data/.gitignore unless reviewed data is copied into model-specific sft/ or eval/ folders.",
+            "All data/ paths are Git-tracked; do not store secrets, private repository artifacts, or unredacted sensitive data under data/.",
         ),
     )
 

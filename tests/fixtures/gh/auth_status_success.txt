@@ -1,0 +1,5 @@
+github.com
+  Logged in to github.com account octocat
+  Git operations protocol: https
+  Token: *******************
+  Token scopes: 'repo', 'read:org', 'workflow'

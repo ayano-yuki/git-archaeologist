@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "dataset_version": "incident-analysis-v1",
+  "repository_id": "react/react",
+  "review_status": "curated",
+  "cases": [
+    {
+      "case_id": "incident-react-0001",
+      "question": "What introduced and fixed the createRoot guard failure?",
+      "expected_timeline": [
+        "commit-abc1234",
+        "failure-signature-demo",
+        "commit-fix"
+      ],
+      "expected_causality": {
+        "observed": [
+          "failure detected after introducing change",
+          "fix explicitly linked to failure"
+        ],
+        "inferred": []
+      },
+      "expected_constraint_state": "maintained",
+      "must_not_claim": [
+        "production outage",
+        "root cause outside the cited failure"
+      ]
+    },
+    {
+      "case_id": "incident-react-0002",
+      "question": "Should a same-file-only edit receive a historical incident warning?",
+      "expected_risk": "no_risk_found",
+      "suppression_reason": "same_file_only"
+    }
+  ],
+  "metrics": {
+    "timeline_reconstruction_accuracy": 1.0,
+    "causality_provenance_accuracy": 1.0,
+    "unknown_cause_abstention_accuracy": 1.0,
+    "historical_risk_precision": 1.0
+  },
+  "notes": "Synthetic reviewed Phase3 evaluation data. It stores no raw private artifacts or credentials."
+}

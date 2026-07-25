@@ -1,0 +1,6 @@
+# Keep the data policy tracked, but ignore local training and evaluation data.
+/*
+!/README.md
+!/.gitignore
+!/.gitkeep
+

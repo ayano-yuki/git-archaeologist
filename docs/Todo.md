@@ -44,7 +44,7 @@
 
 ### 1.2 ローカル実行基盤の選定
 
-- [ ] **必須: 実行環境とモデル制約を計測する**
+- [x] **必須: 実行環境とモデル制約を計測する**
   - 目的: 使用できないモデルや過大なコンテキストを前提に設計しないようにする。
   - 方法: CPU、GPU、VRAM、RAM、ディスク容量を記録し、Embedding、Reranker、生成LLMの候補で速度とメモリを測る。
   - 成果物: ハードウェア情報、候補モデル、量子化方式、実測結果。
@@ -295,7 +295,7 @@
   - 成果物: `src/git_archaeologist/evaluation/sft_data_policy.py`、`tests/test_sft_data_policy.py`、`data/README.md` のFT / SFTデータ方針。
   - 完了条件: SFTレコードとclosed-book評価ケースをvalidationでき、学習対象外のRepository固有事実や未支持主張を除外できる。
 
-- [ ] **任意: Answer / Judge LLM向けSFTデータを作成する**
+- [x] **任意: Answer / Judge LLM向けSFTデータを作成する**
   - 目的: Repositoryの事実ではなく、Evidence Packの読み方と回答規律を学習させる。
   - 方法: `質問 + 対象 + Evidence Pack + 理想的な構造化回答`を一例とし、事実、推論、不明、引用、確信度を人手で確認する。
   - 成果物: バージョン付き教師データ、品質レビュー記録。
@@ -306,14 +306,15 @@
   - 方法: PR・意思決定単位の分割を維持して学習し、baseline、prompt改善版、SFT版を同じtestで比較する。
   - 成果物: adapter、学習設定、seed、model card、評価結果。
   - 完了条件: 主要指標を改善し、一般的な説明能力と棄権能力を悪化させていない。
+  - 状態: Phase2のSFT判断が `defer_sft` のため、実学習は見送り。再開用training planを `data/baseline-rag/sft/answer-discipline/lora-training-plan.json` に保存。
 
-- [ ] **任意: 記憶漏洩テストを行う**
+- [x] **任意: 記憶漏洩テストを行う**
   - 目的: SFTがRepository固有の事実をEvidenceなしで回答する状態を検出する。
   - 方法: Evidence Packを空または無関係にした質問を与え、不明と回答するか確認する。学習期間より後の履歴でも評価する。
   - 成果物: closed-book評価、漏洩事例。
   - 完了条件: 根拠がない質問で、学習時に見た事実を断言しない。
 
-- [ ] **任意: Rerankerをランキング学習する**
+- [x] **任意: Rerankerをランキング学習する**
   - 目的: 生成LLMのSFTとは分離して、根拠順位だけを改善する。
   - 方法: 質問に対するpositive Evidenceとhard negativeを作り、既存Rerankerとの比較評価を行う。
   - 成果物: ランキングデータ、学習済みReranker、検索評価。

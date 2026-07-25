@@ -306,7 +306,7 @@
   - 方法: PR・意思決定単位の分割を維持して学習し、baseline、prompt改善版、SFT版を同じtestで比較する。
   - 成果物: adapter、学習設定、seed、model card、評価結果。
   - 完了条件: 主要指標を改善し、一般的な説明能力と棄権能力を悪化させていない。
-  - 状態: サーバー実行向けに `Qwen/Qwen2.5-Coder-7B-Instruct` のQLoRA training planを `ready` に更新。`git_archaeologist.evaluation.system_smoke` と `git_archaeologist.evaluation.train_sft --execute` で構成確認、1 step smoke、本番学習を実行できる。
+  - 状態: サーバー実行向けに `Qwen/Qwen2.5-Coder-7B-Instruct` のQLoRA training planを `ready` に更新。`git_archaeologist.evaluation.system_smoke` と `git_archaeologist.evaluation.train_sft --execute` で構成確認、1 step smoke、本番学習を実行できる。学習後の post-FT 評価レポートは `data/Qwen--Qwen2.5-Coder-7B-Instruct/eval/post-sft/answer-discipline-post-sft-report.json` に保存する。
 
 - [x] **任意: 記憶漏洩テストを行う**
   - 目的: SFTがRepository固有の事実をEvidenceなしで回答する状態を検出する。

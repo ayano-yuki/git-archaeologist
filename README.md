@@ -15,6 +15,16 @@ uv --system-certs run python -c "import git_archaeologist; print(git_archaeologi
 
 環境によって `uv run` が証明書エラーになる場合があるため、このリポジトリでは `uv --system-certs run ...` を推奨します。
 
+## MVPチャットデモ
+
+外部サービスを呼ばない決定的なデモとして、入力解釈、対象解決、Evidence Pack取得、回答生成、引用検証までを一周できます。
+
+```powershell
+uv --system-certs run python -m git_archaeologist.demo_chat
+```
+
+実運用では `git_archaeologist.chat_flow.run_chat_flow` に Target Resolver、Evidence Retriever、Answer Generator、Citation Verifier の各backendを渡して利用します。Evidence Pack が空の場合や最新PR取得に失敗した場合は、根拠なしに断言せず安全な結果を返します。
+
 ## ディレクトリ構成
 
 ```text

@@ -64,19 +64,19 @@
   - 成果物: 接続確認コマンド、権限検査結果。
   - 完了条件: 必要な情報へアクセスできない場合、収集開始前に原因を示して停止する。
 
-- [ ] **必須: GitHub Artifact Collectorを実装する**
+- [x] **必須: GitHub Artifact Collectorを実装する**
   - 目的: PR、Issue、Review、コメント、CI Runを欠落なく取得する。
   - 方法: `gh pr`、`gh issue`、`gh run`と必要な`gh api`呼び出しを組み合わせ、ページング、Rate Limit、再試行、中断再開に対応する。
   - 成果物: ArtifactごとのRaw JSON、取得日時、取得条件、API上のID。
   - 完了条件: 同じ収集処理を再実行しても重複せず、中断地点から再開できる。
 
-- [ ] **必須: Git履歴Collectorを実装する**
+- [x] **必須: Git履歴Collectorを実装する**
   - 目的: GitHub上の議論と実際のコード変更を結び付ける。
   - 方法: Commit metadata、parent、Diff、rename、merge、tag、blameに必要な情報を取得する。対象CommitをSHAで再取得できる形にする。
   - 成果物: Commit metadata、patch、変更ファイル一覧、親子関係。
   - 完了条件: 任意の収集済みCommitについて、変更内容と親Commitを再現できる。
 
-- [ ] **必須: Raw Archiveを不変データとして保存する**
+- [x] **必須: Raw Archiveを不変データとして保存する**
   - 目的: 正規化や要約を変更しても、元の根拠へ戻れるようにする。
   - 方法: Artifact種別と外部IDで保存し、取得時刻、source URL、内容ハッシュ、スキーマバージョンを付与する。秘密情報やCIログのCredentialは保存前に除去する。
   - 成果物: Raw Archive、manifest、改ざん・重複検査。

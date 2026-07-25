@@ -38,7 +38,7 @@ Member Codex は次を人間に提示する。
 - 危険な変更が明示されている。
 - PR の向き先が `main <- project` または `project <- feature` の隣接階層である。
 - PR タイトルが `[機能] PR内容（#issue番号）` 形式である。
-- PR 本文に `- [issue] [#123](https://github.com/ayano-yuki/ayano-yuki-pbi/issues/123)` のリンク形式が含まれている。
+- PR 本文に `- [https://github.com/ayano-yuki/ayano-yuki-pbi/issues/123](https://github.com/ayano-yuki/ayano-yuki-pbi/issues/123)` のように、Issue URL をラベルにも使うリンク形式が含まれている。
 
 ## 再開条件
 

@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "status": "deferred",
+  "method": "qlora",
+  "base_model": "local-7b-to-14b-instruct",
+  "dataset_path": "data/baseline-rag/sft/answer-discipline/sft-records.jsonl",
+  "output_dir": "data/baseline-rag/models/answer-discipline-qlora",
+  "seed": 20260726,
+  "reason": "Phase2 SFT decision is defer_sft, so adapter training is not run. This plan records the reproducible settings to use if later evaluation changes the decision to consider_sft.",
+  "safety_checks": [
+    "dataset validates with SFT policy",
+    "closed-book leakage suite passes before training",
+    "same evaluation suite must be run before and after adapter training"
+  ]
+}

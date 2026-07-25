@@ -84,19 +84,19 @@
 
 ### 1.4 共通イベントと関係グラフの構築
 
-- [ ] **必須: 共通イベントスキーマを定義する**
+- [x] **必須: 共通イベントスキーマを定義する**
   - 目的: Commit、PR、Issue、Review、CI、Revertを同じ探索処理で扱えるようにする。
   - 方法: event ID、種別、時刻、actor、SHA、PR・Issue番号、file、symbol、hunk、本文、source URL、関係、証拠種別を定義する。観測値と抽出・推定値を別フィールドにする。
   - 成果物: バージョン付きイベントスキーマ、正常・異常サンプル。
   - 完了条件: すべてのArtifactを検証可能なイベントへ変換できる。
 
-- [ ] **必須: ArtifactごとのNormalizerを実装する**
+- [x] **必須: ArtifactごとのNormalizerを実装する**
   - 目的: GitHub APIやGitの形式差を検索基盤から隠蔽する。
   - 方法: Rawデータを共通イベントへ変換し、変換失敗を握りつぶさず隔離する。再実行時に同じevent IDを生成する。
   - 成果物: Normalizer、変換エラーログ、スキーマ検証テスト。
   - 完了条件: 収集済みデータの変換成功率と失敗理由を集計できる。
 
-- [ ] **必須: Event Graphの関係を生成する**
+- [x] **必須: Event Graphの関係を生成する**
   - 目的: 一つのCommitから関連PR、Issue、Review、CI、Revertへ探索できるようにする。
   - 方法: 明示リンク、merge SHA、PR番号、Issue参照、Workflowのhead SHAを優先して関連付ける。文字列類似や時刻だけによる関係は推定として保存する。
   - 成果物: イベント間Edge、関係種別、関係の根拠、確信度。

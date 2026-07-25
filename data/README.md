@@ -135,6 +135,17 @@ SFT 用データは `data/<model-name>/sft/` に保存し、質問、対象、Ev
 
 `split` は `train`、`validation`、`test` のいずれかにする。同じ PR、Issue、Review thread、または同じ意思決定に属する artifact は複数 split へ跨がせない。時系列評価が必要な場合は、学習期間より後の履歴を `eval/` に置き、SFT 前後で同じ評価を再実行できるようにする。
 
+## QLoRA 実行計画
+
+Answer / Judge LLM の初期FT対象は `Qwen/Qwen2.5-Coder-7B-Instruct` とする。実行計画は `data/baseline-rag/sft/answer-discipline/lora-training-plan.json` に保存し、adapter 出力は `data/Qwen--Qwen2.5-Coder-7B-Instruct/models/answer-discipline-qlora/` に置く。
+
+学習前には次を実行し、SFTデータ、runtime制約、training optional dependenciesを確認する。
+
+```powershell
+uv --system-certs run --extra training python -m git_archaeologist.evaluation.system_smoke --require-training-dependencies
+uv --system-certs run --extra training python -m git_archaeologist.evaluation.train_sft --dry-run
+```
+
 ## 収集エラー時の人間連絡
 
 収集時に次のエラーが発生した場合は、人間へ連絡する。

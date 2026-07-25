@@ -22,8 +22,8 @@
 - 学習・評価・実験用データは `data/` 配下に置く。
 - `data/` はモデルごとにフォルダーを分ける。
 - `data/<model-name>/` の構造は `data/README.md` に従う。
-- `data/` 配下の生データ、モデル出力、評価ログは原則 Git に含めない。
-- レビュー済みの SFT 教師データと評価データは Git 管理対象にする。個人情報、秘密情報、private repository 固有情報、未redactの生artifactを除去してから `data/<model-name>/sft/` または `data/<model-name>/eval/` に追加する。
+- `data/` 配下の生データ、モデル出力、評価ログ、runtime output は Git 管理対象にする。
+- 個人情報、秘密情報、private repository 固有情報、未redactの生artifactは `data/` に置かない。
 
 ## 子 Issue の必須項目
 

@@ -25,6 +25,16 @@ uv --system-certs run python -m git_archaeologist.demo_chat
 
 実運用では `git_archaeologist.chat_flow.run_chat_flow` に Target Resolver、Evidence Retriever、Answer Generator、Citation Verifier の各backendを渡して利用します。Evidence Pack が空の場合や最新PR取得に失敗した場合は、根拠なしに断言せず安全な結果を返します。
 
+## Phase2 動作確認
+
+Phase2 の安定化機能は、外部サービスを呼ばない smoke で確認できます。増分同期、索引transaction、version付きcache、質問trace、障害fallback、失敗分類、RAG ablation、SFT判断を一周します。
+
+```powershell
+uv --system-certs run python -m git_archaeologist.phase2_smoke
+```
+
+`status` が `phase2_smoke_passed` であれば、MVPチャットとPhase2安定化部品が同じローカル環境で動作しています。
+
 ## ディレクトリ構成
 
 ```text

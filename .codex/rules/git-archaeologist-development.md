@@ -41,6 +41,8 @@
 - `feature/<issue-number>-<short-title>` は Member の作業ブランチとして扱う。
 - 並列作業では `git worktree` を使い、Issue ごとに作業ディレクトリを分ける。
 - 同じ worktree で別 Issue の作業を混ぜない。
+- 承認済みの並列作業は、Issue ごとの commit、push、PR 作成までを完了条件にする。
+- push 済み feature ブランチに対応する PR がない状態は未完了として扱う。
 
 ## 機能領域
 
@@ -83,6 +85,7 @@ docs: Issue分解テンプレートを追加
 - PR タイトルは `[機能] PR内容（#issue番号）` とする。
 - PR 本文には `- [issue] #123` の形式で関連 Issue を記載する。
 - PR 作成前に、受け入れ条件、テスト結果、設計ズレの有無をまとめて人間確認を受ける。
+- 人間が PR 作成を依頼または承認済みの場合は、feature ブランチの push だけで止めず、PR URL を取得するまで進める。
 - PR 作成後、人間レビュー前に Manager Codex が一次レビューする。
 
 ## 停止ルール

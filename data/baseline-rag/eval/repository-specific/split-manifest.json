@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "dataset_version": "repository-specific-mvp-v1",
+  "source_repository": "react/react",
+  "entries": [
+    {
+      "split": "train",
+      "decision_ids": ["decision-create-root-guard", "decision-doc-only"],
+      "artifact_ids": ["pr-reviewed-guard", "review-guard", "commit-guard", "pr-doc-only", "diff-doc-only", "review-no-runtime-change"],
+      "reason": "Reviewed seed cases available before validation cutoff; grouped by decision to prevent artifact leakage.",
+      "window": {"start": "2023-01-01", "end": "2023-12-31"}
+    },
+    {
+      "split": "validation",
+      "decision_ids": ["decision-hydration-risk"],
+      "artifact_ids": ["pr-hydration-risk", "review-hydration-warning", "ci-hydration-test"],
+      "reason": "Risk calibration case held out from training decisions.",
+      "window": {"start": "2024-01-01", "end": "2024-06-30"}
+    },
+    {
+      "split": "test",
+      "decision_ids": ["decision-unknown-symbol", "decision-ambiguous-snippet"],
+      "artifact_ids": ["symbol-unknown", "snippet-ambiguous-a", "snippet-ambiguous-b"],
+      "reason": "Abstention and clarification cases reserved for final MVP checks.",
+      "window": {"start": "2024-07-01", "end": "2024-12-31"}
+    }
+  ]
+}

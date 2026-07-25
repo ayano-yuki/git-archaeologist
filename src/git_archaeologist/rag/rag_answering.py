@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 from typing import Any, Mapping, Protocol
 
-from git_archaeologist.answer_schema import (
+from git_archaeologist.rag.answer_schema import (
     AnswerClaim,
     AnswerVerdict,
     Confidence,
@@ -13,7 +13,7 @@ from git_archaeologist.answer_schema import (
     safe_schema_error,
     validate_answer,
 )
-from git_archaeologist.evidence_pack import EvidencePack
+from git_archaeologist.rag.evidence_pack import EvidencePack
 
 
 RAG_SYSTEM_PROMPT_VERSION = "rag-only-answer-v1"

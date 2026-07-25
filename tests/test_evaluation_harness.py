@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import unittest
 
-from git_archaeologist.evaluation_harness import (
+from git_archaeologist.evaluation.evaluation_harness import (
     AnswerEvaluation,
     FailureStage,
     RetrievalEvaluation,

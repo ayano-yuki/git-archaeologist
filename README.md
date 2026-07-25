@@ -23,7 +23,7 @@ uv --system-certs run python -c "import git_archaeologist; print(git_archaeologi
 uv --system-certs run python -m git_archaeologist.demo_chat
 ```
 
-実運用では `git_archaeologist.chat_flow.run_chat_flow` に Target Resolver、Evidence Retriever、Answer Generator、Citation Verifier の各backendを渡して利用します。Evidence Pack が空の場合や最新PR取得に失敗した場合は、根拠なしに断言せず安全な結果を返します。
+実運用では `git_archaeologist.chat.chat_flow.run_chat_flow` に Target Resolver、Evidence Retriever、Answer Generator、Citation Verifier の各backendを渡して利用します。Evidence Pack が空の場合や最新PR取得に失敗した場合は、根拠なしに断言せず安全な結果を返します。
 
 ## Phase2 動作確認
 

@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from enum import StrEnum
 import re
 
-from git_archaeologist.symbol_index import SymbolCandidate, SymbolIndex
+from git_archaeologist.search.symbol_index import SymbolCandidate, SymbolIndex
 
 
 class SnippetMatchKind(StrEnum):

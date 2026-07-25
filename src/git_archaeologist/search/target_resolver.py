@@ -8,8 +8,8 @@ from enum import StrEnum
 import re
 from typing import Protocol
 
-from git_archaeologist.code_snippet_resolver import CodeDocument, ResolutionStatus, resolve_code_snippet
-from git_archaeologist.symbol_index import SymbolCandidate, SymbolIndex
+from git_archaeologist.search.code_snippet_resolver import CodeDocument, ResolutionStatus, resolve_code_snippet
+from git_archaeologist.search.symbol_index import SymbolCandidate, SymbolIndex
 
 
 class TargetKind(StrEnum):

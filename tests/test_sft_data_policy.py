@@ -3,7 +3,7 @@ from __future__ import annotations
 import copy
 import unittest
 
-from git_archaeologist.sft_data_policy import (
+from git_archaeologist.evaluation.sft_data_policy import (
     ALLOWED_TRAINING_CONTENT,
     COLLECTION_ERROR_CATEGORIES,
     EVAL_DATA_PATH_PATTERN,

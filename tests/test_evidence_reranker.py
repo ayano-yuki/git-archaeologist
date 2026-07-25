@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 import unittest
 
-from git_archaeologist.evidence_reranker import (
+from git_archaeologist.rag.evidence_reranker import (
     EvidenceCandidate,
     RerankDecisionKind,
     baseline_order,

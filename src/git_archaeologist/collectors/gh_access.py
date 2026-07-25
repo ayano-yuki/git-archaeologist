@@ -9,7 +9,7 @@ import json
 import subprocess
 from typing import Protocol
 
-from git_archaeologist.repository_config import ArtifactKind, RepositoryConfig
+from git_archaeologist.config.repository_config import ArtifactKind, RepositoryConfig
 
 
 class GhCheckKind(str, Enum):

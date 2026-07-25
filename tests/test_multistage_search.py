@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 import unittest
 
-from git_archaeologist.multistage_search import (
+from git_archaeologist.rag.multistage_search import (
     EventCandidate,
     MultiStageSearchResult,
     PlanStepKind,

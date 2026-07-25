@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import unittest
 
-from git_archaeologist.code_snippet_resolver import CodeDocument
-from git_archaeologist.symbol_index import SymbolIndex, SymbolRange, SymbolRecord
-from git_archaeologist.target_resolver import (
+from git_archaeologist.search.code_snippet_resolver import CodeDocument
+from git_archaeologist.search.symbol_index import SymbolIndex, SymbolRange, SymbolRecord
+from git_archaeologist.search.target_resolver import (
     GitLogMatch,
     TargetKind,
     TargetRequest,

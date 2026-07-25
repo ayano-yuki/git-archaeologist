@@ -8,7 +8,7 @@ from enum import StrEnum
 import json
 from typing import Any
 
-from git_archaeologist.gh_access import (
+from git_archaeologist.collectors.gh_access import (
     GhCommandResult,
     GhErrorType,
     GhFailure,
@@ -16,7 +16,7 @@ from git_archaeologist.gh_access import (
     classify_gh_error,
     run_gh_command,
 )
-from git_archaeologist.repository_config import ArtifactKind, RepositoryConfig
+from git_archaeologist.config.repository_config import ArtifactKind, RepositoryConfig
 
 
 DEFAULT_LIST_LIMIT = 100

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import unittest
 
-from git_archaeologist.chat_flow import (
+from git_archaeologist.chat.chat_flow import (
     ChatAnswer,
     ChatCitation,
     ChatEvidenceItem,
@@ -14,7 +14,7 @@ from git_archaeologist.chat_flow import (
     TargetResolutionState,
     run_chat_flow,
 )
-from git_archaeologist.current_change_context import (
+from git_archaeologist.chat.current_change_context import (
     CurrentChangeFetchError,
     PullRequestLocator,
     PullRequestMetadata,

@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 from enum import StrEnum
 
-from git_archaeologist.evaluation_harness import EvaluationReport, FailureClassification, FailureStage
+from git_archaeologist.evaluation.evaluation_harness import EvaluationReport, FailureClassification, FailureStage
 
 
 class FailureResponsibility(StrEnum):

@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import unittest
 
-from git_archaeologist.common_events import (
+from git_archaeologist.normalization.common_events import (
     COMMON_EVENT_SCHEMA_VERSION,
     ArtifactReference,
     CommonEvent,

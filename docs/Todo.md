@@ -53,7 +53,7 @@
 - [x] **必須: アプリケーションとデータストアの構成を決める**
   - 目的: Raw Archive、イベント、全文検索、ベクトル検索、関係情報の保存先を明確にする。
   - 方法: ローカルで再現可能であり、バックアップとスキーマ更新が可能な構成を比較する。PoCでは運用対象を増やしすぎない。
-  - 成果物: `src/git_archaeologist/storage_config.py`、`tests/test_storage_config.py`、`docs/storage-architecture.md`。
+  - 成果物: `src/git_archaeologist/config/storage_config.py`、`tests/test_storage_config.py`、`docs/storage-architecture.md`。
   - 完了条件: 空の環境から開発環境とデータストアを再構築できる。
 
 ### 1.3 GitHub・Git履歴の収集
@@ -292,7 +292,7 @@
 - [x] **任意: FT / SFTデータ方針とレコード形式を定義する**
   - 目的: Repository固有事実を暗記させず、Evidence Packの読み方と回答規律だけを学習対象にする。
   - 方法: 学習してよい内容、学習してはいけない内容、SFTレコード、closed-book評価ケース、収集エラー時の人間連絡項目を定義する。
-  - 成果物: `src/git_archaeologist/sft_data_policy.py`、`tests/test_sft_data_policy.py`、`data/README.md` のFT / SFTデータ方針。
+  - 成果物: `src/git_archaeologist/evaluation/sft_data_policy.py`、`tests/test_sft_data_policy.py`、`data/README.md` のFT / SFTデータ方針。
   - 完了条件: SFTレコードとclosed-book評価ケースをvalidationでき、学習対象外のRepository固有事実や未支持主張を除外できる。
 
 - [ ] **任意: Answer / Judge LLM向けSFTデータを作成する**

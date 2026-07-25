@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import unittest
 
-from git_archaeologist.input_interpreter import QueryIntent, interpret_input
-from git_archaeologist.mvp_contracts import InputDecision, MvpInputKind
+from git_archaeologist.chat.input_interpreter import QueryIntent, interpret_input
+from git_archaeologist.evaluation.mvp_contracts import InputDecision, MvpInputKind
 
 
 class InputInterpreterTests(unittest.TestCase):

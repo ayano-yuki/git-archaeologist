@@ -2,14 +2,14 @@ from __future__ import annotations
 
 import unittest
 
-from git_archaeologist.code_snippet_resolver import (
+from git_archaeologist.search.code_snippet_resolver import (
     CodeDocument,
     ResolutionStatus,
     SnippetMatchKind,
     normalize_code,
     resolve_code_snippet,
 )
-from git_archaeologist.symbol_index import SymbolIndex, SymbolRange, SymbolRecord
+from git_archaeologist.search.symbol_index import SymbolIndex, SymbolRange, SymbolRecord
 
 
 class CodeSnippetResolverTests(unittest.TestCase):

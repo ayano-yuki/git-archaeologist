@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import unittest
 
-from git_archaeologist.symbol_index import (
+from git_archaeologist.search.symbol_index import (
     SymbolIndex,
     SymbolMatchKind,
     SymbolRange,

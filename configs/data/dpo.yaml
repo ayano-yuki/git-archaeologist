@@ -1,7 +1,0 @@
-train_file: data/processed/dpo_train.jsonl
-validation_file: data/processed/dpo_validation.jsonl
-format: dpo
-required_fields:
-  - prompt
-  - chosen
-  - rejected

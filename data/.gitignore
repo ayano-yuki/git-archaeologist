@@ -1,8 +1,5 @@
-# Track curated training and evaluation data under sft/ and eval/.
-# Ignore bulky or private local artifacts by default.
-/*/raw/
-/*/processed/
-/*/evidence-packs/
-/*/runs/
-/*/models/
-*.log
+# data/ is intentionally Git-tracked, including runtime raw archives,
+# processed indexes, evidence packs, run summaries, and model data.
+#
+# Do not place secrets, private repository artifacts, credentials, or
+# unreviewed private data under data/.

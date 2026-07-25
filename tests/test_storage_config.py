@@ -39,10 +39,10 @@ class StorageConfigTests(unittest.TestCase):
         self.assertEqual(STORAGE_CONFIG_VERSION, stack.schema_version)
         self.assertEqual(DEFAULT_DATA_ROOT.as_posix(), stack.data_root)
 
-    def test_runtime_storage_is_not_git_tracked(self) -> None:
+    def test_runtime_storage_is_git_tracked(self) -> None:
         stack = build_application_stack()
 
-        self.assertTrue(all(not component.git_tracked for component in stack.components))
+        self.assertTrue(all(component.git_tracked for component in stack.components))
         self.assertFalse(stack.component(StorageRole.RAW_ARCHIVE).rebuildable)
         self.assertTrue(stack.component(StorageRole.FULL_TEXT_INDEX).rebuildable)
         self.assertIn("sqlite", stack.component(StorageRole.EVENT_STORE).backend)

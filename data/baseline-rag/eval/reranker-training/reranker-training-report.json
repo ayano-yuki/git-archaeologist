@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "dataset_version": "reranker-training-v1",
+  "model_name": "baseline-rag",
+  "training_method": "keyword-positive-minus-hard-negative",
+  "example_count": 2,
+  "mean_reciprocal_rank": 1.0,
+  "positive_first_count": 2,
+  "status": "passed",
+  "notes": "Small reviewed ranking-learning fixture for validating the Reranker training workflow without external model dependencies."
+}

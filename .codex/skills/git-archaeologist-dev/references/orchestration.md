@@ -12,28 +12,30 @@
 
 - 親 PBI: `ayano-yuki/ayano-yuki-pbi#58`
 - 子 Issue タイトル形式: `【git-archaeologist 】 <title>`
-- 子 Issue は親 PBI #58 の GitHub sub-issue として作成する。
+- 親 PBI #58 直下には phase Issue を置く。phase Issue タイトル形式は `【git-archaeologist 】 phaseNN` とする。
+- phase 内で実施する子 Issue は、対応する phase Issue の GitHub sub-issue として作成する。
 
 ## 全体フロー
 
 1. Manager Codex が親 Issue、`docs/plan.md`、`docs/Todo.md` を読む。
-2. Manager Codex が `.codex/orchestration/templates/child-issue.md` で子 Issue 案を作る。
-3. Manager Codex が `.codex/orchestration/templates/issue-batch-plan.md` で一括作成計画を作る。
-4. Manager Codex が `.codex/hooks/issue-create-gate.md` で停止する。
-5. 人間が一括作成計画を修正または承認する。
-6. Manager Codex が `gh issue create --parent 58` コマンドを準備または実行する。
-7. Manager Codex が作成済み Issue の sub-issue 関係を確認し、抜けがあれば `gh issue edit <issue-number> --parent 58` で修復する。
-8. Manager Codex が各 Issue を Member Codex へ割り当てる。
-9. Member Codex が Issue 専用の `git worktree` を作る。
-10. Member Codex が実装、テスト、コミットを行う。
-11. Member Codex が `.codex/orchestration/templates/pr.md` で PR 本文を作る。
-12. Member Codex が `.codex/hooks/pr-create-gate.md` で停止する。
-13. 人間が Issue 設計からズレていないかを確認する。
-14. Member Codex が feature ブランチを push し、PR を作成する。push だけで停止した状態は未完了とする。
-15. Manager Codex が push 済み feature ブランチと open PR の対応を確認し、PR 作成漏れがあれば作成する。
-16. Manager Codex が人間レビュー前の一次レビューを行う。
-17. 人間が PR をレビューする。
-18. Manager Codex がレビュー指摘を元 Member または別 Member へ再割り当てする。
+2. Manager Codex が対応する phase Issue を確認し、なければ phase Issue 作成案を準備する。
+3. Manager Codex が `.codex/orchestration/templates/child-issue.md` で phase Issue 配下の子 Issue 案を作る。
+4. Manager Codex が `.codex/orchestration/templates/issue-batch-plan.md` で一括作成計画を作る。
+5. Manager Codex が `.codex/hooks/issue-create-gate.md` で停止する。
+6. 人間が一括作成計画を修正または承認する。
+7. Manager Codex が phase Issue は `gh issue create --parent 58`、実施 Issue は `gh issue create --parent <phase-issue-number>` で準備または実行する。
+8. Manager Codex が作成済み Issue の sub-issue 関係を確認し、抜けがあれば `gh issue edit <issue-number> --parent <phase-issue-number>` で修復する。
+9. Manager Codex が各 Issue を Member Codex へ割り当てる。
+10. Member Codex が Issue 専用の `git worktree` を作る。
+11. Member Codex が実装、テスト、コミットを行う。
+12. Member Codex が `.codex/orchestration/templates/pr.md` で PR 本文を作る。
+13. Member Codex が `.codex/hooks/pr-create-gate.md` で停止する。
+14. 人間が Issue 設計からズレていないかを確認する。
+15. Member Codex が feature ブランチを push し、PR を作成する。push だけで停止した状態は未完了とする。
+16. Manager Codex が push 済み feature ブランチと open PR の対応を確認し、PR 作成漏れがあれば作成する。
+17. Manager Codex が人間レビュー前の一次レビューを行う。
+18. 人間が PR をレビューする。
+19. Manager Codex がレビュー指摘を元 Member または別 Member へ再割り当てする。
 
 ## ブランチモデル
 

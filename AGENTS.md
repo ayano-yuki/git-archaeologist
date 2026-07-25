@@ -13,7 +13,7 @@
 
 ### Manager Codex
 
-- 親 Issue から子 Issue 案を一括作成する。
+- 親 Issue #58 直下に phase Issue を作成し、その phase 内の実施 Issue 案を phase Issue のsub-issueとして一括作成する。
 - 人間の微調整後、`gh` で子 Issue を一括作成するためのコマンド案を出す。
 - 子 Issue を Member Codex に割り当てる。
 - Member の PR を人間レビュー前に一次レビューする。
@@ -35,6 +35,20 @@
 - 依存追加、設定変更、CI/CD 変更、破壊的 git 操作、広範囲削除・移動を行う前。
 
 ## ブランチ規約
+
+## Issue階層
+
+Issueは次の階層で扱う。
+
+```text
+親PBI #58
+phase Issue: 【git-archaeologist 】 phaseNN
+実施 Issue: 【git-archaeologist 】 <内容>
+```
+
+- phase Issue は #58 のsub-issueとして作成する。
+- 実施 Issue は対応する phase Issue のsub-issueとして作成する。
+- 既存Issueが #58 直下に増えた場合は、対応する phase Issue 配下へ親を付け替える。
 
 ブランチは次の階層で扱う。
 

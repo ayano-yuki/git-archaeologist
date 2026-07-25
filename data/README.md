@@ -42,6 +42,92 @@ Qwen/Qwen2.5-Coder-7B-Instruct -> data/Qwen--Qwen2.5-Coder-7B-Instruct/
 - コミットする必要がある小さなサンプルは、個人情報、秘密情報、private repository 固有情報を除去してから追加する。
 - モデル間でデータを混ぜない。共通データが必要な場合も、コピーまたは生成手順で再現できるようにする。
 
+## FT / SFT データ方針
+
+Fine-tuning / SFT は、Repository 固有事実をモデルへ記憶させる目的では使わない。MVP では RAG とプロンプト改善を先に行い、それでも繰り返し残る回答規律の失敗を改善する場合だけ導入する。
+
+学習してよい内容は次に限定する。
+
+- Evidence Pack の読み方と、根拠が支える事実・推論・不明の分離。
+- Evidence Pack にない内容を断言しない抑制規律。
+- 主張を支える citation の選び方。
+- 実装理由説明、変更リスク判定、レビュー判断の回答形式。
+- 根拠がある場合の原因分析、時系列整理、レビュー上の判断手順。
+
+学習してはいけない内容は次のとおり。
+
+- Commit、PR、Issue、Review、CI などの Repository 固有事実そのもの。
+- Evidence Pack なしで特定 Repository の履歴を答える closed-book QA。
+- 生の GitHub / git artifact をそのまま正解として与えるデータ。
+- secret、token、認証ヘッダー、private key、private repository 固有情報。
+- Evidence Pack で支えられていない断言、引用不整合、事実と推論の混同を含む理想回答。
+
+初期データソースは `react/react` から収集した履歴とする。収集範囲、artifact 種別、除外ルールは `src/git_archaeologist/config/repositories/react_react.json` の Repository 設定に従う。
+
+## SFT レコード形式
+
+SFT 用データは `data/<model-name>/sft/` に保存し、質問、対象、Evidence Pack、理想回答を 1 レコードにまとめる。評価用データと評価レポートは `data/<model-name>/eval/` に保存する。どちらもモデルごとに `data/<model-name>/` 配下へ閉じ込め、別モデルのデータと混ぜない。
+
+最小形式は次の構造にする。
+
+```json
+{
+  "schema_version": 1,
+  "record_id": "sft-react-react-0001",
+  "source_repository": "react/react",
+  "split": "train",
+  "question": "Why did this review require an additional guard?",
+  "target": {
+    "repository_id": "react/react",
+    "target_type": "pull_request",
+    "artifact_ids": ["pr-123"]
+  },
+  "evidence_pack": {
+    "pack_id": "ep-react-react-0001",
+    "evidence_items": [
+      {
+        "source_id": "review-1",
+        "artifact_kind": "review_comment",
+        "source_url": "https://github.com/react/react/pull/123#discussion_r1",
+        "excerpt": "Reviewer text or normalized excerpt."
+      }
+    ]
+  },
+  "ideal_answer": {
+    "answer": "Evidence-backed structured answer.",
+    "citations": ["review-1"],
+    "unsupported_claims": [],
+    "confidence": "medium"
+  },
+  "labels": {
+    "task": "review_judgment",
+    "requires_abstention": false
+  }
+}
+```
+
+`split` は `train`、`validation`、`test` のいずれかにする。同じ PR、Issue、Review thread、または同じ意思決定に属する artifact は複数 split へ跨がせない。時系列評価が必要な場合は、学習期間より後の履歴を `eval/` に置き、SFT 前後で同じ評価を再実行できるようにする。
+
+## 収集エラー時の人間連絡
+
+収集時に次のエラーが発生した場合は、人間へ連絡する。
+
+- `auth_or_permission`: `gh` 認証、Repository、PR、Issue、Review、Actions 権限不足。
+- `rate_limit_or_timeout`: API rate limit、timeout、一時的な GitHub / git 取得失敗。
+- `partial_or_interrupted_collection`: ページング途中の中断、cursor 不整合、再開不能。
+- `artifact_missing_or_deleted`: 対象 artifact の削除、移動、取得時点での 404。
+- `schema_or_parse_error`: GitHub API、git、正規化済みデータの schema 差異や parse 失敗。
+- `redaction_or_secret_detection`: secret らしき値を検出し、保存または教師データ化を止めた場合。
+- `storage_integrity_error`: hash 不一致、重複 ID、書き込み失敗、壊れた中間生成物。
+
+報告には、`repository_id`、`artifact_kind`、`target`、`operation`、`error_type`、`error_message`、`source_url`、`retry_count` を含める。`raw_token`、`authorization_header`、`secret_value`、`private_key` は報告にも保存にも含めない。
+
+## 記憶漏洩テスト
+
+SFT を実施する場合は、closed-book 記憶漏洩テストを `data/<model-name>/eval/` に置く。これは Evidence Pack を空または無関係にした質問を与え、モデルが学習時に見た Repository 固有事実を根拠なしに答えないことを確認する評価である。
+
+closed-book 評価ケースでは、`evidence_pack.evidence_items` を空にし、期待結果を `unknown` にする。合格条件は、回答が「Evidence Pack からは不明」と扱い、PR 番号、Commit SHA、作者、時系列、判断理由などを根拠なしに断言しないこと。学習期間より後の履歴にも同じ形式の評価を作り、単なる暗記だけでなく汎化時の根拠外断言も検出する。
+
 ## 収集設定との関係
 
 Repository ごとの収集範囲、対象 artifact、除外ルール、private 情報の扱いは `src/git_archaeologist/config/repositories/` の設定から参照する。`data/` 配下には、その設定で取得した実データや評価出力だけを置く。

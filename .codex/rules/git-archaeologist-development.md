@@ -5,6 +5,9 @@
 - 親 PBI Issue は `ayano-yuki/ayano-yuki-pbi#58` とする。
 - 子 Issue タイトルは `【git-archaeologist 】 <内容>` 形式にする。
 - 子 Issue は Manager Codex が一括で案を作り、人間が微調整してから `gh` で作成する。
+- 子 Issue は親 PBI #58 の GitHub sub-issue として作成する。`gh issue create` では `--parent 58` を必ず付ける。
+- 既存 Issue が sub-issue になっていない場合は、`gh issue edit <issue-number> --parent 58` で修復する。
+- Issue 作成または修復後は、親 Issue #58 の `subIssues` または子 Issue の `parent` を確認する。
 - 子 Issue は Member Codex が迷わず着手できる粒度にする。
 
 ## 開発環境とディレクトリ
@@ -16,13 +19,15 @@
 - 学習・評価・実験用データは `data/` 配下に置く。
 - `data/` はモデルごとにフォルダーを分ける。
 - `data/<model-name>/` の構造は `data/README.md` に従う。
-- `data/` 配下の生データ、教師データ、モデル出力、評価ログは原則 Git に含めない。
+- `data/` 配下の生データ、モデル出力、評価ログは原則 Git に含めない。
+- レビュー済みの SFT 教師データと評価データは Git 管理対象にする。個人情報、秘密情報、private repository 固有情報、未redactの生artifactを除去してから `data/<model-name>/sft/` または `data/<model-name>/eval/` に追加する。
 
 ## 子 Issue の必須項目
 
 子 Issue には次を含める。
 
 - タイトル
+- 親 PBI #58 との sub-issue 関係
 - 背景
 - 実装内容
 - 受け入れ条件
@@ -40,6 +45,8 @@
 - `feature/<issue-number>-<short-title>` は Member の作業ブランチとして扱う。
 - 並列作業では `git worktree` を使い、Issue ごとに作業ディレクトリを分ける。
 - 同じ worktree で別 Issue の作業を混ぜない。
+- 承認済みの並列作業は、Issue ごとの commit、push、PR 作成までを完了条件にする。
+- push 済み feature ブランチに対応する PR がない状態は未完了として扱う。
 
 ## 機能領域
 
@@ -75,9 +82,14 @@ docs: Issue分解テンプレートを追加
 
 ## PR ルール
 
+- PR の向き先は隣接階層だけに限定する。
+- `project/<function-area>` の PR は `main` を base、`project/<function-area>` を head にする。
+- `feature/<issue-number>-<short-title>` の PR は対応する `project/<function-area>` を base、feature ブランチを head にする。
+- `feature` から `main`、`feature` から別 `feature`、`project` から `feature` への PR は作らない。
 - PR タイトルは `[機能] PR内容（#issue番号）` とする。
 - PR 本文には `- [issue] #123` の形式で関連 Issue を記載する。
 - PR 作成前に、受け入れ条件、テスト結果、設計ズレの有無をまとめて人間確認を受ける。
+- 人間が PR 作成を依頼または承認済みの場合は、feature ブランチの push だけで止めず、PR URL を取得するまで進める。
 - PR 作成後、人間レビュー前に Manager Codex が一次レビューする。
 
 ## 停止ルール

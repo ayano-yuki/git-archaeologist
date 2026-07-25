@@ -1,6 +1,8 @@
-# Keep the data policy tracked, but ignore local training and evaluation data.
-/*
-!/README.md
-!/.gitignore
-!/.gitkeep
-
+# Track curated training and evaluation data under sft/ and eval/.
+# Ignore bulky or private local artifacts by default.
+/*/raw/
+/*/processed/
+/*/evidence-packs/
+/*/runs/
+/*/models/
+*.log

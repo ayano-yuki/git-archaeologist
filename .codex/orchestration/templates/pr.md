@@ -2,7 +2,7 @@
 
 ## 関連 Issue
 
-- [issue] [#123](https://github.com/ayano-yuki/ayano-yuki-pbi/issues/123)
+- [https://github.com/ayano-yuki/ayano-yuki-pbi/issues/123](https://github.com/ayano-yuki/ayano-yuki-pbi/issues/123)
 
 ## 概要
 

@@ -1,0 +1,145 @@
+{
+  "schema_version": 1,
+  "repository": {
+    "id": "react/react",
+    "owner": "react",
+    "name": "react",
+    "url": "https://github.com/react/react",
+    "default_branch": "main",
+    "history": {
+      "since": "2024-01-01T00:00:00Z",
+      "until": "2026-07-25T00:00:00Z"
+    }
+  },
+  "artifact_scopes": [
+    {
+      "kind": "commit",
+      "enabled": true,
+      "selectors": {
+        "branch": "main",
+        "reachable_from_default_branch": true
+      }
+    },
+    {
+      "kind": "pull_request",
+      "enabled": true,
+      "selectors": {
+        "states": ["open", "closed", "merged"],
+        "include_body": true,
+        "include_comments": true,
+        "include_review_threads": true
+      }
+    },
+    {
+      "kind": "issue",
+      "enabled": true,
+      "selectors": {
+        "states": ["open", "closed"],
+        "include_body": true,
+        "include_comments": true
+      }
+    },
+    {
+      "kind": "review",
+      "enabled": true,
+      "selectors": {
+        "include_submitted_reviews": true
+      }
+    },
+    {
+      "kind": "review_comment",
+      "enabled": true,
+      "selectors": {
+        "include_resolved_threads": true
+      }
+    },
+    {
+      "kind": "issue_comment",
+      "enabled": true,
+      "selectors": {
+        "include_issue_comments": true,
+        "include_pull_request_comments": true
+      }
+    },
+    {
+      "kind": "ci_run",
+      "enabled": true,
+      "selectors": {
+        "event_types": ["pull_request", "push"],
+        "conclusions": ["failure", "cancelled", "timed_out", "success"],
+        "include_jobs": true
+      }
+    },
+    {
+      "kind": "ci_job",
+      "enabled": true,
+      "selectors": {
+        "include_failed_steps": true,
+        "include_full_logs": false
+      }
+    }
+  ],
+  "exclusion_rules": [
+    {
+      "id": "exclude-git-internals",
+      "artifact_kinds": ["commit"],
+      "field": "path",
+      "pattern": ".git/**",
+      "reason": "Git internal files are not repository artifacts."
+    },
+    {
+      "id": "exclude-vendored-node-modules",
+      "artifact_kinds": ["commit"],
+      "field": "path",
+      "pattern": "**/node_modules/**",
+      "reason": "Vendored dependency trees are not part of React source history."
+    },
+    {
+      "id": "exclude-minified-assets",
+      "artifact_kinds": ["commit"],
+      "field": "path",
+      "pattern": "**/*.min.js",
+      "reason": "Minified generated assets should not drive rationale retrieval."
+    },
+    {
+      "id": "exclude-security-advisory-private-threads",
+      "artifact_kinds": ["issue", "pull_request", "review_comment", "issue_comment"],
+      "field": "visibility",
+      "pattern": "private",
+      "reason": "Private or restricted security discussions must not enter the public MVP corpus."
+    }
+  ],
+  "private_info_policy": {
+    "repository_visibility": "public",
+    "allow_private_repository": false,
+    "store_raw_private_data": false,
+    "redact_secret_like_values": true,
+    "redaction_labels": [
+      "token",
+      "secret",
+      "password",
+      "authorization_header",
+      "private_key"
+    ],
+    "ci_log_policy": "metadata_and_failed_steps_only"
+  },
+  "error_reporting": {
+    "notify_human": true,
+    "required_fields": [
+      "repository_id",
+      "artifact_kind",
+      "target",
+      "operation",
+      "error_type",
+      "error_message",
+      "source_url",
+      "retry_count"
+    ],
+    "suppressed_fields": [
+      "raw_token",
+      "authorization_header",
+      "secret_value",
+      "private_key"
+    ]
+  }
+}

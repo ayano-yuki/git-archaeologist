@@ -35,6 +35,30 @@ uv --system-certs run python -m git_archaeologist.phase2_smoke
 
 `status` が `phase2_smoke_passed` であれば、MVPチャットとPhase2安定化部品が同じローカル環境で動作しています。
 
+## FT / QLoRA 動作確認
+
+Answer / Judge LLM の回答規律を SFT する場合は、先に構成全体の smoke を実行します。
+
+```powershell
+uv --system-certs run python -m git_archaeologist.evaluation.system_smoke
+```
+
+学習用依存関係も含めて確認する場合は、training extra を使います。
+
+```powershell
+uv sync --extra training
+uv --system-certs run --extra training python -m git_archaeologist.evaluation.system_smoke --require-training-dependencies
+uv --system-certs run --extra training python -m git_archaeologist.evaluation.train_sft --dry-run
+```
+
+サーバーで GPU とモデルロードまで確認する最小実行は次のコマンドです。
+
+```powershell
+uv --system-certs run --extra training python -m git_archaeologist.evaluation.train_sft --execute --max-steps 1
+```
+
+本番学習は `--max-steps` を外して実行します。対象モデルは runtime profile で選定した `Qwen/Qwen2.5-Coder-7B-Instruct`、方式は QLoRA です。adapter は `data/Qwen--Qwen2.5-Coder-7B-Instruct/models/answer-discipline-qlora/` へ出力します。
+
 ## ディレクトリ構成
 
 ```text

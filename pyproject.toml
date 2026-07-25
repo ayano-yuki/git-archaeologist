@@ -6,6 +6,16 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = []
 
+[project.optional-dependencies]
+training = [
+  "accelerate>=1.0,<2",
+  "bitsandbytes>=0.43,<1",
+  "datasets>=2.20,<5",
+  "peft>=0.12,<1",
+  "torch>=2.4,<3",
+  "transformers>=4.45,<5",
+]
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"

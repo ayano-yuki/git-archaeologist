@@ -90,7 +90,7 @@ docs: Issue分解テンプレートを追加
 - `feature/<issue-number>-<short-title>` の PR は対応する `project/<function-area>` を base、feature ブランチを head にする。
 - `feature` から `main`、`feature` から別 `feature`、`project` から `feature` への PR は作らない。
 - PR タイトルは `[機能] PR内容（#issue番号）` とする。
-- PR 本文には `- [issue] [#123](https://github.com/ayano-yuki/ayano-yuki-pbi/issues/123)` のリンク形式で関連 Issue を記載する。
+- PR 本文には `- [https://github.com/ayano-yuki/ayano-yuki-pbi/issues/123](https://github.com/ayano-yuki/ayano-yuki-pbi/issues/123)` のように、Issue URL をラベルにも使うリンク形式で関連 Issue を記載する。
 - PR 作成前に、受け入れ条件、テスト結果、設計ズレの有無をまとめて人間確認を受ける。
 - 人間が PR 作成を依頼または承認済みの場合は、feature ブランチの push だけで止めず、PR URL を取得するまで進める。
 - PR 作成後、人間レビュー前に Manager Codex が一次レビューする。

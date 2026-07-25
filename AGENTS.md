@@ -80,5 +80,5 @@ feature/<issue-number>-<short-title>
 
 - コミットメッセージは `接頭語: 日本語の内容` とする。
 - PR タイトルは `[機能] PR内容（#issue番号）` とする。
-- PR 本文には関連 Issue を `- [issue] [#123](https://github.com/ayano-yuki/ayano-yuki-pbi/issues/123)` のリンク形式で書く。
+- PR 本文には関連 Issue を `- [https://github.com/ayano-yuki/ayano-yuki-pbi/issues/123](https://github.com/ayano-yuki/ayano-yuki-pbi/issues/123)` のように、Issue URL をラベルにも使うリンク形式で書く。
 - PR 本文には受け入れ条件、テスト結果、Manager 一次レビューの観点を含める。

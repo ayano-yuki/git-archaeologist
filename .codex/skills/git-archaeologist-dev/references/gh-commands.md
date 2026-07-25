@@ -99,7 +99,7 @@ PR 作成前ゲートで人間確認を受け、隣接階層だけに PR を作�
 - project 統合は `main` を base にする。
 
 feature ブランチを push してから実行する。
-PR 本文の関連 Issue は `- [issue] [#123](https://github.com/ayano-yuki/ayano-yuki-pbi/issues/123)` のリンク形式にする。
+PR 本文の関連 Issue は `- [https://github.com/ayano-yuki/ayano-yuki-pbi/issues/123](https://github.com/ayano-yuki/ayano-yuki-pbi/issues/123)` のように、Issue URL をラベルにも使うリンク形式にする。
 
 ```powershell
 gh pr create `

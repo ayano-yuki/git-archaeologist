@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "dataset_version": "lineage-analysis-v1",
+  "repository_id": "react/react",
+  "review_status": "curated",
+  "cases": [
+    {
+      "case_id": "lineage-react-0001",
+      "target": {
+        "file_path": "packages/react-dom/client.js",
+        "start_line": 20,
+        "end_line": 20,
+        "symbol_name": "ReactDOM.createRoot"
+      },
+      "expected_origin_commit": "abc1234",
+      "expected_file_lineage": "moved",
+      "expected_symbol_lineage": "renamed",
+      "expected_condition_change": "extended",
+      "related_tests": [
+        "ReactDOM.createRoot.test"
+      ],
+      "expected_answer_status": "answered"
+    },
+    {
+      "case_id": "lineage-react-0002",
+      "target": {
+        "file_path": "packages/shared/ambiguous.js",
+        "start_line": 5,
+        "end_line": 5
+      },
+      "expected_answer_status": "ambiguous",
+      "must_not_claim": [
+        "single definitive origin",
+        "maintenance reason without evidence"
+      ]
+    }
+  ],
+  "metrics": {
+    "origin_reachability": 1.0,
+    "rename_move_copy_detection_accuracy": 1.0,
+    "condition_change_classification_accuracy": 1.0,
+    "ambiguity_detection_accuracy": 1.0
+  },
+  "notes": "Synthetic reviewed Phase4 evaluation data for line and condition lineage. It stores no raw private artifacts."
+}

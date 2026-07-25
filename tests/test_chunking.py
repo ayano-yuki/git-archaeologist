@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import unittest
 
-from git_archaeologist.chunking import (
+from git_archaeologist.rag.chunking import (
     ChunkKind,
     chunk_commit_message,
     chunk_diff_hunk,

@@ -15,7 +15,7 @@ from pathlib import Path
 import subprocess
 from typing import Any
 
-from git_archaeologist.raw_archive import (
+from git_archaeologist.collectors.raw_archive import (
     RawArtifact,
     canonical_json_bytes,
     error_report_payload,

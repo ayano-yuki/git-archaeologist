@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 import re
 
-from git_archaeologist.common_events import (
+from git_archaeologist.normalization.common_events import (
     CommonEvent,
     EventRelation,
     EvidenceKind,

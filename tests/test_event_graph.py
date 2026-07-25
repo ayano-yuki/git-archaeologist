@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import unittest
 
-from git_archaeologist.common_events import (
+from git_archaeologist.normalization.common_events import (
     ArtifactReference,
     CommonEvent,
     EventFieldSet,
@@ -10,7 +10,7 @@ from git_archaeologist.common_events import (
     EvidenceKind,
     RelationKind,
 )
-from git_archaeologist.event_graph import generate_event_graph_edges
+from git_archaeologist.normalization.event_graph import generate_event_graph_edges
 
 
 class EventGraphTests(unittest.TestCase):

@@ -6,14 +6,14 @@ from dataclasses import asdict, dataclass
 from enum import StrEnum
 from typing import Protocol
 
-from git_archaeologist.current_change_context import (
+from git_archaeologist.chat.current_change_context import (
     CurrentChangeClient,
     CurrentChangeContext,
     CurrentChangeStatus,
     build_current_change_context,
 )
-from git_archaeologist.input_interpreter import InterpretedInput, interpret_input
-from git_archaeologist.query_trace import QueryTrace, QueryTraceStore, start_query_trace
+from git_archaeologist.chat.input_interpreter import InterpretedInput, interpret_input
+from git_archaeologist.ops.query_trace import QueryTrace, QueryTraceStore, start_query_trace
 
 
 class ChatFlowStatus(StrEnum):

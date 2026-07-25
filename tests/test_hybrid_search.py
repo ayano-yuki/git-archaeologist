@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 import unittest
 
-from git_archaeologist.hybrid_search import (
+from git_archaeologist.search.hybrid_search import (
     HybridSearchEngine,
     KeywordSearchEngine,
     SearchDocument,

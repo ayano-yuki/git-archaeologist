@@ -5,7 +5,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
 
-from git_archaeologist.raw_archive import (
+from git_archaeologist.collectors.raw_archive import (
     HUMAN_ERROR_SUPPRESSED_FIELDS,
     RAW_ARCHIVE_SCHEMA_VERSION,
     RawArchiveStorageError,

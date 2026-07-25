@@ -135,7 +135,7 @@ def build_application_stack(data_root: str | Path = DEFAULT_DATA_ROOT) -> Applic
                 purpose="Store local execution logs, benchmark reports, and evaluation outputs.",
             ),
         ),
-        rebuild_command="uv run python -m git_archaeologist.storage_config --init",
+        rebuild_command="uv run python -m git_archaeologist.config.storage_config --init",
         notes=(
             "Raw Archive is immutable and not rebuildable unless GitHub or git artifacts are fetched again.",
             "SQLite is the MVP coordination store; vector storage remains sidecar-compatible so the backend can be swapped after benchmark results.",

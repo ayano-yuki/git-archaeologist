@@ -7,7 +7,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from git_archaeologist.storage_config import (
+from git_archaeologist.config.storage_config import (
     DEFAULT_DATA_ROOT,
     STORAGE_CONFIG_VERSION,
     StorageRole,

@@ -5,14 +5,14 @@ from datetime import datetime, timezone
 import json
 import unittest
 
-from git_archaeologist.gh_access import GhCommandResult
-from git_archaeologist.github_artifacts import (
+from git_archaeologist.collectors.gh_access import GhCommandResult
+from git_archaeologist.collectors.github_artifacts import (
     GithubCollectionOperation,
     build_child_github_artifact_requests,
     build_root_github_artifact_requests,
     collect_github_artifacts,
 )
-from git_archaeologist.repository_config import ArtifactKind, load_builtin_repository_config
+from git_archaeologist.config.repository_config import ArtifactKind, load_builtin_repository_config
 
 
 class FakeGhRunner:

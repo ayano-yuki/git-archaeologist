@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import unittest
 
-from git_archaeologist.answer_schema import (
+from git_archaeologist.rag.answer_schema import (
     AnswerClaim,
     AnswerSchemaViolation,
     AnswerVerdict,

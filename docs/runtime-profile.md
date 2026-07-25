@@ -26,13 +26,13 @@ Answer / Judge LLM の Evidence Pack 予算は最大 24k token を目安にし�
 標準ライブラリだけで、現在のハードウェアと固定したモデル制約を JSON として出力できる。
 
 ```powershell
-uv run python -m git_archaeologist.runtime_profile
+uv run python -m git_archaeologist.evaluation.runtime_profile
 ```
 
 証明書エラーが出る環境では次を使う。
 
 ```powershell
-uv --system-certs run python -m git_archaeologist.runtime_profile
+uv --system-certs run python -m git_archaeologist.evaluation.runtime_profile
 ```
 
 この出力をベンチマーク実行時の前提として保存する。モデル ID、量子化方式、最大コンテキスト長、受け入れ基準を変更する場合は、実測前に `runtime-profile-v1` とは別の profile version と変更理由を記録する。
@@ -40,7 +40,7 @@ uv --system-certs run python -m git_archaeologist.runtime_profile
 Python API から、モデル別の run directory へ保存できる。
 
 ```python
-from git_archaeologist.runtime_profile import build_runtime_profile, write_runtime_profile
+from git_archaeologist.evaluation.runtime_profile import build_runtime_profile, write_runtime_profile
 
 profile = build_runtime_profile()
 write_runtime_profile(profile, model_name="Qwen/Qwen2.5-Coder-7B-Instruct")

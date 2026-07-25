@@ -30,18 +30,19 @@ Git Archaeologist を Issue 駆動で並列開発するための Skill。人間�
 
 ## Manager ワークフロー
 
-1. 親 Issue `ayano-yuki/ayano-yuki-pbi#58`、`docs/plan.md`、`docs/Todo.md` を読む。
-2. `.codex/orchestration/templates/child-issue.md` を使って子 Issue 案を作る。
-3. 各 Issue を `collector`、`normalizer`、`search`、`rag`、`chat`、`evaluation` のいずれかへ分類する。
-4. `.codex/orchestration/templates/issue-batch-plan.md` を使って一括作成計画を作る。
-5. `gh issue create --parent 58` の前に停止し、人間へ設計ズレ確認を依頼する。
-6. 承認後、`.codex/skills/git-archaeologist-dev/references/gh-commands.md` のコマンド例をもとに Issue 作成を準備または実行する。子 Issue は必ず親 PBI #58 の GitHub sub-issue として作成する。
-7. 作成済み Issue が sub-issue になっていない場合は、`gh issue edit <issue-number> --parent 58` で修復する。
-8. Issue 作成または修復後、親 Issue #58 の `subIssues` または子 Issue の `parent` を確認する。
-9. 子 Issue を Member Codex の worktree へ割り当てる。承認済みの並列作業は、各 Issue のコミット、push、PR 作成までを完了条件にする。
-10. 最終報告前に、push 済み feature ブランチと open PR の対応を確認する。PR がない push 済み feature ブランチは未完了として扱い、PR 作成まで進める。
-11. 人間レビュー前に、PR の範囲、受け入れ条件、明らかな問題、テスト、規約違反を一次レビューする。
-12. レビュー指摘が来たら、元 Member または別 Member へ再割り当てする。
+1. 親 Issue `ayano-yuki/ayano-yuki-pbi#58`、対応する phase Issue、`docs/plan.md`、`docs/Todo.md` を読む。
+2. 対応する phase Issue がなければ、`【git-archaeologist 】 phaseNN` を親 PBI #58 の sub-issue として作る案を準備する。
+3. `.codex/orchestration/templates/child-issue.md` を使って、phase Issue 配下に置く実施 Issue 案を作る。
+4. 各 Issue を `collector`、`normalizer`、`search`、`rag`、`chat`、`evaluation` のいずれかへ分類する。
+5. `.codex/orchestration/templates/issue-batch-plan.md` を使って一括作成計画を作る。
+6. phase Issue 作成または実施 Issue 作成の前に停止し、人間へ設計ズレ確認を依頼する。
+7. 承認後、`.codex/skills/git-archaeologist-dev/references/gh-commands.md` のコマンド例をもとに Issue 作成を準備または実行する。phase Issue は親 PBI #58 の sub-issue、実施 Issue は対応する phase Issue の sub-issue として作成する。
+8. 作成済み実施 Issue が #58 直下にある場合は、`gh issue edit <issue-number> --parent <phase-issue-number>` で修復する。
+9. Issue 作成または修復後、親 Issue #58 の `subIssues`、phase Issue の `subIssues`、または子 Issue の `parent` を確認する。
+10. 子 Issue を Member Codex の worktree へ割り当てる。承認済みの並列作業は、各 Issue のコミット、push、PR 作成までを完了条件にする。
+11. 最終報告前に、push 済み feature ブランチと open PR の対応を確認する。PR がない push 済み feature ブランチは未完了として扱い、PR 作成まで進める。
+12. 人間レビュー前に、PR の範囲、受け入れ条件、明らかな問題、テスト、規約違反を一次レビューする。
+13. レビュー指摘が来たら、元 Member または別 Member へ再割り当てする。
 
 ## Member ワークフロー
 
@@ -60,7 +61,7 @@ Git Archaeologist を Issue 駆動で並列開発するための Skill。人間�
 
 次の操作前には停止する。
 
-- 子 Issue の一括作成または sub-issue 紐付けの修復。
+- phase Issue または子 Issue の一括作成、sub-issue 紐付けの修復。
 - PR 作成。
 - 依存関係の追加。
 - CI/CD、GitHub Actions、認証、秘密情報、データ保存先、ロードマップの変更。
@@ -77,6 +78,21 @@ PR 作成まで完了した worktree は、`git status --short --branch` で cle
 1 ファイルあたりの変更量は、おおむね 400 行から 600 行に収まるようにする。600 行を超えそうな場合は、Issue 分割、責務ごとのファイル分割、テスト fixture の分離を検討し、やむを得ず超える場合は PR 本文と Manager 一次レビューで理由を明記する。
 
 ## ブランチと PR ルール
+
+## Issue 階層ルール
+
+Issue は次の階層で扱う。
+
+```text
+親PBI #58
+phase Issue: 【git-archaeologist 】 phaseNN
+実施 Issue: 【git-archaeologist 】 <内容>
+```
+
+- phase Issue は親 PBI #58 の sub-issue として作成する。
+- 実施 Issue は対応する phase Issue の sub-issue として作成する。
+- 新しい phase に着手するときは、最初に phase Issue を作る。
+- 既存の実施 Issue が #58 直下にある場合は、対応する phase Issue 配下へ親を付け替える。
 
 ブランチ階層は次を使う。
 

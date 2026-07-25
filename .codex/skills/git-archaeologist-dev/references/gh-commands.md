@@ -2,24 +2,36 @@
 
 実行前に `.codex/hooks/` の該当ゲートを確認する。`<function-area>` は `collector`、`normalizer`、`search`、`rag`、`chat`、`evaluation` のいずれかに置き換える。
 
-## Issue 作成
+## phase Issue 作成
+
+```powershell
+gh issue create `
+  --repo ayano-yuki/ayano-yuki-pbi `
+  --title "【git-archaeologist 】 phaseNN" `
+  --body-file "<path-to-phase-body.md>" `
+  --parent 58
+```
+
+## 実施 Issue 作成
+
+phase 内で実施する Issue は、対応する phase Issue の sub-issue にする。
 
 ```powershell
 gh issue create `
   --repo ayano-yuki/ayano-yuki-pbi `
   --title "【git-archaeologist 】 <title>" `
   --body-file "<path-to-generated-body.md>" `
-  --parent 58
+  --parent <phase-issue-number>
 ```
 
 ## sub-issue 修復
 
-既存の子 Issue が親 PBI #58 の sub-issue になっていない場合は、次で修復する。
+既存の実施 Issue が親 PBI #58 直下にある場合は、対応する phase Issue の sub-issue へ修復する。
 
 ```powershell
 gh issue edit <child-issue-number> `
   --repo ayano-yuki/ayano-yuki-pbi `
-  --parent 58
+  --parent <phase-issue-number>
 ```
 
 複数 Issue をまとめて修復する場合は、Issue 番号を並べる。
@@ -27,7 +39,7 @@ gh issue edit <child-issue-number> `
 ```powershell
 gh issue edit 68 69 70 `
   --repo ayano-yuki/ayano-yuki-pbi `
-  --parent 58
+  --parent <phase-issue-number>
 ```
 
 ## sub-issue 確認
@@ -38,6 +50,10 @@ Issue 作成または修復後、親 Issue または子 Issue から親子関係
 gh issue view 58 `
   --repo ayano-yuki/ayano-yuki-pbi `
   --json number,title,subIssues
+
+gh issue view <phase-issue-number> `
+  --repo ayano-yuki/ayano-yuki-pbi `
+  --json number,title,parent,subIssues
 
 gh issue view <child-issue-number> `
   --repo ayano-yuki/ayano-yuki-pbi `

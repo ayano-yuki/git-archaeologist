@@ -1,6 +1,17 @@
 """Git Archaeologist package."""
 
-from .mvp_contracts import (
+from git_archaeologist.gh_access import (
+    GhCheckKind,
+    GhCheckResult,
+    GhCommandResult,
+    GhErrorType,
+    GhFailure,
+    GhPreflightReport,
+    check_github_access,
+    classify_gh_error,
+    run_gh_command,
+)
+from git_archaeologist.mvp_contracts import (
     CONTRACT_VERSION,
     EVALUATION_CORPUS,
     FREEZE_POLICY,
@@ -19,8 +30,29 @@ from .mvp_contracts import (
     load_mvp_quality_targets,
     structure_mvp_input,
 )
+from git_archaeologist.repository_config import (
+    ArtifactKind,
+    ArtifactScope,
+    ErrorReportingPolicy,
+    ExclusionRule,
+    HistoryWindow,
+    PrivateInfoPolicy,
+    RepositoryConfig,
+    load_builtin_repository_config,
+    load_repository_config,
+    parse_repository_config,
+)
 
 __all__ = [
+    "GhCheckKind",
+    "GhCheckResult",
+    "GhCommandResult",
+    "GhErrorType",
+    "GhFailure",
+    "GhPreflightReport",
+    "check_github_access",
+    "classify_gh_error",
+    "run_gh_command",
     "CONTRACT_VERSION",
     "EVALUATION_CORPUS",
     "FREEZE_POLICY",
@@ -38,5 +70,14 @@ __all__ = [
     "load_mvp_input_formats",
     "load_mvp_quality_targets",
     "structure_mvp_input",
+    "ArtifactKind",
+    "ArtifactScope",
+    "ErrorReportingPolicy",
+    "ExclusionRule",
+    "HistoryWindow",
+    "PrivateInfoPolicy",
+    "RepositoryConfig",
+    "load_builtin_repository_config",
+    "load_repository_config",
+    "parse_repository_config",
 ]
-

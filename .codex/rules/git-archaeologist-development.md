@@ -4,10 +4,13 @@
 
 - 親 PBI Issue は `ayano-yuki/ayano-yuki-pbi#58` とする。
 - 子 Issue タイトルは `【git-archaeologist 】 <内容>` 形式にする。
+- 親 PBI #58 直下には、原則として phase まとめ Issue だけを置く。phase Issue は `【git-archaeologist 】 phaseNN` 形式にする。
+- 各 phase 内で実施する作業 Issue は、対応する phase Issue の GitHub sub-issue として作成する。例: Phase3作業は `phase03` Issue の sub-issue にする。
 - 子 Issue は Manager Codex が一括で案を作り、人間が微調整してから `gh` で作成する。
-- 子 Issue は親 PBI #58 の GitHub sub-issue として作成する。`gh issue create` では `--parent 58` を必ず付ける。
-- 既存 Issue が sub-issue になっていない場合は、`gh issue edit <issue-number> --parent 58` で修復する。
-- Issue 作成または修復後は、親 Issue #58 の `subIssues` または子 Issue の `parent` を確認する。
+- phase Issue は親 PBI #58 の GitHub sub-issue として作成する。`gh issue create` では `--parent 58` を付ける。
+- 実施 Issue は対応する phase Issue の GitHub sub-issue として作成する。`gh issue create` では `--parent <phase-issue-number>` を付ける。
+- 既存の実施 Issue が親 PBI #58 直下にある場合は、`gh issue edit <issue-number> --parent <phase-issue-number>` で修復する。
+- Issue 作成または修復後は、親 Issue #58 の `subIssues`、phase Issue の `subIssues`、または子 Issue の `parent` を確認する。
 - 子 Issue は Member Codex が迷わず着手できる粒度にする。
 
 ## 開発環境とディレクトリ

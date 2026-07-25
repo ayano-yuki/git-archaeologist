@@ -9,7 +9,8 @@
 ## 親 Issue
 
 - 親 Issue: ayano-yuki/ayano-yuki-pbi#58
-- GitHub sub-issue: #58 の sub-issue として作成する
+- phase Issue: ayano-yuki/ayano-yuki-pbi#<phase-issue-number>
+- GitHub sub-issue: 対応する phase Issue の sub-issue として作成する
 
 ## 背景
 

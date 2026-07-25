@@ -104,13 +104,13 @@
 
 ### 1.5 コード・シンボル索引
 
-- [ ] **必須: 対応言語とParserを決める**
+- [x] **必須: 対応言語とParserを決める**
   - 目的: 関数やクラスの境界を文字列推測ではなく構文から取得する。
   - 方法: 対象Repositoryの主要言語を集計し、Tree-sitter等のParser対応範囲とfallbackを決める。
   - 成果物: 対応言語一覧、Parser設定、未対応時の動作。
   - 完了条件: MVP評価対象の主要ファイルからシンボルを抽出できる。
 
-- [ ] **必須: Symbol Indexを構築する**
+- [x] **必須: Symbol Indexを構築する**
   - 目的: ファイル名、関数名、コード断片をCommit履歴へ接続する。
   - 方法: symbol ID、qualified name、file、範囲、Commit SHA、言語、content hashを保存する。現行版だけでなく、履歴上の主要な版も参照可能にする。
   - 成果物: Code / Symbol Index、索引作成コマンド。

@@ -43,6 +43,12 @@ project/<function-area>
 feature/<issue-number>-<short-title>
 ```
 
+PR の向き先は隣接階層だけに限定する。
+
+- `project/<function-area>` から `main`。
+- `feature/<issue-number>-<short-title>` から対応する `project/<function-area>`。
+- `feature` から `main`、`feature` から別 `feature`、`project` から `feature` への PR は作らない。
+
 使える機能領域:
 
 - `collector`
@@ -87,7 +93,7 @@ feature/<issue-number>-<short-title>
 - PR が Issue の受け入れ条件を満たしている。
 - 差分が Issue の範囲内に収まっている。
 - テストが Issue のテスト方針と合っている。
-- ブランチ、コミット、PR タイトル、PR 本文が規約に合っている。
+- ブランチ、PR の向き先、コミット、PR タイトル、PR 本文が規約に合っている。
 - 危険操作が人間確認ゲートを通っている。
 - 変更が `docs/plan.md` または `docs/Todo.md` と矛盾していない。
 

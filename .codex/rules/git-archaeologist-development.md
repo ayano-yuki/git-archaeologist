@@ -16,7 +16,8 @@
 - 学習・評価・実験用データは `data/` 配下に置く。
 - `data/` はモデルごとにフォルダーを分ける。
 - `data/<model-name>/` の構造は `data/README.md` に従う。
-- `data/` 配下の生データ、教師データ、モデル出力、評価ログは原則 Git に含めない。
+- `data/` 配下の生データ、モデル出力、評価ログは原則 Git に含めない。
+- レビュー済みの SFT 教師データと評価データは Git 管理対象にする。個人情報、秘密情報、private repository 固有情報、未redactの生artifactを除去してから `data/<model-name>/sft/` または `data/<model-name>/eval/` に追加する。
 
 ## 子 Issue の必須項目
 
@@ -75,6 +76,10 @@ docs: Issue分解テンプレートを追加
 
 ## PR ルール
 
+- PR の向き先は隣接階層だけに限定する。
+- `project/<function-area>` の PR は `main` を base、`project/<function-area>` を head にする。
+- `feature/<issue-number>-<short-title>` の PR は対応する `project/<function-area>` を base、feature ブランチを head にする。
+- `feature` から `main`、`feature` から別 `feature`、`project` から `feature` への PR は作らない。
 - PR タイトルは `[機能] PR内容（#issue番号）` とする。
 - PR 本文には `- [issue] #123` の形式で関連 Issue を記載する。
 - PR 作成前に、受け入れ条件、テスト結果、設計ズレの有無をまとめて人間確認を受ける。

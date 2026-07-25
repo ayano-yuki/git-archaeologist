@@ -49,7 +49,7 @@ Git Archaeologist を Issue 駆動で並列開発するための Skill。人間�
 5. `.codex/rules/git-archaeologist-development.md` の形式でコミットする。
 6. `.codex/orchestration/templates/pr.md` を使って PR 本文を作る。
 7. `gh pr create` の前に停止し、人間へ設計ズレ確認を依頼する。
-8. 承認後、feature ブランチを push して PR を作成する。push だけで停止しない。
+8. 承認後、feature ブランチを push し、対応する `project/<function-area>` を base に PR を作成する。push だけで停止しない。
 9. PR 作成後、作業済み worktree が clean で push 済みであることを確認し、不要になった worktree を削除する。
 
 ## 人間確認ゲート
@@ -80,6 +80,12 @@ phase/1-mvp
 project/<function-area>
 feature/<issue-number>-<short-title>
 ```
+
+PR の向き先は隣接階層だけに限定する。
+
+- `project/<function-area>` から `main`。
+- `feature/<issue-number>-<short-title>` から対応する `project/<function-area>`。
+- `feature` から `main`、`feature` から別 `feature`、`project` から `feature` への PR は作らない。
 
 PR タイトルは次の形式にする。
 

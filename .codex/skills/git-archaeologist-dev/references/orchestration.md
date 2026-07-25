@@ -29,10 +29,11 @@
 11. Member Codex が `.codex/orchestration/templates/pr.md` で PR 本文を作る。
 12. Member Codex が `.codex/hooks/pr-create-gate.md` で停止する。
 13. 人間が Issue 設計からズレていないかを確認する。
-14. Member Codex が feature ブランチを push し、PR を作成する。
-15. Manager Codex が人間レビュー前の一次レビューを行う。
-16. 人間が PR をレビューする。
-17. Manager Codex がレビュー指摘を元 Member または別 Member へ再割り当てする。
+14. Member Codex が feature ブランチを push し、PR を作成する。push だけで停止した状態は未完了とする。
+15. Manager Codex が push 済み feature ブランチと open PR の対応を確認し、PR 作成漏れがあれば作成する。
+16. Manager Codex が人間レビュー前の一次レビューを行う。
+17. 人間が PR をレビューする。
+18. Manager Codex がレビュー指摘を元 Member または別 Member へ再割り当てする。
 
 ## ブランチモデル
 
@@ -93,6 +94,7 @@ PR の向き先は隣接階層だけに限定する。
 人間レビュー前に Manager Codex は次を確認する。
 
 - PR が Issue の受け入れ条件を満たしている。
+- push 済み feature ブランチに対応する PR が作成されている。
 - 差分が Issue の範囲内に収まっている。
 - テストが Issue のテスト方針と合っている。
 - ブランチ、PR の向き先、コミット、PR タイトル、PR 本文が規約に合っている。

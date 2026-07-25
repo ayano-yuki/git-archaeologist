@@ -1,5 +1,16 @@
 """Git Archaeologist package."""
 
+from git_archaeologist.gh_access import (
+    GhCheckKind,
+    GhCheckResult,
+    GhCommandResult,
+    GhErrorType,
+    GhFailure,
+    GhPreflightReport,
+    check_github_access,
+    classify_gh_error,
+    run_gh_command,
+)
 from git_archaeologist.repository_config import (
     ArtifactKind,
     ArtifactScope,
@@ -14,6 +25,15 @@ from git_archaeologist.repository_config import (
 )
 
 __all__ = [
+    "GhCheckKind",
+    "GhCheckResult",
+    "GhCommandResult",
+    "GhErrorType",
+    "GhFailure",
+    "GhPreflightReport",
+    "check_github_access",
+    "classify_gh_error",
+    "run_gh_command",
     "ArtifactKind",
     "ArtifactScope",
     "ErrorReportingPolicy",

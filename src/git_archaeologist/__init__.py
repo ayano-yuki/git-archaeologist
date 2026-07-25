@@ -1,5 +1,35 @@
 """Git Archaeologist package."""
 
+from git_archaeologist.gh_access import (
+    GhCheckKind,
+    GhCheckResult,
+    GhCommandResult,
+    GhErrorType,
+    GhFailure,
+    GhPreflightReport,
+    check_github_access,
+    classify_gh_error,
+    run_gh_command,
+)
+from git_archaeologist.mvp_contracts import (
+    CONTRACT_VERSION,
+    EVALUATION_CORPUS,
+    FREEZE_POLICY,
+    ExampleCategory,
+    InputDecision,
+    InputExample,
+    InputFormatSpec,
+    MvpContract,
+    MvpInputKind,
+    QualityMetricTarget,
+    StructuredMvpInput,
+    contract_to_dict,
+    load_mvp_contract,
+    load_mvp_input_examples,
+    load_mvp_input_formats,
+    load_mvp_quality_targets,
+    structure_mvp_input,
+)
 from git_archaeologist.repository_config import (
     ArtifactKind,
     ArtifactScope,
@@ -32,6 +62,32 @@ from git_archaeologist.sft_data_policy import (
 )
 
 __all__ = [
+    "GhCheckKind",
+    "GhCheckResult",
+    "GhCommandResult",
+    "GhErrorType",
+    "GhFailure",
+    "GhPreflightReport",
+    "check_github_access",
+    "classify_gh_error",
+    "run_gh_command",
+    "CONTRACT_VERSION",
+    "EVALUATION_CORPUS",
+    "FREEZE_POLICY",
+    "ExampleCategory",
+    "InputDecision",
+    "InputExample",
+    "InputFormatSpec",
+    "MvpContract",
+    "MvpInputKind",
+    "QualityMetricTarget",
+    "StructuredMvpInput",
+    "contract_to_dict",
+    "load_mvp_contract",
+    "load_mvp_input_examples",
+    "load_mvp_input_formats",
+    "load_mvp_quality_targets",
+    "structure_mvp_input",
     "ALLOWED_TRAINING_CONTENT",
     "ArtifactKind",
     "ArtifactScope",
@@ -59,4 +115,3 @@ __all__ = [
     "validate_evaluation_case",
     "validate_sft_record",
 ]
-

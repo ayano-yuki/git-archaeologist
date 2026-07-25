@@ -1,0 +1,4 @@
+github.com
+  X github.com: authentication failed
+  - The github.com token in keyring is invalid.
+  - To re-authenticate, run: gh auth login

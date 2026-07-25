@@ -49,7 +49,8 @@ Git Archaeologist を Issue 駆動で並列開発するための Skill。人間�
 5. `.codex/rules/git-archaeologist-development.md` の形式でコミットする。
 6. `.codex/orchestration/templates/pr.md` を使って PR 本文を作る。
 7. `gh pr create` の前に停止し、人間へ設計ズレ確認を依頼する。
-8. 承認後、feature ブランチを push して PR を作成する。
+8. 承認後、feature ブランチを push して PR を作成する。push だけで停止しない。
+9. PR 作成後、作業済み worktree が clean で push 済みであることを確認し、不要になった worktree を削除する。
 
 ## 人間確認ゲート
 
@@ -62,6 +63,12 @@ Git Archaeologist を Issue 駆動で並列開発するための Skill。人間�
 - 破壊的 git 操作または破壊的ファイル操作。
 
 停止時には、実行したい操作、理由、影響範囲、コマンド案、戻し方または代替案を提示する。
+
+人間が明示的に PR 作成を依頼または承認した場合は、PR 作成前ゲートを通過したものとして扱い、feature ブランチの push と PR 作成まで完了する。Member に作業を投げる場合も、承認済みなら最終成果物を「コミット、push、PR 作成」まで含めて指示する。
+
+PR 作成まで完了した worktree は、`git status --short --branch` で clean かつ upstream 追跡済みであることを確認してから `git worktree remove <path>` で片付ける。未コミット差分、未 push commit、レビュー対応予定が残る worktree は削除せず、残す理由を報告する。
+
+1 ファイルあたりの変更量は、おおむね 400 行から 600 行に収まるようにする。600 行を超えそうな場合は、Issue 分割、責務ごとのファイル分割、テスト fixture の分離を検討し、やむを得ず超える場合は PR 本文と Manager 一次レビューで理由を明記する。
 
 ## ブランチと PR ルール
 

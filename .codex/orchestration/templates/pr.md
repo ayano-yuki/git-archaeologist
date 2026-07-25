@@ -2,7 +2,7 @@
 
 ## 関連 Issue
 
-- [issue] #123
+- issue link
 
 ## 概要
 

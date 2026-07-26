@@ -11,10 +11,10 @@ from git_archaeologist.ops.incremental_sync import (
     SyncState,
     SyncWatermark,
 )
-from git_archaeologist.ops.phase5_sync import (
+from git_archaeologist.ops.sync import (
     build_default_sync_state,
-    build_phase5_manual_sync_plan_report,
-    build_phase5_sync_status_report,
+    build_manual_sync_plan_report,
+    build_sync_status_report,
     build_scheduler_config,
     load_observed_updates,
     load_sync_state,
@@ -22,7 +22,7 @@ from git_archaeologist.ops.phase5_sync import (
 )
 
 
-class Phase5SyncTests(unittest.TestCase):
+class SyncCliTests(unittest.TestCase):
     def test_status_report_exposes_repository_index_and_watermarks(self) -> None:
         state = build_default_sync_state(
             repository_id="react/react",
@@ -30,10 +30,10 @@ class Phase5SyncTests(unittest.TestCase):
             synced_at="2026-07-26T00:00:00+00:00",
         )
 
-        report = build_phase5_sync_status_report(state)
+        report = build_sync_status_report(state)
         payload = report.to_dict()
 
-        self.assertEqual("phase5_sync_status_ready", report.status)
+        self.assertEqual("sync_status_ready", report.status)
         self.assertEqual("react/react", payload["repository_id"])
         self.assertEqual("index-v7", payload["index_version"])
         self.assertTrue(payload["watermarks"])
@@ -67,10 +67,10 @@ class Phase5SyncTests(unittest.TestCase):
             ),
         )
 
-        report = build_phase5_manual_sync_plan_report(state, updates)
+        report = build_manual_sync_plan_report(state, updates)
         payload = report.to_dict()
 
-        self.assertEqual("phase5_manual_sync_plan_ready", report.status)
+        self.assertEqual("manual_sync_plan_ready", report.status)
         self.assertEqual(2, payload["observed_update_count"])
         self.assertEqual(("pr-1",), report.skipped_artifact_ids)
         self.assertEqual("pr-2", report.selected_updates[0]["artifact_id"])
@@ -82,7 +82,7 @@ class Phase5SyncTests(unittest.TestCase):
         self.assertTrue(scheduler.enabled)
         self.assertEqual(30, scheduler.interval_minutes)
         self.assertFalse(scheduler.mutates_external_scheduler)
-        self.assertIn("phase5_sync --plan", scheduler.command)
+        self.assertIn("git_archaeologist.ops.sync --plan", scheduler.command)
 
     def test_state_and_observed_updates_can_be_loaded_from_json(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -130,10 +130,10 @@ class Phase5SyncTests(unittest.TestCase):
 
     def test_reports_are_json_serializable(self) -> None:
         state = build_default_sync_state()
-        text = report_to_json(build_phase5_sync_status_report(state))
+        text = report_to_json(build_sync_status_report(state))
 
         payload = json.loads(text)
-        self.assertEqual("phase5_sync_status_ready", payload["status"])
+        self.assertEqual("sync_status_ready", payload["status"])
 
 
 if __name__ == "__main__":

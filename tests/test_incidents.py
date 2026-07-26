@@ -15,14 +15,14 @@ from git_archaeologist.normalization.incident_graph import (
     build_incident_graph,
     detect_revert_state,
 )
-from git_archaeologist.phase3_smoke import run_phase3_smoke
+from git_archaeologist.ops.smoke import run_incident_smoke
 from git_archaeologist.rag.incident_answering import (
     build_incident_answer,
     evaluate_historical_risk,
 )
 
 
-class Phase3IncidentTests(unittest.TestCase):
+class IncidentTests(unittest.TestCase):
     def test_ci_log_policy_redacts_and_truncates(self) -> None:
         redacted = redact_ci_log("token=secret-value\nAssertionError: boom", CIRetentionPolicy(max_excerpt_bytes=30))
 
@@ -96,8 +96,8 @@ class Phase3IncidentTests(unittest.TestCase):
         self.assertFalse(finding.risk_found)
         self.assertEqual("same_file_only", finding.suppressed_reason)
 
-    def test_phase3_smoke_passes(self) -> None:
-        self.assertEqual("phase3_smoke_passed", run_phase3_smoke()["status"])
+    def test_incident_smoke_passes(self) -> None:
+        self.assertEqual("incident_smoke_passed", run_incident_smoke()["status"])
 
 
 if __name__ == "__main__":

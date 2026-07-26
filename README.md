@@ -25,43 +25,43 @@ uv --system-certs run python -m git_archaeologist.demo_chat
 
 実運用では `git_archaeologist.chat.chat_flow.run_chat_flow` に Target Resolver、Evidence Retriever、Answer Generator、Citation Verifier の各backendを渡して利用します。Evidence Pack が空の場合や最新PR取得に失敗した場合は、根拠なしに断言せず安全な結果を返します。
 
-## Phase2 動作確認
+## ローカル Smoke 確認
 
-Phase2 の安定化機能は、外部サービスを呼ばない smoke で確認できます。増分同期、索引transaction、version付きcache、質問trace、障害fallback、失敗分類、RAG ablation、SFT判断を一周します。
+外部サービスを呼ばない smoke で、安定化、障害分析、lineage 分析をまとめて確認できます。増分同期、索引transaction、version付きcache、質問trace、障害fallback、失敗分類、RAG ablation、SFT判断、incident graph、行・条件分岐分析を一周します。
 
 ```powershell
-uv --system-certs run python -m git_archaeologist.phase2_smoke
+uv --system-certs run python -m git_archaeologist.ops.smoke
 ```
 
-`status` が `phase2_smoke_passed` であれば、MVPチャットとPhase2安定化部品が同じローカル環境で動作しています。
+`status` が `local_smoke_passed` であれば、MVPチャットと主要な分析部品が同じローカル環境で動作しています。
 
-## Phase5 セットアップ確認
+## セットアップ確認
 
-Phase5 のローカル運用を始める前に、Repository設定、storage layout、`gh` 認証、runtime profile、本番データ学習 readiness、初回索引手順を一括で確認できます。
+ローカル運用を始める前に、Repository設定、storage layout、`gh` 認証、runtime profile、本番データ学習 readiness、初回索引手順を一括で確認できます。setup の合否と、重い学習実行まで進められるかは別フィールドとして表示されます。
 
 ```powershell
-uv --system-certs run python -m git_archaeologist.ops.phase5_setup --dry-run
+uv --system-certs run python -m git_archaeologist.ops.setup --dry-run
 ```
 
 外部サービスに触れずに設定とローカル状態だけを確認する場合は、GitHub access check を明示的にスキップします。
 
 ```powershell
-uv --system-certs run python -m git_archaeologist.ops.phase5_setup --dry-run --skip-github-access
+uv --system-certs run python -m git_archaeologist.ops.setup --dry-run --skip-github-access
 ```
 
 storage directory を作成する場合だけ `--execute` を使います。setup は外部収集や破壊的な削除を実行しません。
 
 ```powershell
-uv --system-certs run python -m git_archaeologist.ops.phase5_setup --execute --skip-github-access
+uv --system-certs run python -m git_archaeologist.ops.setup --execute --skip-github-access
 ```
 
-## Phase5 同期状態確認
+## 同期状態確認
 
-Phase5 の同期状態は、外部収集を実行せずに status と manual sync plan を確認できます。
+同期状態は、外部収集を実行せずに status と manual sync plan を確認できます。
 
 ```powershell
-uv --system-certs run python -m git_archaeologist.ops.phase5_sync --status
-uv --system-certs run python -m git_archaeologist.ops.phase5_sync --plan
+uv --system-certs run python -m git_archaeologist.ops.sync --status
+uv --system-certs run python -m git_archaeologist.ops.sync --plan
 ```
 
 scheduler は設定内容をレポートするだけで、OS の常駐ジョブやGitHub状態は変更しません。
@@ -135,4 +135,3 @@ docs/
 - `.agents/member.md`: Member Codex の責務。
 - `.codex/rules/git-archaeologist-development.md`: ブランチ、コミット、PR、停止条件のルール。
 - `.codex/orchestration/templates/`: Issue / PR テンプレート。
-

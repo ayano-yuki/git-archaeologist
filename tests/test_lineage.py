@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import unittest
 
-from git_archaeologist.phase4_smoke import run_phase4_smoke
+from git_archaeologist.ops.smoke import run_lineage_smoke
 from git_archaeologist.rag.lineage_answering import (
     LineageAnswerStatus,
     build_lineage_answer,
@@ -21,7 +21,7 @@ from git_archaeologist.search.lineage_analysis import (
 )
 
 
-class Phase4LineageTests(unittest.TestCase):
+class LineageTests(unittest.TestCase):
     def test_blame_porcelain_returns_line_origin_candidates(self) -> None:
         candidates = parse_blame_porcelain(
             "abc1234 10 20 1\nboundary\n\tline\n",
@@ -88,8 +88,8 @@ class Phase4LineageTests(unittest.TestCase):
     def test_content_fingerprint_normalizes_whitespace(self) -> None:
         self.assertEqual(content_fingerprint("return  value"), content_fingerprint("return value"))
 
-    def test_phase4_smoke_passes(self) -> None:
-        self.assertEqual("phase4_smoke_passed", run_phase4_smoke()["status"])
+    def test_lineage_smoke_passes(self) -> None:
+        self.assertEqual("lineage_smoke_passed", run_lineage_smoke()["status"])
 
 
 if __name__ == "__main__":

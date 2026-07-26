@@ -9,7 +9,7 @@ from git_archaeologist.search.hybrid_search import (
     SearchDocument,
     SearchFilter,
     SearchSource,
-    StubVectorSearchBackend,
+    DeterministicVectorSearchBackend,
     reciprocal_rank_fusion,
 )
 
@@ -34,12 +34,12 @@ class HybridSearchTests(unittest.TestCase):
             _document("review-1", "This review explains why hydration warnings are delayed."),
             _document("issue-2", "Unrelated issue about package metadata."),
         )
-        backend = StubVectorSearchBackend({"review-1": 0.89, "issue-2": 0.12})
+        backend = DeterministicVectorSearchBackend({"review-1": 0.89, "issue-2": 0.12})
 
         hits = backend.search("why did we delay hydration warning?", documents)
 
         self.assertEqual(["review-1", "issue-2"], [hit.document.document_id for hit in hits])
-        self.assertIn("stub vector score", hits[0].explanation)
+        self.assertIn("deterministic vector score", hits[0].explanation)
 
     def test_rank_fusion_preserves_source_explanations(self) -> None:
         documents = (
@@ -47,7 +47,7 @@ class HybridSearchTests(unittest.TestCase):
             _document("b", "semantic text"),
         )
         keyword = KeywordSearchEngine(documents).search("exact")
-        vector = StubVectorSearchBackend({"b": 0.99, "a": 0.75}).search("semantic exact", documents)
+        vector = DeterministicVectorSearchBackend({"b": 0.99, "a": 0.75}).search("semantic exact", documents)
 
         hits = reciprocal_rank_fusion(keyword, vector)
 
@@ -71,7 +71,7 @@ class HybridSearchTests(unittest.TestCase):
                 timestamp=datetime(2024, 6, 1, tzinfo=timezone.utc),
             ),
         )
-        engine = HybridSearchEngine(documents, StubVectorSearchBackend({"old": 0.5, "new": 0.9}))
+        engine = HybridSearchEngine(documents, DeterministicVectorSearchBackend({"old": 0.5, "new": 0.9}))
 
         hits = engine.search(
             "createRoot warning",

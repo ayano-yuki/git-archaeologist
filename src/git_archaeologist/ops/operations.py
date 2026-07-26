@@ -1,4 +1,4 @@
-"""Phase5 local operations, sync, data protection, and QA planning."""
+"""Local operations, sync, data protection, and QA planning."""
 
 from __future__ import annotations
 
@@ -31,7 +31,7 @@ class OperationStep:
 
 
 @dataclass(frozen=True)
-class Phase5OperationsPlan:
+class LocalOperationsPlan:
     """End-user runnable plan for local setup, sync, training, and QA."""
 
     repository_id: str
@@ -112,13 +112,13 @@ class RegressionSuitePlan:
         return asdict(self)
 
 
-def build_phase5_operations_plan(
+def build_local_operations_plan(
     *,
     repository_id: str = "react/react",
     model_id: str = "Qwen/Qwen2.5-Coder-7B-Instruct",
     include_training_execute: bool = False,
-) -> Phase5OperationsPlan:
-    """Build the reproducible command plan needed to operate Phase5 locally."""
+) -> LocalOperationsPlan:
+    """Build the reproducible command plan needed to operate locally."""
 
     training_execute_status = OperationStatus.READY if include_training_execute else OperationStatus.PENDING
     training_execute_reason = (
@@ -126,7 +126,7 @@ def build_phase5_operations_plan(
         if include_training_execute
         else "Heavy QLoRA execution is intentionally explicit; run after readiness passes."
     )
-    return Phase5OperationsPlan(
+    return LocalOperationsPlan(
         repository_id=repository_id,
         model_id=model_id,
         setup_steps=(
@@ -134,8 +134,8 @@ def build_phase5_operations_plan(
             OperationStep("training-deps-smoke", "uv --system-certs run --extra training python -m git_archaeologist.evaluation.system_smoke --require-training-dependencies", OperationStatus.READY, "Verifies optional training dependencies before model loading."),
         ),
         sync_steps=(
-            OperationStep("sync-status", "uv --system-certs run python -m git_archaeologist.ops.phase5_sync --status", OperationStatus.READY, "Shows repository, index version, synced_at, watermarks, and scheduler settings."),
-            OperationStep("manual-incremental-sync", "uv --system-certs run python -m git_archaeologist.ops.phase5_sync --plan", OperationStatus.READY, "Plans selected and skipped artifact updates without collecting remote data."),
+            OperationStep("sync-status", "uv --system-certs run python -m git_archaeologist.ops.sync --status", OperationStatus.READY, "Shows repository, index version, synced_at, watermarks, and scheduler settings."),
+            OperationStep("manual-incremental-sync", "uv --system-certs run python -m git_archaeologist.ops.sync --plan", OperationStatus.READY, "Plans selected and skipped artifact updates without collecting remote data."),
             OperationStep("question-time-current-pr", "uv --system-certs run python -m git_archaeologist.demo_chat", OperationStatus.READY, "Verifies current PR context can be attached to a chat turn."),
         ),
         training_steps=(
@@ -178,10 +178,10 @@ def build_protected_data_inventory(
 
 
 def build_regression_suite_plan() -> RegressionSuitePlan:
-    """Return the Phase5 regression commands and expected reports."""
+    """Return local regression commands and expected reports."""
 
     return RegressionSuitePlan(
-        suite_id="phase5-regression-suite-v1",
+        suite_id="local-regression-suite-v1",
         commands=(
             "uv --system-certs run python -m unittest discover tests",
             "uv --system-certs run python -m git_archaeologist.evaluation.post_sft_evaluation",

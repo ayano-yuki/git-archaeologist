@@ -1,4 +1,4 @@
-"""Phase5 chat routing, unified citations, and session freshness."""
+"""Chat routing, unified citations, and session freshness."""
 
 from __future__ import annotations
 
@@ -13,7 +13,7 @@ from git_archaeologist.chat.input_interpreter import (
 )
 
 
-class Phase5Route(StrEnum):
+class ChatRoute(StrEnum):
     """Integrated chat routes across all completed feature families."""
 
     IMPLEMENTATION_RATIONALE = "implementation_rationale"
@@ -27,9 +27,9 @@ class Phase5Route(StrEnum):
 
 @dataclass(frozen=True)
 class UnifiedQueryPlan:
-    """Routing result for a Phase5 chat turn."""
+    """Routing result for a chat turn."""
 
-    route: Phase5Route
+    route: ChatRoute
     query_plan_ids: tuple[str, ...]
     requires_current_change: bool
     reason: str
@@ -37,8 +37,8 @@ class UnifiedQueryPlan:
     def __post_init__(self) -> None:
         object.__setattr__(self, "query_plan_ids", tuple(self.query_plan_ids))
         if not self.query_plan_ids and self.route not in {
-            Phase5Route.NEEDS_CLARIFICATION,
-            Phase5Route.UNSUPPORTED,
+            ChatRoute.NEEDS_CLARIFICATION,
+            ChatRoute.UNSUPPORTED,
         }:
             raise ValueError("query_plan_ids must be non-empty for executable routes")
 
@@ -104,26 +104,26 @@ class SessionFreshness:
         object.__setattr__(self, "stale_fields", tuple(self.stale_fields))
 
 
-def route_phase5_query(raw_input: str) -> UnifiedQueryPlan:
-    """Route a user question to one or more Phase5 query plans."""
+def route_chat_query(raw_input: str) -> UnifiedQueryPlan:
+    """Route a user question to one or more query plans."""
 
     interpreted = interpret_input(raw_input)
-    return route_interpreted_phase5_query(interpreted)
+    return route_interpreted_chat_query(interpreted)
 
 
-def route_interpreted_phase5_query(interpreted: InterpretedInput) -> UnifiedQueryPlan:
+def route_interpreted_chat_query(interpreted: InterpretedInput) -> UnifiedQueryPlan:
     """Route already interpreted input without re-parsing it."""
 
     if interpreted.intent is QueryIntent.UNSUPPORTED:
         return UnifiedQueryPlan(
-            route=Phase5Route.UNSUPPORTED,
+            route=ChatRoute.UNSUPPORTED,
             query_plan_ids=(),
             requires_current_change=False,
             reason="The input is outside the supported Git Archaeologist query contract.",
         )
     if not interpreted.can_resolve_target:
         return UnifiedQueryPlan(
-            route=Phase5Route.NEEDS_CLARIFICATION,
+            route=ChatRoute.NEEDS_CLARIFICATION,
             query_plan_ids=(),
             requires_current_change=False,
             reason=interpreted.clarification_reason or "A concrete repository target is required.",
@@ -190,17 +190,17 @@ def check_session_freshness(
     return SessionFreshness(can_reuse=True, reason="Stored chat context matches the current repository state.")
 
 
-def _route_for_plan_ids(plan_ids: tuple[str, ...]) -> Phase5Route:
+def _route_for_plan_ids(plan_ids: tuple[str, ...]) -> ChatRoute:
     unique = tuple(dict.fromkeys(plan_ids))
     if len(unique) > 1:
-        return Phase5Route.COMBINED
+        return ChatRoute.COMBINED
     if unique == ("lineage-origin-maintenance",):
-        return Phase5Route.LINEAGE_ANALYSIS
+        return ChatRoute.LINEAGE_ANALYSIS
     if unique == ("incident-causal-history",):
-        return Phase5Route.INCIDENT_ANALYSIS
+        return ChatRoute.INCIDENT_ANALYSIS
     if unique == ("historical-change-risk",):
-        return Phase5Route.CHANGE_RISK
-    return Phase5Route.IMPLEMENTATION_RATIONALE
+        return ChatRoute.CHANGE_RISK
+    return ChatRoute.IMPLEMENTATION_RATIONALE
 
 
 def _mentions_lineage(question: str) -> bool:

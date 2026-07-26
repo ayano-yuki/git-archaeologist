@@ -1,4 +1,4 @@
-"""Phase5 setup preflight for local operation."""
+"""Setup preflight for local Git Archaeologist operation."""
 
 from __future__ import annotations
 
@@ -32,7 +32,7 @@ from git_archaeologist.evaluation.train_sft import (
     DEFAULT_PLAN_PATH,
     REQUIRED_TRAINING_MODULES,
 )
-from git_archaeologist.ops.phase5_operations import build_phase5_operations_plan
+from git_archaeologist.ops.operations import build_local_operations_plan
 
 
 class SetupMode(StrEnum):
@@ -67,13 +67,14 @@ class SetupCheck:
 
 
 @dataclass(frozen=True)
-class Phase5SetupReport:
-    """Complete Phase5 setup preflight report."""
+class LocalSetupReport:
+    """Complete local setup preflight report."""
 
     status: str
     mode: SetupMode
     repository_id: str
     data_root: str
+    training_execute_ready: bool
     checks: tuple[SetupCheck, ...]
     next_commands: tuple[str, ...]
     suppressed_fields: tuple[str, ...]
@@ -85,7 +86,7 @@ class Phase5SetupReport:
 
     @property
     def passed(self) -> bool:
-        return self.status == "phase5_setup_passed"
+        return self.status == "local_setup_passed"
 
     def to_dict(self) -> dict[str, object]:
         return {
@@ -93,13 +94,14 @@ class Phase5SetupReport:
             "mode": self.mode.value,
             "repository_id": self.repository_id,
             "data_root": self.data_root,
+            "training_execute_ready": self.training_execute_ready,
             "checks": [check.to_dict() for check in self.checks],
             "next_commands": list(self.next_commands),
             "suppressed_fields": list(self.suppressed_fields),
         }
 
 
-def build_phase5_setup_report(
+def build_local_setup_report(
     *,
     repository_id: str = "react/react",
     repository_config_path: Path | None = None,
@@ -109,7 +111,7 @@ def build_phase5_setup_report(
     check_github: bool = True,
     require_training_dependencies: bool = False,
     gh_runner: GhRunner = run_gh_command,
-) -> Phase5SetupReport:
+) -> LocalSetupReport:
     """Build a setup report without leaking credentials or secret-like values."""
 
     checks: list[SetupCheck] = []
@@ -162,25 +164,31 @@ def build_phase5_setup_report(
         )
 
     checks.append(_runtime_check(data_root=data_root))
-    checks.append(
-        _production_training_check(
-            data_root=data_root,
-            plan_path=plan_path,
-            require_training_dependencies=require_training_dependencies,
-        )
+    training_check = _production_training_check(
+        data_root=data_root,
+        plan_path=plan_path,
+        require_training_dependencies=require_training_dependencies,
     )
+    checks.append(training_check)
     checks.append(_initial_index_check(mode=mode))
 
     blocked_required = any(
         check.required and check.status is SetupCheckStatus.BLOCKED
         for check in checks
     )
-    plan = build_phase5_operations_plan(repository_id=repository_id)
-    return Phase5SetupReport(
-        status="phase5_setup_blocked" if blocked_required else "phase5_setup_passed",
+    dry_run_details = training_check.details.get("dry_run")
+    training_execute_ready = (
+        bool(dry_run_details.get("execute_ready"))
+        if isinstance(dry_run_details, dict)
+        else False
+    )
+    plan = build_local_operations_plan(repository_id=repository_id)
+    return LocalSetupReport(
+        status="local_setup_blocked" if blocked_required else "local_setup_passed",
         mode=mode,
         repository_id=config.repository_id if config is not None else repository_id,
         data_root=str(data_root),
+        training_execute_ready=training_execute_ready,
         checks=tuple(checks),
         next_commands=tuple(step.command for step in plan.all_steps),
         suppressed_fields=(
@@ -192,7 +200,7 @@ def build_phase5_setup_report(
     )
 
 
-def phase5_setup_report_to_json(report: Phase5SetupReport) -> str:
+def setup_report_to_json(report: LocalSetupReport) -> str:
     """Return a formatted JSON setup report."""
 
     return json.dumps(report.to_dict(), ensure_ascii=False, indent=2)
@@ -297,9 +305,9 @@ def _production_training_check(
         status=SetupCheckStatus.READY if readiness.ready else SetupCheckStatus.BLOCKED,
         required=False,
         reason=(
-            "Production data and SFT plan are ready."
+            "Production data and SFT plan are ready; execution readiness is reported separately."
             if readiness.ready
-            else "Production training is not executable from the current data/dependency state."
+            else "Production training inputs are incomplete in the current data/dependency state."
         ),
         details=readiness.to_dict(),
     )
@@ -316,7 +324,7 @@ def _initial_index_check(*, mode: SetupMode) -> SetupCheck:
             else "Initial index orchestration was confirmed; no external collection was run by setup."
         ),
         details={
-            "dry_run_command": "uv --system-certs run python -m git_archaeologist.ops.phase5_setup --dry-run",
+            "dry_run_command": "uv --system-certs run python -m git_archaeologist.ops.setup --dry-run",
             "storage_init_command": "uv --system-certs run python -m git_archaeologist.config.storage_config --init",
             "external_collection_executed": False,
         },
@@ -340,7 +348,7 @@ def _build_parser() -> argparse.ArgumentParser:
 def main(argv: Sequence[str] | None = None) -> int:
     args = _build_parser().parse_args(argv)
     mode = SetupMode.EXECUTE if args.execute else SetupMode.DRY_RUN
-    report = build_phase5_setup_report(
+    report = build_local_setup_report(
         repository_id=args.repository_id,
         repository_config_path=args.repository_config,
         data_root=args.data_root,
@@ -349,7 +357,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         check_github=not args.skip_github_access,
         require_training_dependencies=args.require_training_dependencies,
     )
-    print(phase5_setup_report_to_json(report))
+    print(setup_report_to_json(report))
     return 0 if report.passed else 1
 
 

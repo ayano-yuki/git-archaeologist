@@ -522,12 +522,12 @@ CI失敗、不具合報告、修正、Revert、再適用を一つの時系列と
   - 完了条件: 新しいローカル環境で手順どおりに起動できる。
   - 状態: #108 で `git_archaeologist.ops.phase5_setup` を追加し、Repository設定、storage layout、`gh` access、runtime profile、本番データ学習 readiness、初回索引手順を dry-run / execute mode で確認できる。
 
-- [ ] **必須: 定期同期と手動同期を提供する**
+- [x] **必須: 定期同期と手動同期を提供する**
   - 目的: Repositoryの新しい履歴を再学習なしで回答へ反映する。
   - 方法: schedulerによる増分同期、質問時の最新PR取得、管理用の手動再同期を実装する。
   - 成果物: 同期job、状態表示、最終同期時刻。
   - 完了条件: 新しいPRやReviewが同期後の検索結果へ反映される。
-  - 状態: Phase2 の増分同期と質問時Current PR取得、Phase5運用手順は実装済み。scheduler、手動同期CLI、同期状態表示の統合は #109 で対応する。
+  - 状態: #109 で `git_archaeologist.ops.phase5_sync` を追加し、`--status` で repository / index version / synced_at / watermarks、`--plan` で selected / skipped artifact updates、scheduler設定を表示できる。
 
 - [ ] **必須: データ保護と削除手順を整備する**
   - 目的: private Repositoryの履歴、モデル入力、ログをローカルで適切に管理する。
@@ -583,5 +583,5 @@ CI失敗、不具合報告、修正、Revert、再適用を一つの時系列と
 - [x] 障害、CI失敗、修正、Revert、復旧を時系列で説明できる
 - [x] すべての主要な主張から元の履歴へ追跡できる
 - [x] 根拠がない場合は不明と回答し、追加で必要な情報を示せる
-- [ ] Repositoryの追加履歴を増分同期し、モデル再学習なしで利用できる（#109）
+- [x] Repositoryの追加履歴を増分同期し、モデル再学習なしで利用できる（#109）
 - [ ] ローカル環境で再現可能にセットアップ、評価、更新、削除できる（setupは#108で完了。残りは #110, #111, #113, #114, #115）

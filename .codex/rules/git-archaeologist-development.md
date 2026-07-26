@@ -1,109 +1,29 @@
-# Git Archaeologist 開発ルール
+# Git Archaeologist 開発ルール入口
 
-## Issue 運用
+このファイルは全体ルールの入口だけを持つ。具体ルールは責務別ファイルに分け、作業ロールに必要なものだけ読む。
 
-- 親 PBI Issue は `ayano-yuki/ayano-yuki-pbi#58` とする。
-- 子 Issue タイトルは `【git-archaeologist 】 <内容>` 形式にする。
-- 親 PBI #58 直下には、原則として phase まとめ Issue だけを置く。phase Issue は `【git-archaeologist 】 phaseNN` 形式にする。
-- 各 phase 内で実施する作業 Issue は、対応する phase Issue の GitHub sub-issue として作成する。例: Phase3作業は `phase03` Issue の sub-issue にする。
-- 子 Issue は Manager Codex が一括で案を作り、人間が微調整してから `gh` で作成する。
-- phase Issue は親 PBI #58 の GitHub sub-issue として作成する。`gh issue create` では `--parent 58` を付ける。
-- 実施 Issue は対応する phase Issue の GitHub sub-issue として作成する。`gh issue create` では `--parent <phase-issue-number>` を付ける。
-- 既存の実施 Issue が親 PBI #58 直下にある場合は、`gh issue edit <issue-number> --parent <phase-issue-number>` で修復する。
-- Issue 作成または修復後は、親 Issue #58 の `subIssues`、phase Issue の `subIssues`、または子 Issue の `parent` を確認する。
-- 子 Issue は Member Codex が迷わず着手できる粒度にする。
+## 最初に読む
 
-## 開発環境とディレクトリ
+- 共通: `.codex/rules/workflow.md`
+- Issue 作成、phase 整理、Member 割り当て: `.codex/rules/issues.md`
+- branch、worktree、PR topology: `.codex/rules/branches.md`
+- commit、PR 作成、一次レビュー: `.codex/rules/pull-requests.md`
+- merge 後 cleanup: `.codex/rules/cleanup.md`
+- 開発配置、data 管理: `.codex/rules/data-and-layout.md`
+- 停止条件、人間確認: `.codex/rules/gates.md`
 
-- Python 開発は `uv` を使う。
-- 証明書エラーで `uv run` が失敗する環境では `uv --system-certs run ...` を使う。
-- Python コードは `src/` 配下に置く。
-- パッケージコードは `src/git_archaeologist/` 配下に置く。
-- 学習・評価・実験用データは `data/` 配下に置く。
-- `data/` はモデルごとにフォルダーを分ける。
-- `data/<model-name>/` の構造は `data/README.md` に従う。
-- `data/` 配下の生データ、モデル出力、評価ログ、runtime output は Git 管理対象にする。
-- 個人情報、秘密情報、private repository 固有情報、未redactの生artifactは `data/` に置かない。
+## Role 別読み込み
 
-## 子 Issue の必須項目
+- `git-archaeologist-manager`: `workflow.md`, `issues.md`, `branches.md`, `gates.md`
+- `git-archaeologist-member`: `workflow.md`, `branches.md`, `pull-requests.md`, `data-and-layout.md`, `gates.md`
+- `git-archaeologist-reviewer`: `workflow.md`, `branches.md`, `pull-requests.md`, `gates.md`
+- `git-archaeologist-cleanup`: `workflow.md`, `branches.md`, `cleanup.md`, `gates.md`
 
-子 Issue には次を含める。
+## 全ロール共通の絶対ルール
 
-- タイトル
-- 親 PBI #58 との sub-issue 関係
-- 背景
-- 実装内容
-- 受け入れ条件
-- 触る想定ファイル
-- テスト方針
-- 依存 Issue
-- 優先度
-- Member への作業指示
-- PR 作成時の注意点
-
-## ブランチルール
-
-- `phase/1-mvp` は MVP フェーズの統合ブランチとして扱う。
-- `project/<function-area>` は機能領域の統合ブランチとして扱う。
-- `feature/<issue-number>-<short-title>` は Member の作業ブランチとして扱う。
-- 並列作業では `git worktree` を使い、Issue ごとに作業ディレクトリを分ける。
-- 同じ worktree で別 Issue の作業を混ぜない。
-- 承認済みの並列作業は、Issue ごとの commit、push、PR 作成までを完了条件にする。
-- push 済み feature ブランチに対応する PR がない状態は未完了として扱う。
-
-## 機能領域
-
-`project/<function-area>` は次の固定値から選ぶ。
-
-- `collector`: GitHub / git 履歴収集、Raw Archive、認証・権限検査。
-- `normalizer`: 共通イベント、Normalizer、Event Graph、関係生成。
-- `search`: Code / Symbol Index、Hybrid Search、Target Resolver。
-- `rag`: Evidence Pack、Reranker、Answer / Judge LLM、Citation Verifier。
-- `chat`: Input Interpreter、チャット UI / API、会話状態。
-- `evaluation`: 評価セット、品質指標、回帰評価、性能計測。
-
-## コミットルール
-
-コミットメッセージは `接頭語: 日本語の内容` 形式にする。
-
-推奨接頭語:
-
-- `feat`: 機能追加
-- `fix`: 不具合修正
-- `test`: テスト追加・修正
-- `docs`: ドキュメント
-- `refactor`: 振る舞いを変えない整理
-- `chore`: 設定・雑務
-
-例:
-
-```text
-feat: GitHub Artifact Collectorの基本構造を追加
-test: Raw Archive manifestの検証ケースを追加
-docs: Issue分解テンプレートを追加
-```
-
-## PR ルール
-
-- PR の向き先は隣接階層だけに限定する。
-- `project/<function-area>` の PR は `main` を base、`project/<function-area>` を head にする。
-- `feature/<issue-number>-<short-title>` の PR は対応する `project/<function-area>` を base、feature ブランチを head にする。
-- `feature` から `main`、`feature` から別 `feature`、`project` から `feature` への PR は作らない。
-- PR タイトルは `[機能] PR内容（#issue番号）` とする。
-- PR 本文には `- [https://github.com/ayano-yuki/ayano-yuki-pbi/issues/123](https://github.com/ayano-yuki/ayano-yuki-pbi/issues/123)` のように、Issue URL をラベルにも使うリンク形式で関連 Issue を記載する。
-- PR 作成前に、受け入れ条件、テスト結果、設計ズレの有無をまとめて人間確認を受ける。
-- 人間が PR 作成を依頼または承認済みの場合は、feature ブランチの push だけで止めず、PR URL を取得するまで進める。
-- PR 作成後、人間レビュー前に Manager Codex が一次レビューする。
-
-## 停止ルール
-
-次の操作前には停止して、人間に確認内容を提示する。
-
-- 子 Issue の一括作成。
-- PR 作成。
-- 新しい依存関係の追加。
-- 設定ファイル、CI/CD、GitHub Actions、認証、秘密情報、保存場所の変更。
-- 破壊的 git 操作。
-- 大量削除、移動、リネーム。
-- `docs/plan.md` または `docs/Todo.md` のロードマップ変更。
-
+- 作業開始前に Manager が依頼内容、Issue、phase、依存関係、機能領域、並列化可否を整理する。
+- Manager は実装しない。実装は必ず Member として開始する。
+- Member は 1 Issue だけを扱い、Issue ごとに worktree を分ける。
+- PR は隣接階層だけに作る。
+- `feature -> main`、`feature -> feature`、`project -> feature` の PR は作らない。
+- PR merge 後の branch / worktree 削除は Cleanup として行う。

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Git Archaeologist Member"
+  short_description: "単一Issueを実装しPR作成まで進める"
+  default_prompt: "割り当てIssueを実装してPRを作成して"

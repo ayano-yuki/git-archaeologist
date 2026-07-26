@@ -1,4 +1,4 @@
 interface:
   display_name: "Git Archaeologist Dev"
-  short_description: "Git Archaeologist の Issue 駆動並列開発を支援します。"
-  default_prompt: "この Skill を使って、Git Archaeologist の Issue 分解、割り当て、実装、レビュー、PR 作成を進めてください。"
+  short_description: "Manager 整理から Member 並列実装へ流すルーターです。"
+  default_prompt: "この Skill を使って、まず Manager として作業内容を整理し、並列化できる Issue は Member に分配して、実装、レビュー、cleanup まで進めてください。"

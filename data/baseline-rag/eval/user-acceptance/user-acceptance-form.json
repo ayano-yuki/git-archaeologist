@@ -1,0 +1,139 @@
+{
+  "schema_version": "phase5-user-acceptance-v1",
+  "form_id": "phase5-human-acceptance-v1",
+  "instructions": [
+    "Use pseudonymous evaluator IDs only.",
+    "Score every dimension from 1 to 5 before reading aggregate results.",
+    "Use comment markers such as 'Issue:' or 'Follow-up:' for unresolved work."
+  ],
+  "thresholds": {
+    "minimum_average_score": 4.0,
+    "minimum_dimension_average": {
+      "accuracy": 4.0,
+      "evidence_sufficiency": 4.0,
+      "clarity": 4.0,
+      "unnecessary_warning": 4.0,
+      "investigation_time_saved": 4.0
+    },
+    "maximum_critical_misinformation": 0,
+    "maximum_unnecessary_warning_rate": 0.2,
+    "minimum_investigation_time_saved_ratio": 0.25
+  },
+  "rubric": [
+    {
+      "dimension": "accuracy",
+      "label": "Accuracy",
+      "prompt": "Does the answer avoid factual mistakes and separate observed facts from inference?",
+      "min_score": 1,
+      "max_score": 5,
+      "pass_score": 4,
+      "anchors": {
+        "1": "Major incorrect explanation or unsupported causal claim.",
+        "3": "Mostly correct but contains ambiguity that could mislead a maintainer.",
+        "5": "Correct, scoped to the evidence, and explicit about uncertainty."
+      }
+    },
+    {
+      "dimension": "evidence_sufficiency",
+      "label": "Evidence sufficiency",
+      "prompt": "Are citations and evidence excerpts enough to inspect the answer?",
+      "min_score": 1,
+      "max_score": 5,
+      "pass_score": 4,
+      "anchors": {
+        "1": "Key claims lack usable citations.",
+        "3": "Some claims are supported but the reviewer must search for missing context.",
+        "5": "Important claims point to enough source material to verify them."
+      }
+    },
+    {
+      "dimension": "clarity",
+      "label": "Clarity",
+      "prompt": "Is the explanation easy to understand during a real code investigation?",
+      "min_score": 1,
+      "max_score": 5,
+      "pass_score": 4,
+      "anchors": {
+        "1": "Hard to follow or mixes unrelated history.",
+        "3": "Understandable but requires rereading or extra interpretation.",
+        "5": "Concise, ordered, and easy to act on."
+      }
+    },
+    {
+      "dimension": "unnecessary_warning",
+      "label": "Unnecessary warning control",
+      "prompt": "Does the answer avoid warning fatigue and false high-risk labels?",
+      "min_score": 1,
+      "max_score": 5,
+      "pass_score": 4,
+      "anchors": {
+        "1": "Raises severe warnings without direct supporting evidence.",
+        "3": "Some warnings are useful but noisy or too broad.",
+        "5": "Warnings are specific, evidence-backed, and not inflated."
+      }
+    },
+    {
+      "dimension": "investigation_time_saved",
+      "label": "Investigation time saved",
+      "prompt": "Does the answer shorten the reviewer investigation compared with manual history lookup?",
+      "min_score": 1,
+      "max_score": 5,
+      "pass_score": 4,
+      "anchors": {
+        "1": "Adds work or sends the reviewer to unrelated artifacts.",
+        "3": "Saves a small amount of navigation but still needs manual reconstruction.",
+        "5": "Clearly reduces time to understand the change and next action."
+      }
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "ua-implementation-rationale",
+      "scenario": "implementation_rationale",
+      "task": "Review whether a file/function explanation is correct, cited, and useful.",
+      "required_dimensions": [
+        "accuracy",
+        "evidence_sufficiency",
+        "clarity",
+        "unnecessary_warning",
+        "investigation_time_saved"
+      ],
+      "expected_evidence_ids": [
+        "citation-implementation-review",
+        "citation-implementation-commit"
+      ],
+      "notes": "Synthetic evidence identifiers only."
+    },
+    {
+      "case_id": "ua-risk-warning",
+      "scenario": "change_risk",
+      "task": "Review whether a risk warning is specific enough and avoids warning fatigue.",
+      "required_dimensions": [
+        "accuracy",
+        "evidence_sufficiency",
+        "clarity",
+        "unnecessary_warning",
+        "investigation_time_saved"
+      ],
+      "expected_evidence_ids": [
+        "citation-risk-review",
+        "citation-risk-ci"
+      ],
+      "notes": "Synthetic evidence identifiers only."
+    },
+    {
+      "case_id": "ua-insufficient-evidence",
+      "scenario": "abstention",
+      "task": "Review whether the system admits missing evidence instead of inventing a reason.",
+      "required_dimensions": [
+        "accuracy",
+        "evidence_sufficiency",
+        "clarity",
+        "unnecessary_warning",
+        "investigation_time_saved"
+      ],
+      "expected_evidence_ids": [],
+      "notes": "Covers unknown and missing-evidence behavior."
+    }
+  ]
+}

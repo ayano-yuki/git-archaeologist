@@ -79,3 +79,31 @@ GPU / VRAM カウンタが取得できない場合、該当フィールドは `n
 - `phase5-performance.md`: p95 または代表値から見た bottleneck summary。
 
 性能数値は OS、CPU/GPU、同時実行中のプロセス、GPU カウンタ取得可否に依存する。同じ runtime profile 内で比較し、異なる環境の絶対値を品質差として扱わない。
+
+## Phase 5 モデル・索引最適化レポート
+
+Phase 5 の最適化では、量子化、context圧縮、batching、Embedding cache、候補数、Rerank範囲を profile として構造化し、品質指標と速度指標を同じ JSON report で比較する。
+標準実装は既に得られた実測値、または deterministic test fixture を入力として扱う。学習、本物モデルの重い推論、外部収集は行わない。
+
+```powershell
+uv run python -m git_archaeologist.evaluation.optimization_report
+```
+
+証明書エラーが出る環境では次を使う。
+
+```powershell
+uv --system-certs run python -m git_archaeologist.evaluation.optimization_report
+```
+
+出力先の既定値は `data/Qwen--Qwen2.5-Coder-7B-Instruct/runs/optimization-report/` で、次の2ファイルを生成する。
+
+- `optimization-report.json`: 比較対象 profile、品質指標、速度指標、品質閾値、推薦/棄却理由、推奨 runtime profile を含む機械可読 report。
+- `optimization-report.md`: 推薦結果と棄却理由を確認するための summary。
+
+推薦判定では、次の条件をすべて満たす profile だけを候補にする。
+
+- 実測または deterministic test result として `measured=true` で記録されている。
+- Evidence recall、citation integrity、unsupported claim rate、risk precision、schema validation rate が固定した品質閾値を満たす。
+- p95 latency と、指定されている場合は peak RAM の速度・資源目標を満たす。
+
+品質基準を下回る profile や、まだ測定されていない profile は、速度が良くても recommended にはしない。棄却理由は JSON の `decisions[].rejection_reasons` に残し、選ばれた profile は `recommended_runtime_profile` として model ID、量子化、context長、batch size、Embedding cache、候補数、Rerank範囲を持つ。

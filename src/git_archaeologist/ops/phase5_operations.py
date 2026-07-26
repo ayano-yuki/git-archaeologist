@@ -134,7 +134,8 @@ def build_phase5_operations_plan(
             OperationStep("training-deps-smoke", "uv --system-certs run --extra training python -m git_archaeologist.evaluation.system_smoke --require-training-dependencies", OperationStatus.READY, "Verifies optional training dependencies before model loading."),
         ),
         sync_steps=(
-            OperationStep("manual-incremental-sync", "uv --system-certs run python -m git_archaeologist.ops.phase2_smoke", OperationStatus.READY, "Exercises incremental sync and index generation safeguards."),
+            OperationStep("sync-status", "uv --system-certs run python -m git_archaeologist.ops.phase5_sync --status", OperationStatus.READY, "Shows repository, index version, synced_at, watermarks, and scheduler settings."),
+            OperationStep("manual-incremental-sync", "uv --system-certs run python -m git_archaeologist.ops.phase5_sync --plan", OperationStatus.READY, "Plans selected and skipped artifact updates without collecting remote data."),
             OperationStep("question-time-current-pr", "uv --system-certs run python -m git_archaeologist.demo_chat", OperationStatus.READY, "Verifies current PR context can be attached to a chat turn."),
         ),
         training_steps=(

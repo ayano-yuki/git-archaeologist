@@ -55,6 +55,17 @@ storage directory を作成する場合だけ `--execute` を使います。setu
 uv --system-certs run python -m git_archaeologist.ops.phase5_setup --execute --skip-github-access
 ```
 
+## Phase5 同期状態確認
+
+Phase5 の同期状態は、外部収集を実行せずに status と manual sync plan を確認できます。
+
+```powershell
+uv --system-certs run python -m git_archaeologist.ops.phase5_sync --status
+uv --system-certs run python -m git_archaeologist.ops.phase5_sync --plan
+```
+
+scheduler は設定内容をレポートするだけで、OS の常駐ジョブやGitHub状態は変更しません。
+
 ## FT / QLoRA 動作確認
 
 Answer / Judge LLM の回答規律を SFT する場合は、先に構成全体の smoke を実行します。

@@ -132,6 +132,7 @@ def build_local_operations_plan(
         setup_steps=(
             OperationStep("runtime-smoke", "uv --system-certs run python -m git_archaeologist.evaluation.system_smoke", OperationStatus.READY, "Checks local runtime profile and baseline data."),
             OperationStep("training-deps-smoke", "uv --system-certs run --extra training python -m git_archaeologist.evaluation.system_smoke --require-training-dependencies", OperationStatus.READY, "Verifies optional training dependencies before model loading."),
+            OperationStep("data-protection-inventory", "uv --system-certs run python -m git_archaeologist.ops.data_protection --inventory", OperationStatus.READY, "Lists repository-derived raw, run, model, and eval data before backup or deletion."),
         ),
         sync_steps=(
             OperationStep("sync-status", "uv --system-certs run python -m git_archaeologist.ops.sync --status", OperationStatus.READY, "Shows repository, index version, synced_at, watermarks, and scheduler settings."),

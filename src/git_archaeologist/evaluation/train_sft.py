@@ -130,7 +130,7 @@ def build_dry_run_report(
         execute_ready=execute_ready,
         command_hint=(
             "uv run --extra training python -m git_archaeologist.evaluation.train_sft "
-            f"--plan {plan_path} --execute"
+            f"--plan {_display_path(plan_path)} --execute"
         ),
     )
 
@@ -328,6 +328,10 @@ def _resolve_path(path_value: str) -> Path:
     if path.is_absolute():
         return path
     return Path.cwd() / path
+
+
+def _display_path(path: Path) -> str:
+    return path.as_posix()
 
 
 def _build_parser() -> argparse.ArgumentParser:

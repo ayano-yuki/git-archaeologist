@@ -136,7 +136,7 @@ def build_production_training_readiness(
         dry_run=dry_run,
         execute_command=(
             "uv --system-certs run --extra training python -m "
-            f"git_archaeologist.evaluation.train_sft --plan {plan_path} --execute"
+            f"git_archaeologist.evaluation.train_sft --plan {plan_path.as_posix()} --execute"
         ),
     )
 

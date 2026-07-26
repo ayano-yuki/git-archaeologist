@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "status": "ready",
+  "method": "qlora",
+  "base_model": "Qwen/Qwen2.5-Coder-7B-Instruct",
+  "dataset_path": "data/Qwen--Qwen2.5-Coder-7B-Instruct/sft/answer-discipline/production-sft-records.jsonl",
+  "output_dir": "data/Qwen--Qwen2.5-Coder-7B-Instruct/models/answer-discipline-qlora",
+  "seed": 20260726,
+  "reason": "Production raw archive artifacts were converted into evidence-pack answer-discipline SFT records.",
+  "training_args": {
+    "max_seq_length": 4096,
+    "num_train_epochs": 1,
+    "per_device_train_batch_size": 1,
+    "gradient_accumulation_steps": 8,
+    "learning_rate": 0.0002,
+    "lora_r": 16,
+    "lora_alpha": 32,
+    "lora_dropout": 0.05,
+    "logging_steps": 10,
+    "optim": "paged_adamw_8bit",
+    "target_modules": [
+      "q_proj",
+      "k_proj",
+      "v_proj",
+      "o_proj",
+      "gate_proj",
+      "up_proj",
+      "down_proj"
+    ]
+  },
+  "safety_checks": [
+    "dataset validates with SFT policy",
+    "records are generated from Evidence Pack excerpts, not raw closed-book facts",
+    "decision IDs are assigned to only one split",
+    "closed-book leakage suite must pass before and after adapter training"
+  ]
+}

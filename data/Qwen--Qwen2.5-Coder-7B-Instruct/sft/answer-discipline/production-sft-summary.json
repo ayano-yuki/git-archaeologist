@@ -1,0 +1,25 @@
+{
+  "status": "production_sft_dataset_ready",
+  "raw_root": "data/local-runtime/raw/react/react",
+  "dataset_path": "data/Qwen--Qwen2.5-Coder-7B-Instruct/sft/answer-discipline/production-sft-records.jsonl",
+  "plan_path": "data/Qwen--Qwen2.5-Coder-7B-Instruct/sft/answer-discipline/production-lora-training-plan.json",
+  "summary_path": "data/Qwen--Qwen2.5-Coder-7B-Instruct/sft/answer-discipline/production-sft-summary.json",
+  "raw_artifact_count": 2155,
+  "record_count": 2155,
+  "split_counts": {
+    "train": 1977,
+    "validation": 101,
+    "test": 77
+  },
+  "artifact_counts": {
+    "ci_job": 1316,
+    "ci_run": 100,
+    "commit": 100,
+    "issue": 100,
+    "issue_comment": 261,
+    "pull_request": 100,
+    "review": 125,
+    "review_comment": 53
+  },
+  "decision_count": 472
+}

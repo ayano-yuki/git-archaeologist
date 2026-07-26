@@ -8,10 +8,10 @@ from unittest.mock import patch
 
 from git_archaeologist.collectors.gh_access import GhCommandResult
 from git_archaeologist.evaluation.runtime_profile import ModelRole
-from git_archaeologist.ops.phase5_setup import (
+from git_archaeologist.ops.setup import (
     SetupCheckStatus,
     SetupMode,
-    build_phase5_setup_report,
+    build_local_setup_report,
 )
 
 
@@ -57,19 +57,19 @@ def _gh_auth_failure(command):
     raise AssertionError("setup should stop gh checks after auth failure")
 
 
-class Phase5SetupTests(unittest.TestCase):
+class SetupCliTests(unittest.TestCase):
     def test_dry_run_passes_with_safe_fake_github_access(self) -> None:
         with patch(
-            "git_archaeologist.ops.phase5_setup.build_runtime_profile",
+            "git_archaeologist.ops.setup.build_runtime_profile",
             return_value=_Profile(),
         ):
-            report = build_phase5_setup_report(
+            report = build_local_setup_report(
                 plan_path=PLAN_PATH,
                 mode=SetupMode.DRY_RUN,
                 gh_runner=_gh_success,
             )
 
-        self.assertEqual("phase5_setup_passed", report.status)
+        self.assertEqual("local_setup_passed", report.status)
         self.assertEqual(SetupMode.DRY_RUN, report.mode)
         self.assertIn("raw_token", report.suppressed_fields)
         check_ids = {check.check_id for check in report.checks}
@@ -79,11 +79,11 @@ class Phase5SetupTests(unittest.TestCase):
 
     def test_execute_creates_storage_layout(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir, patch(
-            "git_archaeologist.ops.phase5_setup.build_runtime_profile",
+            "git_archaeologist.ops.setup.build_runtime_profile",
             return_value=_Profile(),
         ):
             data_root = Path(temp_dir) / "local-runtime"
-            report = build_phase5_setup_report(
+            report = build_local_setup_report(
                 plan_path=PLAN_PATH,
                 data_root=data_root,
                 mode=SetupMode.EXECUTE,
@@ -99,16 +99,16 @@ class Phase5SetupTests(unittest.TestCase):
 
     def test_github_failure_is_blocking_and_redacted_to_human_payload(self) -> None:
         with patch(
-            "git_archaeologist.ops.phase5_setup.build_runtime_profile",
+            "git_archaeologist.ops.setup.build_runtime_profile",
             return_value=_Profile(),
         ):
-            report = build_phase5_setup_report(
+            report = build_local_setup_report(
                 plan_path=PLAN_PATH,
                 mode=SetupMode.DRY_RUN,
                 gh_runner=_gh_auth_failure,
             )
 
-        self.assertEqual("phase5_setup_blocked", report.status)
+        self.assertEqual("local_setup_blocked", report.status)
         github_check = next(check for check in report.checks if check.check_id == "github_access")
         self.assertEqual(SetupCheckStatus.BLOCKED, github_check.status)
         serialized = str(github_check.details)
@@ -117,10 +117,10 @@ class Phase5SetupTests(unittest.TestCase):
 
     def test_can_skip_github_access_for_offline_setup_inspection(self) -> None:
         with patch(
-            "git_archaeologist.ops.phase5_setup.build_runtime_profile",
+            "git_archaeologist.ops.setup.build_runtime_profile",
             return_value=_Profile(),
         ):
-            report = build_phase5_setup_report(
+            report = build_local_setup_report(
                 plan_path=PLAN_PATH,
                 mode=SetupMode.DRY_RUN,
                 check_github=False,

@@ -9,20 +9,20 @@ from git_archaeologist.chat.chat_flow import (
     ChatEvidencePack,
     ChatTarget,
 )
-from git_archaeologist.chat.phase5 import (
+from git_archaeologist.chat.routing import (
     ChatSessionState,
-    Phase5Route,
+    ChatRoute,
     build_unified_citations,
     check_session_freshness,
-    route_phase5_query,
+    route_chat_query,
 )
 from git_archaeologist.evaluation.production_training import (
     build_production_training_readiness,
     discover_production_collection_summaries,
 )
-from git_archaeologist.ops.phase5_operations import (
+from git_archaeologist.ops.operations import (
     OperationStatus,
-    build_phase5_operations_plan,
+    build_local_operations_plan,
     build_protected_data_inventory,
     build_regression_suite_plan,
 )
@@ -32,9 +32,9 @@ ROOT = Path(__file__).resolve().parents[1]
 PLAN_PATH = ROOT / "data/baseline-rag/sft/answer-discipline/lora-training-plan.json"
 
 
-class Phase5CompletionTests(unittest.TestCase):
+class ChatRoutingTests(unittest.TestCase):
     def test_integrated_routing_combines_lineage_incident_and_risk(self) -> None:
-        result = route_phase5_query(
+        result = route_chat_query(
             "\n".join(
                 (
                     "https://github.com/facebook/react/pull/12345",
@@ -44,7 +44,7 @@ class Phase5CompletionTests(unittest.TestCase):
             )
         )
 
-        self.assertEqual(Phase5Route.COMBINED, result.route)
+        self.assertEqual(ChatRoute.COMBINED, result.route)
         self.assertIn("lineage-origin-maintenance", result.query_plan_ids)
         self.assertIn("incident-causal-history", result.query_plan_ids)
         self.assertIn("historical-change-risk", result.query_plan_ids)
@@ -142,8 +142,8 @@ class Phase5CompletionTests(unittest.TestCase):
         self.assertFalse(readiness.ready)
         self.assertIn("pull_request", readiness.missing_artifact_kinds)
 
-    def test_phase5_operations_plan_covers_setup_sync_training_and_qa(self) -> None:
-        plan = build_phase5_operations_plan()
+    def test_local_operations_plan_covers_setup_sync_training_and_qa(self) -> None:
+        plan = build_local_operations_plan()
 
         self.assertEqual(OperationStatus.PENDING, plan.status)
         self.assertTrue(plan.setup_steps)

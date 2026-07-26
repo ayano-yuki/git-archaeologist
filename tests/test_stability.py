@@ -24,7 +24,7 @@ from git_archaeologist.ops.index_integrity import (
     IndexTransactionStatus,
     ensure_answer_uses_published_index,
 )
-from git_archaeologist.phase2_smoke import run_phase2_smoke
+from git_archaeologist.ops.smoke import run_stability_smoke
 from git_archaeologist.evaluation.quality_analysis import (
     ExperimentRun,
     FailureResponsibility,
@@ -37,7 +37,7 @@ from git_archaeologist.ops.resilience import FailureKind, classify_failure_messa
 from git_archaeologist.ops.versioned_cache import CacheKey, CacheOperation, VersionedCache
 
 
-class Phase2StabilityTests(unittest.TestCase):
+class StabilityTests(unittest.TestCase):
     def test_incremental_sync_selects_changed_only_and_tracks_tombstone(self) -> None:
         state = SyncState(
             repository_id="react/react",
@@ -153,10 +153,10 @@ class Phase2StabilityTests(unittest.TestCase):
         self.assertEqual("defer_sft", decision.decision)
         self.assertIn("RAG改善", " ".join(decision.reasons))
 
-    def test_phase2_smoke_passes(self) -> None:
-        result = run_phase2_smoke()
+    def test_stability_smoke_passes(self) -> None:
+        result = run_stability_smoke()
 
-        self.assertEqual("phase2_smoke_passed", result["status"])
+        self.assertEqual("stability_smoke_passed", result["status"])
         self.assertEqual("answered", result["chat_status"])
         self.assertEqual("defer_sft", result["sft_decision"]["decision"])
 

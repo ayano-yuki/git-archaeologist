@@ -497,7 +497,7 @@ CI失敗、不具合報告、修正、Revert、再適用を一つの時系列と
   - 方法: 対象粒度、説明要求、リスク要求、障害要求を判定し、必要に応じて複数のQuery Planを組み合わせる。
   - 成果物: 統合Input Interpreter、routingテスト。
   - 完了条件: 同じ会話内でファイル説明から障害分析へ文脈を保って移行できる。
-  - 状態: `src/git_archaeologist/chat/phase5.py` の `route_phase5_query` / `route_interpreted_phase5_query` と `tests/test_phase5_completion.py` で、実装理由、変更リスク、障害分析、行・条件分岐分析を統合Routingできる。
+  - 状態: `src/git_archaeologist/chat/routing.py` の `route_chat_query` / `route_interpreted_chat_query` と `tests/test_chat_routing.py` で、実装理由、変更リスク、障害分析、行・条件分岐分析を統合Routingできる。
 
 - [x] **必須: 根拠表示を統一する**
   - 目的: どの機能でも、回答から元履歴へ同じ方法で辿れるようにする。
@@ -520,14 +520,14 @@ CI失敗、不具合報告、修正、Revert、再適用を一つの時系列と
   - 方法: 依存関係、モデル、データストア、認証確認、初回索引を一連の手順へまとめる。
   - 成果物: setupコマンド、設定テンプレート、利用手順。
   - 完了条件: 新しいローカル環境で手順どおりに起動できる。
-  - 状態: #108 で `git_archaeologist.ops.phase5_setup` を追加し、Repository設定、storage layout、`gh` access、runtime profile、本番データ学習 readiness、初回索引手順を dry-run / execute mode で確認できる。
+  - 状態: #108 で `git_archaeologist.ops.setup` を追加し、Repository設定、storage layout、`gh` access、runtime profile、本番データ学習 readiness、初回索引手順を dry-run / execute mode で確認できる。
 
 - [x] **必須: 定期同期と手動同期を提供する**
   - 目的: Repositoryの新しい履歴を再学習なしで回答へ反映する。
   - 方法: schedulerによる増分同期、質問時の最新PR取得、管理用の手動再同期を実装する。
   - 成果物: 同期job、状態表示、最終同期時刻。
   - 完了条件: 新しいPRやReviewが同期後の検索結果へ反映される。
-  - 状態: #109 で `git_archaeologist.ops.phase5_sync` を追加し、`--status` で repository / index version / synced_at / watermarks、`--plan` で selected / skipped artifact updates、scheduler設定を表示できる。
+  - 状態: #109 で `git_archaeologist.ops.sync` を追加し、`--status` で repository / index version / synced_at / watermarks、`--plan` で selected / skipped artifact updates、scheduler設定を表示できる。
 
 - [ ] **必須: データ保護と削除手順を整備する**
   - 目的: private Repositoryの履歴、モデル入力、ログをローカルで適切に管理する。
@@ -543,7 +543,7 @@ CI失敗、不具合報告、修正、Revert、再適用を一つの時系列と
   - 方法: 対象解決、検索、Rerank、LLM生成、引用検証の時間、CPU・GPU・RAM・VRAM使用量を計測する。
   - 成果物: performance profile、改善優先順位。
   - 完了条件: 主要なbottleneckを数値で説明できる。
-  - 状態: runtime profile と Phase5運用手順はあり。チャットE2Eの段階別計測、比較レポート、改善優先順位は #111 で対応する。
+  - 状態: runtime profile とローカル運用手順はあり。チャットE2Eの段階別計測、比較レポート、改善優先順位は #111 で対応する。
 
 - [ ] **必須: モデルと索引を最適化する**
   - 目的: 品質を保ちながら、対象ハードウェアで現実的な速度にする。
@@ -559,7 +559,7 @@ CI失敗、不具合報告、修正、Revert、再適用を一つの時系列と
   - 方法: 対象解決、検索、説明、リスク、障害、lineage、引用、棄権、性能の評価を一つのsuiteで実行する。
   - 成果物: regression suite、比較レポート、合否判定。
   - 完了条件: version変更ごとに同じ評価を再実行できる。
-  - 状態: `RegressionSuitePlan` と `tests/test_phase5_completion.py` で suite 仕様は固定済み。評価ケースの一括実行CLI、比較レポート、合否判定出力は #113 で対応する。
+  - 状態: `RegressionSuitePlan` と `tests/test_chat_routing.py` で suite 仕様は固定済み。評価ケースの一括実行CLI、比較レポート、合否判定出力は #113 で対応する。
 
 - [ ] **必須: 人手による受け入れ評価を行う**
   - 目的: 自動指標だけでは測れない説明の有用性と警告疲れを確認する。

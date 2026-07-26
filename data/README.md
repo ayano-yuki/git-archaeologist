@@ -6,10 +6,18 @@ Git 管理対象にする前提のため、`data/` には secret、token、認�
 
 ## 基本構造
 
-モデルごとにフォルダーを分ける。
+モデルごとにフォルダーを分ける。モデル非依存の実行データは、予約済み bucket に閉じ込める。
 
 ```text
 data/
+  baseline-rag/
+    sft/
+    eval/
+  local-runtime/
+    raw/
+    processed/
+    evidence-packs/
+    runs/
   <model-name>/
     raw/
     processed/
@@ -37,6 +45,13 @@ Qwen/Qwen2.5-Coder-7B-Instruct -> data/Qwen--Qwen2.5-Coder-7B-Instruct/
 - `sft/`: SFT 用の教師データ。
 - `eval/`: 評価データ、期待結果、評価レポート。
 - `runs/`: 実験ごとの出力、ログ、メトリクス。
+
+## 予約済み bucket
+
+- `data/baseline-rag/`: 特定モデルへまだ紐づけない baseline、prompt、RAG 評価、SFT 実行計画を置く。
+- `data/local-runtime/`: ローカル運用の raw archive、processed data、Evidence Pack、収集summary、同期や索引の runtime output を置く。
+
+上記以外の学習済み adapter、モデル別評価、モデル別実験ログは `data/<model-name>/` に置く。
 
 ## MVP 評価データ
 

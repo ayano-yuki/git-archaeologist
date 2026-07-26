@@ -15,7 +15,7 @@ from git_archaeologist.evaluation.train_sft import (
     build_dry_run_report,
     dry_run_report_to_dict,
 )
-from git_archaeologist.ops.phase2_smoke import run_phase2_smoke
+from git_archaeologist.ops.smoke import run_stability_smoke
 
 
 @dataclass(frozen=True)
@@ -26,10 +26,10 @@ class SystemSmokeReport:
     runtime_ready: bool
     training_plan_ready: bool
     training_execute_ready: bool
-    phase2_smoke_ready: bool
+    stability_smoke_ready: bool
     missing_optional_dependencies: tuple[str, ...]
     errors: tuple[str, ...]
-    phase2: dict[str, object]
+    stability: dict[str, object]
     sft: dict[str, object]
 
 
@@ -43,16 +43,16 @@ def build_system_smoke_report(
 
     sft_report = build_dry_run_report(plan_path, dependency_names=dependency_names)
     runtime_profile = build_runtime_profile(disk_path=Path.cwd())
-    phase2_report = run_phase2_smoke()
+    stability_report = run_stability_smoke()
     runtime_ready = all(
         check.status == "ready" for check in runtime_profile.constraint_checks
     )
-    phase2_smoke_ready = phase2_report.get("status") == "phase2_smoke_passed"
+    stability_smoke_ready = stability_report.get("status") == "stability_smoke_passed"
     errors: list[str] = []
     if not runtime_ready:
         errors.append("one or more selected runtime models are not ready")
-    if not phase2_smoke_ready:
-        errors.append("Phase2 smoke did not pass")
+    if not stability_smoke_ready:
+        errors.append("stability smoke did not pass")
     if not sft_report.should_train:
         errors.append("SFT training plan is not ready")
     if require_training_dependencies and sft_report.missing_optional_dependencies:
@@ -64,10 +64,10 @@ def build_system_smoke_report(
         runtime_ready=runtime_ready,
         training_plan_ready=sft_report.should_train,
         training_execute_ready=sft_report.execute_ready,
-        phase2_smoke_ready=phase2_smoke_ready,
+        stability_smoke_ready=stability_smoke_ready,
         missing_optional_dependencies=sft_report.missing_optional_dependencies,
         errors=tuple(errors),
-        phase2=phase2_report,
+        stability=stability_report,
         sft=dry_run_report_to_dict(sft_report),
     )
 

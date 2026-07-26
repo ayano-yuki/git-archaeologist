@@ -99,7 +99,7 @@ class VectorSearchBackend(Protocol):
 
 
 @dataclass(frozen=True)
-class StubVectorSearchBackend:
+class DeterministicVectorSearchBackend:
     """Deterministic vector backend for tests and early local evaluation."""
 
     scores_by_document_id: Mapping[str, float]
@@ -117,7 +117,7 @@ class StubVectorSearchBackend:
                 document=document,
                 score=score,
                 source=SearchSource.VECTOR,
-                explanation=f"stub vector score for query '{query}'",
+                explanation=f"deterministic vector score for query '{query}'",
             )
             for document in _filtered(documents, search_filter)
             if (score := self.scores_by_document_id.get(document.document_id, 0.0)) > 0

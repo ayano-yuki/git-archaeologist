@@ -1,4 +1,4 @@
-"""Phase5 sync status, manual sync planning, and scheduler configuration."""
+"""Sync status, manual sync planning, and scheduler configuration."""
 
 from __future__ import annotations
 
@@ -19,7 +19,7 @@ from git_archaeologist.ops.incremental_sync import (
 )
 
 
-DEFAULT_INDEX_VERSION = "phase5-index-v1"
+DEFAULT_INDEX_VERSION = "local-index-v1"
 DEFAULT_SYNCED_AT = "1970-01-01T00:00:00+00:00"
 
 
@@ -41,8 +41,8 @@ class SchedulerConfig:
 
 
 @dataclass(frozen=True)
-class Phase5SyncStatusReport:
-    """Current published sync state for Phase5 local operation."""
+class SyncStatusReport:
+    """Current published sync state for local operation."""
 
     status: str
     repository_id: str
@@ -71,7 +71,7 @@ class Phase5SyncStatusReport:
 
 
 @dataclass(frozen=True)
-class Phase5ManualSyncPlanReport:
+class ManualSyncPlanReport:
     """Manual sync plan that does not collect or mutate remote data."""
 
     status: str
@@ -106,7 +106,7 @@ def build_default_sync_state(
     index_version: str = DEFAULT_INDEX_VERSION,
     synced_at: str = DEFAULT_SYNCED_AT,
 ) -> SyncState:
-    """Return an initial status state with all Phase5 artifact streams visible."""
+    """Return an initial status state with all artifact streams visible."""
 
     watermarks = tuple(
         SyncWatermark(artifact_kind=kind, updated_at=synced_at)
@@ -130,36 +130,36 @@ def build_scheduler_config(
     return SchedulerConfig(
         enabled=enabled,
         interval_minutes=interval_minutes,
-        command="uv --system-certs run python -m git_archaeologist.ops.phase5_sync --plan",
+        command="uv --system-certs run python -m git_archaeologist.ops.sync --plan",
         mutates_external_scheduler=False,
     )
 
 
-def build_phase5_sync_status_report(
+def build_sync_status_report(
     state: SyncState,
     *,
     scheduler: SchedulerConfig | None = None,
-) -> Phase5SyncStatusReport:
+) -> SyncStatusReport:
     """Build a JSON-friendly status report from a published sync state."""
 
-    return Phase5SyncStatusReport(
-        status="phase5_sync_status_ready",
+    return SyncStatusReport(
+        status="sync_status_ready",
         repository_id=state.repository_id,
         index_version=state.index_version,
         synced_at=state.synced_at,
         watermarks=tuple(_watermark_to_dict(mark) for mark in state.watermarks),
         tombstones=state.tombstones,
         scheduler=scheduler or build_scheduler_config(),
-        manual_sync_command="uv --system-certs run python -m git_archaeologist.ops.phase5_sync --plan",
+        manual_sync_command="uv --system-certs run python -m git_archaeologist.ops.sync --plan",
     )
 
 
-def build_phase5_manual_sync_plan_report(
+def build_manual_sync_plan_report(
     state: SyncState,
     observed_updates: tuple[ArtifactUpdate, ...],
     *,
     scheduler: SchedulerConfig | None = None,
-) -> Phase5ManualSyncPlanReport:
+) -> ManualSyncPlanReport:
     """Plan selected artifacts for a manual sync without collecting anything."""
 
     plan = plan_incremental_sync(state, observed_updates)
@@ -201,7 +201,7 @@ def load_observed_updates(path: Path) -> tuple[ArtifactUpdate, ...]:
     return tuple(_artifact_update_from_dict(item) for item in payload)
 
 
-def report_to_json(report: Phase5SyncStatusReport | Phase5ManualSyncPlanReport) -> str:
+def report_to_json(report: SyncStatusReport | ManualSyncPlanReport) -> str:
     """Serialize a status or plan report."""
 
     return json.dumps(report.to_dict(), ensure_ascii=False, indent=2)
@@ -213,9 +213,9 @@ def _manual_plan_report(
     observed_updates: tuple[ArtifactUpdate, ...],
     plan: IncrementalSyncPlan,
     scheduler: SchedulerConfig,
-) -> Phase5ManualSyncPlanReport:
-    return Phase5ManualSyncPlanReport(
-        status="phase5_manual_sync_plan_ready",
+) -> ManualSyncPlanReport:
+    return ManualSyncPlanReport(
+        status="manual_sync_plan_ready",
         repository_id=state.repository_id,
         index_version=state.index_version,
         observed_update_count=len(observed_updates),
@@ -288,13 +288,13 @@ def main(argv: Sequence[str] | None = None) -> int:
     )
     if args.plan:
         updates = load_observed_updates(args.observed_updates) if args.observed_updates else ()
-        report = build_phase5_manual_sync_plan_report(
+        report = build_manual_sync_plan_report(
             state,
             updates,
             scheduler=scheduler,
         )
     else:
-        report = build_phase5_sync_status_report(state, scheduler=scheduler)
+        report = build_sync_status_report(state, scheduler=scheduler)
     print(report_to_json(report))
     return 0
 

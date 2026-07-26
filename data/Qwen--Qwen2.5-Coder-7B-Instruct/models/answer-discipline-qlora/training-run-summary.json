@@ -2,16 +2,16 @@
   "status": "sft_training_completed",
   "method": "qlora",
   "base_model": "Qwen/Qwen2.5-Coder-7B-Instruct",
-  "dataset_path": "data/baseline-rag/sft/answer-discipline/sft-records.jsonl",
-  "record_count": 1,
+  "dataset_path": "data/Qwen--Qwen2.5-Coder-7B-Instruct/sft/answer-discipline/production-sft-records.jsonl",
+  "record_count": 1977,
   "output_dir": "/home/taira/git-archaeologist/data/Qwen--Qwen2.5-Coder-7B-Instruct/models/answer-discipline-qlora",
   "max_steps": null,
   "metrics": {
-    "train_runtime": 1.3824,
-    "train_samples_per_second": 0.723,
-    "train_steps_per_second": 0.723,
-    "total_flos": 8959846533120.0,
-    "train_loss": 3.2103090286254883,
+    "train_runtime": 705.735,
+    "train_samples_per_second": 2.801,
+    "train_steps_per_second": 0.351,
+    "total_flos": 3.771702863833498e+16,
+    "train_loss": 0.35961680787224926,
     "epoch": 1.0
   }
 }

@@ -7,9 +7,9 @@
   "output_dir": "/home/taira/git-archaeologist/data/Qwen--Qwen2.5-Coder-7B-Instruct/models/answer-discipline-qlora",
   "max_steps": null,
   "metrics": {
-    "train_runtime": 1.4522,
-    "train_samples_per_second": 0.689,
-    "train_steps_per_second": 0.689,
+    "train_runtime": 1.3824,
+    "train_samples_per_second": 0.723,
+    "train_steps_per_second": 0.723,
     "total_flos": 8959846533120.0,
     "train_loss": 3.2103090286254883,
     "epoch": 1.0

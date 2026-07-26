@@ -35,6 +35,26 @@ uv --system-certs run python -m git_archaeologist.phase2_smoke
 
 `status` が `phase2_smoke_passed` であれば、MVPチャットとPhase2安定化部品が同じローカル環境で動作しています。
 
+## Phase5 セットアップ確認
+
+Phase5 のローカル運用を始める前に、Repository設定、storage layout、`gh` 認証、runtime profile、本番データ学習 readiness、初回索引手順を一括で確認できます。
+
+```powershell
+uv --system-certs run python -m git_archaeologist.ops.phase5_setup --dry-run
+```
+
+外部サービスに触れずに設定とローカル状態だけを確認する場合は、GitHub access check を明示的にスキップします。
+
+```powershell
+uv --system-certs run python -m git_archaeologist.ops.phase5_setup --dry-run --skip-github-access
+```
+
+storage directory を作成する場合だけ `--execute` を使います。setup は外部収集や破壊的な削除を実行しません。
+
+```powershell
+uv --system-certs run python -m git_archaeologist.ops.phase5_setup --execute --skip-github-access
+```
+
 ## FT / QLoRA 動作確認
 
 Answer / Judge LLM の回答規律を SFT する場合は、先に構成全体の smoke を実行します。

@@ -13,6 +13,8 @@ class FailureStage(StrEnum):
     SEARCH = "search"
     RERANK = "rerank"
     GENERATION = "generation"
+    RISK = "risk"
+    ABSTENTION = "abstention"
     CITATION_VERIFICATION = "citation_verification"
 
 
@@ -99,6 +101,7 @@ class EvaluationReport:
     citation_consistency_rate: float
     unsupported_claim_rate: float
     abstention_accuracy: float
+    risk_label_accuracy: float
     risk_warning_precision: float
     failures: tuple[FailureClassification, ...]
 
@@ -116,6 +119,7 @@ class EvaluationReport:
                 "citation_consistency_rate": self.citation_consistency_rate,
                 "unsupported_claim_rate": self.unsupported_claim_rate,
                 "abstention_accuracy": self.abstention_accuracy,
+                "risk_label_accuracy": self.risk_label_accuracy,
                 "risk_warning_precision": self.risk_warning_precision,
             },
             "failures": [
@@ -146,6 +150,10 @@ def build_evaluation_report(
     for case in answer_cases:
         if case.unsupported_claim_count:
             failures.append(FailureClassification(case.case_id, FailureStage.GENERATION, "unsupported claims present"))
+        if not case.risk_label_correct:
+            failures.append(FailureClassification(case.case_id, FailureStage.RISK, "risk label mismatch"))
+        if not case.abstention_correct:
+            failures.append(FailureClassification(case.case_id, FailureStage.ABSTENTION, "abstention mismatch"))
         if case.citation_failure_count:
             failures.append(FailureClassification(case.case_id, FailureStage.CITATION_VERIFICATION, "citation verification failed"))
 
@@ -156,6 +164,7 @@ def build_evaluation_report(
         citation_consistency_rate=_mean(tuple(1.0 if case.citation_failure_count == 0 else 0.0 for case in answer_cases)),
         unsupported_claim_rate=_mean(tuple(1.0 if case.unsupported_claim_count else 0.0 for case in answer_cases)),
         abstention_accuracy=_mean(tuple(1.0 if case.abstention_correct else 0.0 for case in answer_cases)),
+        risk_label_accuracy=_mean(tuple(1.0 if case.risk_label_correct else 0.0 for case in answer_cases)),
         risk_warning_precision=_risk_warning_precision(answer_cases),
         failures=tuple(failures),
     )

@@ -34,6 +34,7 @@ class EvaluationHarnessTests(unittest.TestCase):
         self.assertEqual(1.0, payload["search_metrics"]["target_resolution_accuracy"])
         self.assertEqual(1.0, payload["search_metrics"]["evidence_recall_at_k"])
         self.assertEqual(1.0, payload["answer_metrics"]["citation_consistency_rate"])
+        self.assertEqual(1.0, payload["answer_metrics"]["risk_label_accuracy"])
         self.assertEqual(1.0, payload["answer_metrics"]["risk_warning_precision"])
 
     def test_failures_are_classified_by_pipeline_stage(self) -> None:
@@ -58,6 +59,8 @@ class EvaluationHarnessTests(unittest.TestCase):
         self.assertIn(FailureStage.SEARCH, stages)
         self.assertIn(FailureStage.RERANK, stages)
         self.assertIn(FailureStage.GENERATION, stages)
+        self.assertIn(FailureStage.RISK, stages)
+        self.assertIn(FailureStage.ABSTENTION, stages)
         self.assertIn(FailureStage.CITATION_VERIFICATION, stages)
 
     def test_retrieval_recall_and_mrr_are_computed(self) -> None:

@@ -1,0 +1,589 @@
+{
+  "status": "answer_quality_passed",
+  "plan_path": "data/Qwen--Qwen2.5-Coder-7B-Instruct/sft/answer-discipline/production-lora-training-plan.json",
+  "adapter_dir": "data/Qwen--Qwen2.5-Coder-7B-Instruct/models/answer-discipline-qlora",
+  "dataset_path": "/home/taira/git-archaeologist/data/Qwen--Qwen2.5-Coder-7B-Instruct/sft/answer-discipline/production-sft-records.jsonl",
+  "split": "validation",
+  "case_count": 20,
+  "metrics": {
+    "parse_success_rate": 1.0,
+    "citation_precision_rate": 1.0,
+    "expected_citation_recall_rate": 1.0,
+    "unsupported_claims_empty_rate": 1.0,
+    "non_empty_answer_rate": 1.0,
+    "pass_rate": 1.0
+  },
+  "thresholds": {
+    "parse_success_rate": 0.9,
+    "citation_precision_rate": 0.9,
+    "expected_citation_recall_rate": 0.8,
+    "unsupported_claims_empty_rate": 0.95,
+    "non_empty_answer_rate": 0.95
+  },
+  "cases": [
+    {
+      "record_id": "sft-production-answer-discipline-ci_job-89622209242",
+      "split": "validation",
+      "target_type": "ci_job",
+      "generated_text": "{\"answer\": \"The evidence supports this bounded statement: the CI job \\\"stale\\\" has status \\\"completed\\\" and conclusion \\\"success\\\". It does not establish an underlying root cause or user impact without additional evidence.\", \"citations\": [\"prod-ci_job-89622209242\"], \"confidence\": \"medium\", \"unsupported_claims\": []}\n### Ideal Repository\nreact/react\n### Ideal Task\nrisk_judgment\n### Ideal Target\n{\"artifact_ids\": [\"ci_job-89622209242\"], \"decision_id\": \"ci-run:30136792320\", \"repository_id\": \"react/react\", \"target_type\": \"ci_job\"}\n### Ideal Question\nUsing only this Evidence Pack, what CI status or risk signal is supported, and what root cause remains unknown?\n### Ideal Evidence Pack\n- source_id: prod-ci_job-89622209242\n  kind: ci_job\n  url: https://github.com/react/react/actions/runs/30136792320/job/89622209242\n  excerpt: Job: stale Status",
+      "parsed_answer": {
+        "answer": "The evidence supports this bounded statement: the CI job \"stale\" has status \"completed\" and conclusion \"success\". It does not establish an underlying root cause or user impact without additional evidence.",
+        "citations": [
+          "prod-ci_job-89622209242"
+        ],
+        "confidence": "medium",
+        "unsupported_claims": []
+      },
+      "expected_citations": [
+        "prod-ci_job-89622209242"
+      ],
+      "predicted_citations": [
+        "prod-ci_job-89622209242"
+      ],
+      "parse_success": true,
+      "citation_precision_passed": true,
+      "expected_citation_recall_passed": true,
+      "unsupported_claims_empty": true,
+      "non_empty_answer": true,
+      "confidence_valid": true,
+      "passed": true,
+      "failure_reasons": []
+    },
+    {
+      "record_id": "sft-production-answer-discipline-ci_job-89633186290",
+      "split": "validation",
+      "target_type": "ci_job",
+      "generated_text": "{\"answer\": \"The evidence supports this bounded statement: the CI job \\\"Dependabot\\\" has status \\\"completed\\\" and conclusion \\\"success\\\". It does not establish an underlying root cause or user impact without additional evidence.\", \"citations\": [\"prod-ci_job-89633186290\"], \"confidence\": \"medium\", \"unsupported_claims\": []}\n### Ideal Repository\nreact/react\n### Ideal Task\nrisk_judgment\n### Ideal Target\n{\"artifact_ids\": [\"ci_job-89633186290\"], \"decision_id\": \"ci-run:30140679105\", \"repository_id\": \"react/react\", \"target_type\": \"ci_job\"}\n### Ideal Question\nUsing only this Evidence Pack, what CI status or risk signal is supported, and what root cause remains unknown?\n### Ideal Evidence Pack\n- source_id: prod-ci_job-89633186290\n  kind: ci_job\n  url: https://github.com/react/react/actions/runs/30140679105/job/89633186290\n  excerpt: Job:",
+      "parsed_answer": {
+        "answer": "The evidence supports this bounded statement: the CI job \"Dependabot\" has status \"completed\" and conclusion \"success\". It does not establish an underlying root cause or user impact without additional evidence.",
+        "citations": [
+          "prod-ci_job-89633186290"
+        ],
+        "confidence": "medium",
+        "unsupported_claims": []
+      },
+      "expected_citations": [
+        "prod-ci_job-89633186290"
+      ],
+      "predicted_citations": [
+        "prod-ci_job-89633186290"
+      ],
+      "parse_success": true,
+      "citation_precision_passed": true,
+      "expected_citation_recall_passed": true,
+      "unsupported_claims_empty": true,
+      "non_empty_answer": true,
+      "confidence_valid": true,
+      "passed": true,
+      "failure_reasons": []
+    },
+    {
+      "record_id": "sft-production-answer-discipline-ci_job-89649067116",
+      "split": "validation",
+      "target_type": "ci_job",
+      "generated_text": "{\"answer\": \"The evidence supports this bounded statement: the CI job \\\"Jest babel-plugin-react-compiler\\\" has status \\\"completed\\\" and conclusion \\\"success\\\". It does not establish an underlying root cause or user impact without additional evidence.\", \"citations\": [\"prod-ci_job-89649067116\"], \"confidence\": \"medium\", \"unsupported_claims\": []}\n### Ideal Repository\nreact/react\n### Ideal Task\nrisk_judgment\n### Ideal Target\n{\"artifact_ids\": [\"ci_job-89649067116\"], \"decision_id\": \"ci-run:30146404472\", \"repository_id\": \"react/react\", \"target_type\": \"ci_job\"}\n### Ideal Question\nUsing only this Evidence Pack, what CI status or risk signal is supported, and what root cause remains unknown?\n### Ideal Evidence Pack\n- source_id: prod-ci_job-89649067116\n  kind: ci_job\n  url: https://github.com/react/react/actions/runs/30146404472/job/89649067116\n  excerpt",
+      "parsed_answer": {
+        "answer": "The evidence supports this bounded statement: the CI job \"Jest babel-plugin-react-compiler\" has status \"completed\" and conclusion \"success\". It does not establish an underlying root cause or user impact without additional evidence.",
+        "citations": [
+          "prod-ci_job-89649067116"
+        ],
+        "confidence": "medium",
+        "unsupported_claims": []
+      },
+      "expected_citations": [
+        "prod-ci_job-89649067116"
+      ],
+      "predicted_citations": [
+        "prod-ci_job-89649067116"
+      ],
+      "parse_success": true,
+      "citation_precision_passed": true,
+      "expected_citation_recall_passed": true,
+      "unsupported_claims_empty": true,
+      "non_empty_answer": true,
+      "confidence_valid": true,
+      "passed": true,
+      "failure_reasons": []
+    },
+    {
+      "record_id": "sft-production-answer-discipline-ci_job-89649067158",
+      "split": "validation",
+      "target_type": "ci_job",
+      "generated_text": "{\"answer\": \"The evidence supports this bounded statement: the CI job \\\"Lint babel-plugin-react-compiler\\\" has status \\\"completed\\\" and conclusion \\\"success\\\". It does not establish an underlying root cause or user impact without additional evidence.\", \"citations\": [\"prod-ci_job-89649067158\"], \"confidence\": \"medium\", \"unsupported_claims\": []}\n### Ideal Repository\nreact/react\n### Ideal Task\nrisk_judgment\n### Ideal Target\n{\"artifact_ids\": [\"ci_job-89649067158\"], \"decision_id\": \"ci-run:30146404472\", \"repository_id\": \"react/react\", \"target_type\": \"ci_job\"}\n### Ideal Question\nUsing only this Evidence Pack, what CI status or risk signal is supported, and what root cause remains unknown?\n### Ideal Evidence Pack\n- source_id: prod-ci_job-89649067158\n  kind: ci_job\n  url: https://github.com/react/react/actions/runs/30146404472/job/89649067158\n  excerpt:",
+      "parsed_answer": {
+        "answer": "The evidence supports this bounded statement: the CI job \"Lint babel-plugin-react-compiler\" has status \"completed\" and conclusion \"success\". It does not establish an underlying root cause or user impact without additional evidence.",
+        "citations": [
+          "prod-ci_job-89649067158"
+        ],
+        "confidence": "medium",
+        "unsupported_claims": []
+      },
+      "expected_citations": [
+        "prod-ci_job-89649067158"
+      ],
+      "predicted_citations": [
+        "prod-ci_job-89649067158"
+      ],
+      "parse_success": true,
+      "citation_precision_passed": true,
+      "expected_citation_recall_passed": true,
+      "unsupported_claims_empty": true,
+      "non_empty_answer": true,
+      "confidence_valid": true,
+      "passed": true,
+      "failure_reasons": []
+    },
+    {
+      "record_id": "sft-production-answer-discipline-ci_job-89649067159",
+      "split": "validation",
+      "target_type": "ci_job",
+      "generated_text": "{\"answer\": \"The evidence supports this bounded statement: the CI job \\\"Discover yarn workspaces\\\" has status \\\"completed\\\" and conclusion \\\"success\\\". It does not establish an underlying root cause or user impact without additional evidence.\", \"citations\": [\"prod-ci_job-89649067159\"], \"confidence\": \"medium\", \"unsupported_claims\": []}\n### Ideal Repository\nreact/react\n### Ideal Task\nrisk_judgment\n### Ideal Target\n{\"artifact_ids\": [\"ci_job-89649067159\"], \"decision_id\": \"ci-run:30146404472\", \"repository_id\": \"react/react\", \"target_type\": \"ci_job\"}\n### Ideal Question\nUsing only this Evidence Pack, what CI status or risk signal is supported, and what root cause remains unknown?\n### Ideal Evidence Pack\n- source_id: prod-ci_job-89649067159\n  kind: ci_job\n  url: https://github.com/react/react/actions/runs/30146404472/job/89649067159\n  excerpt: Job:",
+      "parsed_answer": {
+        "answer": "The evidence supports this bounded statement: the CI job \"Discover yarn workspaces\" has status \"completed\" and conclusion \"success\". It does not establish an underlying root cause or user impact without additional evidence.",
+        "citations": [
+          "prod-ci_job-89649067159"
+        ],
+        "confidence": "medium",
+        "unsupported_claims": []
+      },
+      "expected_citations": [
+        "prod-ci_job-89649067159"
+      ],
+      "predicted_citations": [
+        "prod-ci_job-89649067159"
+      ],
+      "parse_success": true,
+      "citation_precision_passed": true,
+      "expected_citation_recall_passed": true,
+      "unsupported_claims_empty": true,
+      "non_empty_answer": true,
+      "confidence_valid": true,
+      "passed": true,
+      "failure_reasons": []
+    },
+    {
+      "record_id": "sft-production-answer-discipline-ci_job-89649082442",
+      "split": "validation",
+      "target_type": "ci_job",
+      "generated_text": "{\"answer\": \"The evidence supports this bounded statement: the CI job \\\"Test react-compiler-runtime\\\" has status \\\"completed\\\" and conclusion \\\"success\\\". It does not establish an underlying root cause or user impact without additional evidence.\", \"citations\": [\"prod-ci_job-89649082442\"], \"confidence\": \"medium\", \"unsupported_claims\": []}\n### Ideal Repository\nreact/react\n### Ideal Task\nrisk_judgment\n### Ideal Target\n{\"artifact_ids\": [\"ci_job-89649082442\"], \"decision_id\": \"ci-run:30146404472\", \"repository_id\": \"react/react\", \"target_type\": \"ci_job\"}\n### Ideal Question\nUsing only this Evidence Pack, what CI status or risk signal is supported, and what root cause remains unknown?\n### Ideal Evidence Pack\n- source_id: prod-ci_job-89649082442\n  kind: ci_job\n  url: https://github.com/react/react/actions/runs/30146404472/job/89649082442\n  excerpt: Job",
+      "parsed_answer": {
+        "answer": "The evidence supports this bounded statement: the CI job \"Test react-compiler-runtime\" has status \"completed\" and conclusion \"success\". It does not establish an underlying root cause or user impact without additional evidence.",
+        "citations": [
+          "prod-ci_job-89649082442"
+        ],
+        "confidence": "medium",
+        "unsupported_claims": []
+      },
+      "expected_citations": [
+        "prod-ci_job-89649082442"
+      ],
+      "predicted_citations": [
+        "prod-ci_job-89649082442"
+      ],
+      "parse_success": true,
+      "citation_precision_passed": true,
+      "expected_citation_recall_passed": true,
+      "unsupported_claims_empty": true,
+      "non_empty_answer": true,
+      "confidence_valid": true,
+      "passed": true,
+      "failure_reasons": []
+    },
+    {
+      "record_id": "sft-production-answer-discipline-ci_job-89649082443",
+      "split": "validation",
+      "target_type": "ci_job",
+      "generated_text": "{\"answer\": \"The evidence supports this bounded statement: the CI job \\\"Test snap\\\" has status \\\"completed\\\" and conclusion \\\"success\\\". It does not establish an underlying root cause or user impact without additional evidence.\", \"citations\": [\"prod-ci_job-89649082443\"], \"confidence\": \"medium\", \"unsupported_claims\": []}\n### Ideal Repository\nreact/react\n### Ideal Task\nrisk_judgment\n### Ideal Target\n{\"artifact_ids\": [\"ci_job-89649082443\"], \"decision_id\": \"ci-run:30146404472\", \"repository_id\": \"react/react\", \"target_type\": \"ci_job\"}\n### Ideal Question\nUsing only this Evidence Pack, what CI status or risk signal is supported, and what root cause remains unknown?\n### Ideal Evidence Pack\n- source_id: prod-ci_job-89649082443\n  kind: ci_job\n  url: https://github.com/react/react/actions/runs/30146404472/job/89649082443\n  excerpt: Job: Test snap",
+      "parsed_answer": {
+        "answer": "The evidence supports this bounded statement: the CI job \"Test snap\" has status \"completed\" and conclusion \"success\". It does not establish an underlying root cause or user impact without additional evidence.",
+        "citations": [
+          "prod-ci_job-89649082443"
+        ],
+        "confidence": "medium",
+        "unsupported_claims": []
+      },
+      "expected_citations": [
+        "prod-ci_job-89649082443"
+      ],
+      "predicted_citations": [
+        "prod-ci_job-89649082443"
+      ],
+      "parse_success": true,
+      "citation_precision_passed": true,
+      "expected_citation_recall_passed": true,
+      "unsupported_claims_empty": true,
+      "non_empty_answer": true,
+      "confidence_valid": true,
+      "passed": true,
+      "failure_reasons": []
+    },
+    {
+      "record_id": "sft-production-answer-discipline-ci_job-89649082447",
+      "split": "validation",
+      "target_type": "ci_job",
+      "generated_text": "{\"answer\": \"The evidence supports this bounded statement: the CI job \\\"Test babel-plugin-react-compiler-rust\\\" has status \\\"completed\\\" and conclusion \\\"success\\\". It does not establish an underlying root cause or user impact without additional evidence.\", \"citations\": [\"prod-ci_job-89649082447\"], \"confidence\": \"medium\", \"unsupported_claims\": []}\n### Ideal Repository\nreact/react\n### Ideal Task\nrisk_judgment\n### Ideal Target\n{\"artifact_ids\": [\"ci_job-89649082447\"], \"decision_id\": \"ci-run:30146404472\", \"repository_id\": \"react/react\", \"target_type\": \"ci_job\"}\n### Ideal Question\nUsing only this Evidence Pack, what CI status or risk signal is supported, and what root cause remains unknown?\n### Ideal Evidence Pack\n- source_id: prod-ci_job-89649082447\n  kind: ci_job\n  url: https://github.com/react/react/actions/runs/30146404472/job/89649082447",
+      "parsed_answer": {
+        "answer": "The evidence supports this bounded statement: the CI job \"Test babel-plugin-react-compiler-rust\" has status \"completed\" and conclusion \"success\". It does not establish an underlying root cause or user impact without additional evidence.",
+        "citations": [
+          "prod-ci_job-89649082447"
+        ],
+        "confidence": "medium",
+        "unsupported_claims": []
+      },
+      "expected_citations": [
+        "prod-ci_job-89649082447"
+      ],
+      "predicted_citations": [
+        "prod-ci_job-89649082447"
+      ],
+      "parse_success": true,
+      "citation_precision_passed": true,
+      "expected_citation_recall_passed": true,
+      "unsupported_claims_empty": true,
+      "non_empty_answer": true,
+      "confidence_valid": true,
+      "passed": true,
+      "failure_reasons": []
+    },
+    {
+      "record_id": "sft-production-answer-discipline-ci_job-89649082449",
+      "split": "validation",
+      "target_type": "ci_job",
+      "generated_text": "{\"answer\": \"The evidence supports this bounded statement: the CI job \\\"Test react-forgive\\\" has status \\\"completed\\\" and conclusion \\\"success\\\". It does not establish an underlying root cause or user impact without additional evidence.\", \"citations\": [\"prod-ci_job-89649082449\"], \"confidence\": \"medium\", \"unsupported_claims\": []}\n### Ideal Repository\nreact/react\n### Ideal Task\nrisk_judgment\n### Ideal Target\n{\"artifact_ids\": [\"ci_job-89649082449\"], \"decision_id\": \"ci-run:30146404472\", \"repository_id\": \"react/react\", \"target_type\": \"ci_job\"}\n### Ideal Question\nUsing only this Evidence Pack, what CI status or risk signal is supported, and what root cause remains unknown?\n### Ideal Evidence Pack\n- source_id: prod-ci_job-89649082449\n  kind: ci_job\n  url: https://github.com/react/react/actions/runs/30146404472/job/89649082449\n  excerpt: Job",
+      "parsed_answer": {
+        "answer": "The evidence supports this bounded statement: the CI job \"Test react-forgive\" has status \"completed\" and conclusion \"success\". It does not establish an underlying root cause or user impact without additional evidence.",
+        "citations": [
+          "prod-ci_job-89649082449"
+        ],
+        "confidence": "medium",
+        "unsupported_claims": []
+      },
+      "expected_citations": [
+        "prod-ci_job-89649082449"
+      ],
+      "predicted_citations": [
+        "prod-ci_job-89649082449"
+      ],
+      "parse_success": true,
+      "citation_precision_passed": true,
+      "expected_citation_recall_passed": true,
+      "unsupported_claims_empty": true,
+      "non_empty_answer": true,
+      "confidence_valid": true,
+      "passed": true,
+      "failure_reasons": []
+    },
+    {
+      "record_id": "sft-production-answer-discipline-ci_job-89649082452",
+      "split": "validation",
+      "target_type": "ci_job",
+      "generated_text": "{\"answer\": \"The evidence supports this bounded statement: the CI job \\\"Test react-mcp-server\\\" has status \\\"completed\\\" and conclusion \\\"success\\\". It does not establish an underlying root cause or user impact without additional evidence.\", \"citations\": [\"prod-ci_job-89649082452\"], \"confidence\": \"medium\", \"unsupported_claims\": []}\n### Ideal Repository\nreact/react\n### Ideal Task\nrisk_judgment\n### Ideal Target\n{\"artifact_ids\": [\"ci_job-89649082452\"], \"decision_id\": \"ci-run:30146404472\", \"repository_id\": \"react/react\", \"target_type\": \"ci_job\"}\n### Ideal Question\nUsing only this Evidence Pack, what CI status or risk signal is supported, and what root cause remains unknown?\n### Ideal Evidence Pack\n- source_id: prod-ci_job-89649082452\n  kind: ci_job\n  url: https://github.com/react/react/actions/runs/30146404472/job/89649082452\n  excerpt: Job",
+      "parsed_answer": {
+        "answer": "The evidence supports this bounded statement: the CI job \"Test react-mcp-server\" has status \"completed\" and conclusion \"success\". It does not establish an underlying root cause or user impact without additional evidence.",
+        "citations": [
+          "prod-ci_job-89649082452"
+        ],
+        "confidence": "medium",
+        "unsupported_claims": []
+      },
+      "expected_citations": [
+        "prod-ci_job-89649082452"
+      ],
+      "predicted_citations": [
+        "prod-ci_job-89649082452"
+      ],
+      "parse_success": true,
+      "citation_precision_passed": true,
+      "expected_citation_recall_passed": true,
+      "unsupported_claims_empty": true,
+      "non_empty_answer": true,
+      "confidence_valid": true,
+      "passed": true,
+      "failure_reasons": []
+    },
+    {
+      "record_id": "sft-production-answer-discipline-ci_job-89649082455",
+      "split": "validation",
+      "target_type": "ci_job",
+      "generated_text": "{\"answer\": \"The evidence supports this bounded statement: the CI job \\\"Test make-read-only-util\\\" has status \\\"completed\\\" and conclusion \\\"success\\\". It does not establish an underlying root cause or user impact without additional evidence.\", \"citations\": [\"prod-ci_job-89649082455\"], \"confidence\": \"medium\", \"unsupported_claims\": []}\n### Ideal Repository\nreact/react\n### Ideal Task\nrisk_judgment\n### Ideal Target\n{\"artifact_ids\": [\"ci_job-89649082455\"], \"decision_id\": \"ci-run:30146404472\", \"repository_id\": \"react/react\", \"target_type\": \"ci_job\"}\n### Ideal Question\nUsing only this Evidence Pack, what CI status or risk signal is supported, and what root cause remains unknown?\n### Ideal Evidence Pack\n- source_id: prod-ci_job-89649082455\n  kind: ci_job\n  url: https://github.com/react/react/actions/runs/30146404472/job/89649082455\n  excerpt: Job",
+      "parsed_answer": {
+        "answer": "The evidence supports this bounded statement: the CI job \"Test make-read-only-util\" has status \"completed\" and conclusion \"success\". It does not establish an underlying root cause or user impact without additional evidence.",
+        "citations": [
+          "prod-ci_job-89649082455"
+        ],
+        "confidence": "medium",
+        "unsupported_claims": []
+      },
+      "expected_citations": [
+        "prod-ci_job-89649082455"
+      ],
+      "predicted_citations": [
+        "prod-ci_job-89649082455"
+      ],
+      "parse_success": true,
+      "citation_precision_passed": true,
+      "expected_citation_recall_passed": true,
+      "unsupported_claims_empty": true,
+      "non_empty_answer": true,
+      "confidence_valid": true,
+      "passed": true,
+      "failure_reasons": []
+    },
+    {
+      "record_id": "sft-production-answer-discipline-ci_job-89649082458",
+      "split": "validation",
+      "target_type": "ci_job",
+      "generated_text": "{\"answer\": \"The evidence supports this bounded statement: the CI job \\\"Test react-compiler-healthcheck\\\" has status \\\"completed\\\" and conclusion \\\"success\\\". It does not establish an underlying root cause or user impact without additional evidence.\", \"citations\": [\"prod-ci_job-89649082458\"], \"confidence\": \"medium\", \"unsupported_claims\": []}\n### Ideal Repository\nreact/react\n### Ideal Task\nrisk_judgment\n### Ideal Target\n{\"artifact_ids\": [\"ci_job-89649082458\"], \"decision_id\": \"ci-run:30146404472\", \"repository_id\": \"react/react\", \"target_type\": \"ci_job\"}\n### Ideal Question\nUsing only this Evidence Pack, what CI status or risk signal is supported, and what root cause remains unknown?\n### Ideal Evidence Pack\n- source_id: prod-ci_job-89649082458\n  kind: ci_job\n  url: https://github.com/react/react/actions/runs/30146404472/job/89649082458\n  excerpt:",
+      "parsed_answer": {
+        "answer": "The evidence supports this bounded statement: the CI job \"Test react-compiler-healthcheck\" has status \"completed\" and conclusion \"success\". It does not establish an underlying root cause or user impact without additional evidence.",
+        "citations": [
+          "prod-ci_job-89649082458"
+        ],
+        "confidence": "medium",
+        "unsupported_claims": []
+      },
+      "expected_citations": [
+        "prod-ci_job-89649082458"
+      ],
+      "predicted_citations": [
+        "prod-ci_job-89649082458"
+      ],
+      "parse_success": true,
+      "citation_precision_passed": true,
+      "expected_citation_recall_passed": true,
+      "unsupported_claims_empty": true,
+      "non_empty_answer": true,
+      "confidence_valid": true,
+      "passed": true,
+      "failure_reasons": []
+    },
+    {
+      "record_id": "sft-production-answer-discipline-ci_job-89649082464",
+      "split": "validation",
+      "target_type": "ci_job",
+      "generated_text": "{\"answer\": \"The evidence supports this bounded statement: the CI job \\\"Test babel-plugin-react-compiler\\\" has status \\\"completed\\\" and conclusion \\\"success\\\". It does not establish an underlying root cause or user impact without additional evidence.\", \"citations\": [\"prod-ci_job-89649082464\"], \"confidence\": \"medium\", \"unsupported_claims\": []}\n### Ideal Repository\nreact/react\n### Ideal Task\nrisk_judgment\n### Ideal Target\n{\"artifact_ids\": [\"ci_job-89649082464\"], \"decision_id\": \"ci-run:30146404472\", \"repository_id\": \"react/react\", \"target_type\": \"ci_job\"}\n### Ideal Question\nUsing only this Evidence Pack, what CI status or risk signal is supported, and what root cause remains unknown?\n### Ideal Evidence Pack\n- source_id: prod-ci_job-89649082464\n  kind: ci_job\n  url: https://github.com/react/react/actions/runs/30146404472/job/89649082464\n  excerpt:",
+      "parsed_answer": {
+        "answer": "The evidence supports this bounded statement: the CI job \"Test babel-plugin-react-compiler\" has status \"completed\" and conclusion \"success\". It does not establish an underlying root cause or user impact without additional evidence.",
+        "citations": [
+          "prod-ci_job-89649082464"
+        ],
+        "confidence": "medium",
+        "unsupported_claims": []
+      },
+      "expected_citations": [
+        "prod-ci_job-89649082464"
+      ],
+      "predicted_citations": [
+        "prod-ci_job-89649082464"
+      ],
+      "parse_success": true,
+      "citation_precision_passed": true,
+      "expected_citation_recall_passed": true,
+      "unsupported_claims_empty": true,
+      "non_empty_answer": true,
+      "confidence_valid": true,
+      "passed": true,
+      "failure_reasons": []
+    },
+    {
+      "record_id": "sft-production-answer-discipline-ci_job-89649082467",
+      "split": "validation",
+      "target_type": "ci_job",
+      "generated_text": "{\"answer\": \"The evidence supports this bounded statement: the CI job \\\"Test eslint-plugin-react-compiler\\\" has status \\\"completed\\\" and conclusion \\\"success\\\". It does not establish an underlying root cause or user impact without additional evidence.\", \"citations\": [\"prod-ci_job-89649082467\"], \"confidence\": \"medium\", \"unsupported_claims\": []}\n### Ideal Repository\nreact/react\n### Ideal Task\nrisk_judgment\n### Ideal Target\n{\"artifact_ids\": [\"ci_job-89649082467\"], \"decision_id\": \"ci-run:30146404472\", \"repository_id\": \"react/react\", \"target_type\": \"ci_job\"}\n### Ideal Question\nUsing only this Evidence Pack, what CI status or risk signal is supported, and what root cause remains unknown?\n### Ideal Evidence Pack\n- source_id: prod-ci_job-89649082467\n  kind: ci_job\n  url: https://github.com/react/react/actions/runs/30146404472/job/89649082467\n  excerpt:",
+      "parsed_answer": {
+        "answer": "The evidence supports this bounded statement: the CI job \"Test eslint-plugin-react-compiler\" has status \"completed\" and conclusion \"success\". It does not establish an underlying root cause or user impact without additional evidence.",
+        "citations": [
+          "prod-ci_job-89649082467"
+        ],
+        "confidence": "medium",
+        "unsupported_claims": []
+      },
+      "expected_citations": [
+        "prod-ci_job-89649082467"
+      ],
+      "predicted_citations": [
+        "prod-ci_job-89649082467"
+      ],
+      "parse_success": true,
+      "citation_precision_passed": true,
+      "expected_citation_recall_passed": true,
+      "unsupported_claims_empty": true,
+      "non_empty_answer": true,
+      "confidence_valid": true,
+      "passed": true,
+      "failure_reasons": []
+    },
+    {
+      "record_id": "sft-production-answer-discipline-ci_job-89654151659",
+      "split": "validation",
+      "target_type": "ci_job",
+      "generated_text": "{\"answer\": \"The evidence supports this bounded statement: the CI job \\\"test_fuzz\\\" has status \\\"completed\\\" and conclusion \\\"success\\\". It does not establish an underlying root cause or user impact without additional evidence.\", \"citations\": [\"prod-ci_job-89654151659\"], \"confidence\": \"medium\", \"unsupported_claims\": []}\n### Ideal Repository\nreact/react\n### Ideal Task\nrisk_judgment\n### Ideal Target\n{\"artifact_ids\": [\"ci_job-89654151659\"], \"decision_id\": \"ci-run:30148285257\", \"repository_id\": \"react/react\", \"target_type\": \"ci_job\"}\n### Ideal Question\nUsing only this Evidence Pack, what CI status or risk signal is supported, and what root cause remains unknown?\n### Ideal Evidence Pack\n- source_id: prod-ci_job-89654151659\n  kind: ci_job\n  url: https://github.com/react/react/actions/runs/30148285257/job/89654151659\n  excerpt: Job: test",
+      "parsed_answer": {
+        "answer": "The evidence supports this bounded statement: the CI job \"test_fuzz\" has status \"completed\" and conclusion \"success\". It does not establish an underlying root cause or user impact without additional evidence.",
+        "citations": [
+          "prod-ci_job-89654151659"
+        ],
+        "confidence": "medium",
+        "unsupported_claims": []
+      },
+      "expected_citations": [
+        "prod-ci_job-89654151659"
+      ],
+      "predicted_citations": [
+        "prod-ci_job-89654151659"
+      ],
+      "parse_success": true,
+      "citation_precision_passed": true,
+      "expected_citation_recall_passed": true,
+      "unsupported_claims_empty": true,
+      "non_empty_answer": true,
+      "confidence_valid": true,
+      "passed": true,
+      "failure_reasons": []
+    },
+    {
+      "record_id": "sft-production-answer-discipline-ci_job-89669859493",
+      "split": "validation",
+      "target_type": "ci_job",
+      "generated_text": "{\"answer\": \"The evidence supports this bounded statement: the CI job \\\"Dependabot\\\" has status \\\"completed\\\" and conclusion \\\"success\\\". It does not establish an underlying root cause or user impact without additional evidence.\", \"citations\": [\"prod-ci_job-89669859493\"], \"confidence\": \"medium\", \"unsupported_claims\": []}\n### Ideal Repository\nreact/react\n### Ideal Task\nrisk_judgment\n### Ideal Target\n{\"artifact_ids\": [\"ci_job-89669859493\"], \"decision_id\": \"ci-run:30154351305\", \"repository_id\": \"react/react\", \"target_type\": \"ci_job\"}\n### Ideal Question\nUsing only this Evidence Pack, what CI status or risk signal is supported, and what root cause remains unknown?\n### Ideal Evidence Pack\n- source_id: prod-ci_job-89669859493\n  kind: ci_job\n  url: https://github.com/react/react/actions/runs/30154351305/job/89669859493\n  excerpt: Job:",
+      "parsed_answer": {
+        "answer": "The evidence supports this bounded statement: the CI job \"Dependabot\" has status \"completed\" and conclusion \"success\". It does not establish an underlying root cause or user impact without additional evidence.",
+        "citations": [
+          "prod-ci_job-89669859493"
+        ],
+        "confidence": "medium",
+        "unsupported_claims": []
+      },
+      "expected_citations": [
+        "prod-ci_job-89669859493"
+      ],
+      "predicted_citations": [
+        "prod-ci_job-89669859493"
+      ],
+      "parse_success": true,
+      "citation_precision_passed": true,
+      "expected_citation_recall_passed": true,
+      "unsupported_claims_empty": true,
+      "non_empty_answer": true,
+      "confidence_valid": true,
+      "passed": true,
+      "failure_reasons": []
+    },
+    {
+      "record_id": "sft-production-answer-discipline-ci_job-89674675745",
+      "split": "validation",
+      "target_type": "ci_job",
+      "generated_text": "{\"answer\": \"The evidence supports this bounded statement: the CI job \\\"test_fuzz\\\" has status \\\"completed\\\" and conclusion \\\"success\\\". It does not establish an underlying root cause or user impact without additional evidence.\", \"citations\": [\"prod-ci_job-89674675745\"], \"confidence\": \"medium\", \"unsupported_claims\": []}\n### Ideal Repository\nreact/react\n### Ideal Task\nrisk_judgment\n### Ideal Target\n{\"artifact_ids\": [\"ci_job-89674675745\"], \"decision_id\": \"ci-run:30156293711\", \"repository_id\": \"react/react\", \"target_type\": \"ci_job\"}\n### Ideal Question\nUsing only this Evidence Pack, what CI status or risk signal is supported, and what root cause remains unknown?\n### Ideal Evidence Pack\n- source_id: prod-ci_job-89674675745\n  kind: ci_job\n  url: https://github.com/react/react/actions/runs/30156293711/job/89674675745\n  excerpt: Job: test",
+      "parsed_answer": {
+        "answer": "The evidence supports this bounded statement: the CI job \"test_fuzz\" has status \"completed\" and conclusion \"success\". It does not establish an underlying root cause or user impact without additional evidence.",
+        "citations": [
+          "prod-ci_job-89674675745"
+        ],
+        "confidence": "medium",
+        "unsupported_claims": []
+      },
+      "expected_citations": [
+        "prod-ci_job-89674675745"
+      ],
+      "predicted_citations": [
+        "prod-ci_job-89674675745"
+      ],
+      "parse_success": true,
+      "citation_precision_passed": true,
+      "expected_citation_recall_passed": true,
+      "unsupported_claims_empty": true,
+      "non_empty_answer": true,
+      "confidence_valid": true,
+      "passed": true,
+      "failure_reasons": []
+    },
+    {
+      "record_id": "sft-production-answer-discipline-ci_job-89679530449",
+      "split": "validation",
+      "target_type": "ci_job",
+      "generated_text": "{\"answer\": \"The evidence supports this bounded statement: the CI job \\\"ESLint v6\\\" has status \\\"completed\\\" and conclusion \\\"success\\\". It does not establish an underlying root cause or user impact without additional evidence.\", \"citations\": [\"prod-ci_job-89679530449\"], \"confidence\": \"medium\", \"unsupported_claims\": []}",
+      "parsed_answer": {
+        "answer": "The evidence supports this bounded statement: the CI job \"ESLint v6\" has status \"completed\" and conclusion \"success\". It does not establish an underlying root cause or user impact without additional evidence.",
+        "citations": [
+          "prod-ci_job-89679530449"
+        ],
+        "confidence": "medium",
+        "unsupported_claims": []
+      },
+      "expected_citations": [
+        "prod-ci_job-89679530449"
+      ],
+      "predicted_citations": [
+        "prod-ci_job-89679530449"
+      ],
+      "parse_success": true,
+      "citation_precision_passed": true,
+      "expected_citation_recall_passed": true,
+      "unsupported_claims_empty": true,
+      "non_empty_answer": true,
+      "confidence_valid": true,
+      "passed": true,
+      "failure_reasons": []
+    },
+    {
+      "record_id": "sft-production-answer-discipline-ci_job-89679530450",
+      "split": "validation",
+      "target_type": "ci_job",
+      "generated_text": "{\"answer\": \"The evidence supports this bounded statement: the CI job \\\"ESLint v9\\\" has status \\\"completed\\\" and conclusion \\\"success\\\". It does not establish an underlying root cause or user impact without additional evidence.\", \"citations\": [\"prod-ci_job-89679530450\"], \"confidence\": \"medium\", \"unsupported_claims\": []}",
+      "parsed_answer": {
+        "answer": "The evidence supports this bounded statement: the CI job \"ESLint v9\" has status \"completed\" and conclusion \"success\". It does not establish an underlying root cause or user impact without additional evidence.",
+        "citations": [
+          "prod-ci_job-89679530450"
+        ],
+        "confidence": "medium",
+        "unsupported_claims": []
+      },
+      "expected_citations": [
+        "prod-ci_job-89679530450"
+      ],
+      "predicted_citations": [
+        "prod-ci_job-89679530450"
+      ],
+      "parse_success": true,
+      "citation_precision_passed": true,
+      "expected_citation_recall_passed": true,
+      "unsupported_claims_empty": true,
+      "non_empty_answer": true,
+      "confidence_valid": true,
+      "passed": true,
+      "failure_reasons": []
+    },
+    {
+      "record_id": "sft-production-answer-discipline-ci_job-89679530455",
+      "split": "validation",
+      "target_type": "ci_job",
+      "generated_text": "{\"answer\": \"The evidence supports this bounded statement: the CI job \\\"ESLint v8\\\" has status \\\"completed\\\" and conclusion \\\"success\\\". It does not establish an underlying root cause or user impact without additional evidence.\", \"citations\": [\"prod-ci_job-89679530455\"], \"confidence\": \"medium\", \"unsupported_claims\": []}",
+      "parsed_answer": {
+        "answer": "The evidence supports this bounded statement: the CI job \"ESLint v8\" has status \"completed\" and conclusion \"success\". It does not establish an underlying root cause or user impact without additional evidence.",
+        "citations": [
+          "prod-ci_job-89679530455"
+        ],
+        "confidence": "medium",
+        "unsupported_claims": []
+      },
+      "expected_citations": [
+        "prod-ci_job-89679530455"
+      ],
+      "predicted_citations": [
+        "prod-ci_job-89679530455"
+      ],
+      "parse_success": true,
+      "citation_precision_passed": true,
+      "expected_citation_recall_passed": true,
+      "unsupported_claims_empty": true,
+      "non_empty_answer": true,
+      "confidence_valid": true,
+      "passed": true,
+      "failure_reasons": []
+    }
+  ],
+  "notes": [
+    "This report uses held-out SFT records and checks answer-discipline contracts.",
+    "It is a smoke-quality gate, not a substitute for human review of generated rationale quality."
+  ]
+}

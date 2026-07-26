@@ -132,6 +132,53 @@ class RuntimeProfileErrorReport:
 
 
 @dataclass(frozen=True)
+class IndexOptimizationSettings:
+    """Index-side knobs compared during Phase 5 optimization."""
+
+    embedding_cache: str
+    context_compression_ratio: float
+    candidate_count: int
+    rerank_top_k: int
+
+    def __post_init__(self) -> None:
+        if self.embedding_cache not in {"disabled", "memory", "disk"}:
+            raise ValueError("embedding_cache must be disabled, memory, or disk")
+        if not 0 < self.context_compression_ratio <= 1:
+            raise ValueError("context_compression_ratio must be in the range (0, 1]")
+        if self.candidate_count <= 0:
+            raise ValueError("candidate_count must be positive")
+        if self.rerank_top_k <= 0:
+            raise ValueError("rerank_top_k must be positive")
+        if self.rerank_top_k > self.candidate_count:
+            raise ValueError("rerank_top_k must be <= candidate_count")
+
+
+@dataclass(frozen=True)
+class RuntimeOptimizationProfile:
+    """Model and index profile considered by the optimization report."""
+
+    profile_id: str
+    model_id: str
+    quantization: str
+    max_context_tokens: int
+    batch_size: int
+    index: IndexOptimizationSettings
+    notes: tuple[str, ...] = ()
+
+    def __post_init__(self) -> None:
+        if not self.profile_id:
+            raise ValueError("profile_id must be non-empty")
+        if not self.model_id:
+            raise ValueError("model_id must be non-empty")
+        if not self.quantization:
+            raise ValueError("quantization must be non-empty")
+        if self.max_context_tokens <= 0:
+            raise ValueError("max_context_tokens must be positive")
+        if self.batch_size <= 0:
+            raise ValueError("batch_size must be positive")
+
+
+@dataclass(frozen=True)
 class RuntimeProfile:
     """Complete runtime profile payload that can be serialized to JSON."""
 
@@ -207,6 +254,55 @@ def load_mvp_model_constraints() -> tuple[ModelConstraint, ...]:
             recommended_vram_bytes=8 * GIB,
             benchmark_workload="Generate one structured answer from a 24k-token Evidence Pack plus verifier prompts.",
             acceptance_target="Reach >= 8 output tokens/second or keep p95 answer latency <= 30 seconds.",
+        ),
+    )
+
+
+def load_default_optimization_profiles() -> tuple[RuntimeOptimizationProfile, ...]:
+    """Return deterministic Phase 5 model/index profiles for comparison."""
+
+    return (
+        RuntimeOptimizationProfile(
+            profile_id="baseline-qwen-4bit-full-context",
+            model_id="Qwen/Qwen2.5-Coder-7B-Instruct",
+            quantization="4-bit LoRA-compatible local runtime",
+            max_context_tokens=32768,
+            batch_size=1,
+            index=IndexOptimizationSettings(
+                embedding_cache="disabled",
+                context_compression_ratio=1.0,
+                candidate_count=50,
+                rerank_top_k=20,
+            ),
+            notes=("Baseline profile before Phase 5 optimization.",),
+        ),
+        RuntimeOptimizationProfile(
+            profile_id="cache-compressed-context",
+            model_id="Qwen/Qwen2.5-Coder-7B-Instruct",
+            quantization="4-bit LoRA-compatible local runtime",
+            max_context_tokens=24576,
+            batch_size=1,
+            index=IndexOptimizationSettings(
+                embedding_cache="disk",
+                context_compression_ratio=0.75,
+                candidate_count=40,
+                rerank_top_k=16,
+            ),
+            notes=("Uses embedding cache and moderate context compression.",),
+        ),
+        RuntimeOptimizationProfile(
+            profile_id="fast-small-candidate-set",
+            model_id="Qwen/Qwen2.5-Coder-7B-Instruct",
+            quantization="4-bit LoRA-compatible local runtime",
+            max_context_tokens=16384,
+            batch_size=1,
+            index=IndexOptimizationSettings(
+                embedding_cache="disk",
+                context_compression_ratio=0.5,
+                candidate_count=20,
+                rerank_top_k=8,
+            ),
+            notes=("Aggressive candidate reduction; must preserve quality to be used.",),
         ),
     )
 

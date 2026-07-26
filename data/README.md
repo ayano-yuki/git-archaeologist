@@ -195,3 +195,31 @@ Repository ごとの収集範囲、対象 artifact、除外ルール、private �
 
 収集に失敗した場合は、設定で定義されたエラー報告項目を使い、対象 Repository、artifact 種別、対象 ID、実行操作、エラー種別、エラーメッセージを人間へ連絡する。認証ヘッダー、token、秘密鍵などの値は報告や保存に含めない。
 
+## データ保護、バックアップ、選択削除
+
+Repository を切り替える前、または本番データを使った学習・評価の後片付けを行う前に、対象 Repository 由来のローカルデータを inventory で確認する。
+
+```powershell
+uv --system-certs run python -m git_archaeologist.ops.data_protection --inventory
+```
+
+inventory は `raw`、`runs`、`models`、`eval` の候補パス、存在有無、ファイル数、サイズ、削除対象にできるかを表示する。`authorization_header`、`raw_token`、`secret_value`、`private_key` など secret-like な field を検出した場合、値は表示せず、削除・バックアップ plan を block する。
+
+バックアップはまず plan のみを確認する。実コピーはこの CLI では行わない。
+
+```powershell
+uv --system-certs run python -m git_archaeologist.ops.data_protection --backup-plan
+```
+
+削除も既定では dry-run の delete plan だけを表示する。plan は `data/` の外へ出る path を block し、対象 Repository に対応する `data/local-runtime/raw/<owner>/<repo>/`、`data/local-runtime/runs/<owner>-<repo>*`、モデル別 `runs/` を削除候補にする。
+
+```powershell
+uv --system-certs run python -m git_archaeologist.ops.data_protection --delete-plan
+```
+
+実削除が必要な場合は、dry-run 結果と対象 path を人間が確認してから、明示的に `--execute` と `--confirm-repository-id` を指定する。
+
+```powershell
+uv --system-certs run python -m git_archaeologist.ops.data_protection --delete-plan --execute --confirm-repository-id react/react
+```
+

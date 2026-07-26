@@ -25,6 +25,10 @@ uv --system-certs run python -m git_archaeologist.demo_chat
 
 実運用では `git_archaeologist.chat.chat_flow.run_chat_flow` に Target Resolver、Evidence Retriever、Answer Generator、Citation Verifier の各backendを渡して利用します。Evidence Pack が空の場合や最新PR取得に失敗した場合は、根拠なしに断言せず安全な結果を返します。
 
+## 制約と非対応範囲
+
+Phase5 の利用上の制約、回答不能となる条件、外部会話や履歴欠損を推測で補わない方針は `docs/limitations.md` を参照してください。setup、sync、data protection、regression の確認入口も同じ文書にまとめています。
+
 ## ローカル Smoke 確認
 
 外部サービスを呼ばない smoke で、安定化、障害分析、lineage 分析をまとめて確認できます。増分同期、索引transaction、version付きcache、質問trace、障害fallback、失敗分類、RAG ablation、SFT判断、incident graph、行・条件分岐分析を一周します。

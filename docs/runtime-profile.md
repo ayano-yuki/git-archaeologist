@@ -54,3 +54,28 @@ write_runtime_profile(profile, model_name="Qwen/Qwen2.5-Coder-7B-Instruct")
 
 実測結果は、対象モデルの `data/<model-name>/eval/runtime-profile/` に置く。レビュー済みで秘密情報を含まない評価レポートは Git 管理対象にする。
 ローカル実行時の raw profile と benchmark report は `data/<model-name>/runs/runtime-profile/` に置き、secret や private 情報を含まないことを確認したうえで Git 管理対象にする。
+
+## Phase 5 chat E2E 性能計測
+
+Phase 5 では、利用者の待ち時間を支配するチャット処理を段階別に計測する。対象は `target_resolution`、`search`、`rerank`、`answer_generation`、`citation_verification` で、各段階の latency、CPU 時間、RAM、取得できる環境では GPU 利用率と VRAM を `QueryTrace` に記録する。
+
+本物のモデル学習や重い推論は性能計測の前提にしない。標準の runner は deterministic backend を使い、外部収集や本物モデル実行なしで JSON report と summary markdown を生成できる。
+
+```powershell
+uv run python -m git_archaeologist.evaluation.phase5_performance
+```
+
+証明書エラーが出る環境では次を使う。
+
+```powershell
+uv --system-certs run python -m git_archaeologist.evaluation.phase5_performance
+```
+
+GPU / VRAM カウンタが取得できない場合、該当フィールドは `null`、resource status は `unknown` または `partial` として記録し、計測自体は継続する。`nvidia-smi` の呼び出しを避けたい場合は `--no-gpu` を付ける。
+
+出力先の既定値は `data/Qwen--Qwen2.5-Coder-7B-Instruct/runs/phase5-performance/` で、次の2ファイルを生成する。
+
+- `phase5-performance.json`: case、stage record、p95、QueryTrace を含む機械可読 report。
+- `phase5-performance.md`: p95 または代表値から見た bottleneck summary。
+
+性能数値は OS、CPU/GPU、同時実行中のプロセス、GPU カウンタ取得可否に依存する。同じ runtime profile 内で比較し、異なる環境の絶対値を品質差として扱わない。

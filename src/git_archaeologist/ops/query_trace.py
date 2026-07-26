@@ -25,6 +25,34 @@ class TraceStep:
 
 
 @dataclass(frozen=True)
+class ResourceReading:
+    """Point-in-time local resource reading for a trace step."""
+
+    cpu_seconds: float | None = None
+    ram_bytes: int | None = None
+    gpu_utilization_percent: float | None = None
+    vram_bytes: int | None = None
+    notes: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True)
+class StagePerformanceMeasurement:
+    """Latency and resource usage observed for one pipeline stage."""
+
+    stage: str
+    latency_ms: float
+    cpu_seconds_delta: float | None
+    ram_bytes: int | None
+    gpu_utilization_percent: float | None
+    vram_bytes: int | None
+    resource_status: str
+    notes: tuple[str, ...] = ()
+
+    def to_dict(self) -> dict[str, object]:
+        return asdict(self)
+
+
+@dataclass(frozen=True)
 class QueryTrace:
     """Full trace for one user question."""
 
@@ -48,6 +76,17 @@ class QueryTrace:
             result_status=self.result_status,
             steps=self.steps + (TraceStep(name=name, status=status, payload=payload),),
         )
+
+    def add_performance_step(
+        self,
+        name: str,
+        status: str,
+        payload: dict[str, object],
+        measurement: StagePerformanceMeasurement,
+    ) -> "QueryTrace":
+        measured_payload = dict(payload)
+        measured_payload["performance"] = measurement.to_dict()
+        return self.add_step(name, status, measured_payload)
 
     def complete(self, result_status: str) -> "QueryTrace":
         return QueryTrace(
@@ -108,3 +147,71 @@ def start_query_trace(
         model_version=model_version,
         started_at=utc_now_iso(),
     )
+
+
+def build_stage_performance_measurement(
+    *,
+    stage: str,
+    started_at_seconds: float,
+    finished_at_seconds: float,
+    start_resources: ResourceReading | None = None,
+    end_resources: ResourceReading | None = None,
+) -> StagePerformanceMeasurement:
+    """Build a trace payload for one measured chat stage."""
+
+    if not stage:
+        raise ValueError("stage must be non-empty")
+    if finished_at_seconds < started_at_seconds:
+        raise ValueError("finished_at_seconds must be >= started_at_seconds")
+
+    cpu_delta = _subtract_optional(
+        end_resources.cpu_seconds if end_resources else None,
+        start_resources.cpu_seconds if start_resources else None,
+    )
+    ram_bytes = end_resources.ram_bytes if end_resources else None
+    gpu_percent = end_resources.gpu_utilization_percent if end_resources else None
+    vram_bytes = end_resources.vram_bytes if end_resources else None
+    notes = tuple(
+        dict.fromkeys(
+            (start_resources.notes if start_resources else ())
+            + (end_resources.notes if end_resources else ())
+        )
+    )
+
+    return StagePerformanceMeasurement(
+        stage=stage,
+        latency_ms=(finished_at_seconds - started_at_seconds) * 1000,
+        cpu_seconds_delta=cpu_delta,
+        ram_bytes=ram_bytes,
+        gpu_utilization_percent=gpu_percent,
+        vram_bytes=vram_bytes,
+        resource_status=_classify_resource_status(
+            cpu_delta=cpu_delta,
+            ram_bytes=ram_bytes,
+            gpu_utilization_percent=gpu_percent,
+            vram_bytes=vram_bytes,
+        ),
+        notes=notes,
+    )
+
+
+def _subtract_optional(value: float | None, baseline: float | None) -> float | None:
+    if value is None or baseline is None:
+        return None
+    return max(0.0, value - baseline)
+
+
+def _classify_resource_status(
+    *,
+    cpu_delta: float | None,
+    ram_bytes: int | None,
+    gpu_utilization_percent: float | None,
+    vram_bytes: int | None,
+) -> str:
+    fields = (cpu_delta, ram_bytes, gpu_utilization_percent, vram_bytes)
+    measured_count = sum(value is not None for value in fields)
+    if measured_count == 0:
+        return "unknown"
+    if measured_count == len(fields):
+        return "measured"
+    return "partial"

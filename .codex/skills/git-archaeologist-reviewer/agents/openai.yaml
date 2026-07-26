@@ -1,0 +1,4 @@
+interface:
+  display_name: "Git Archaeologist Reviewer"
+  short_description: "PR一次レビューと指摘整理を行う"
+  default_prompt: "Git ArchaeologistのPRを一次レビューして"

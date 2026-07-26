@@ -1,0 +1,4 @@
+interface:
+  display_name: "Git Archaeologist Cleanup"
+  short_description: "merge後のbranchとworktreeを片付ける"
+  default_prompt: "merge済みPRのローカル/remote branchとworktreeを片付けて"

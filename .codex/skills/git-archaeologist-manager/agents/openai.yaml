@@ -1,0 +1,4 @@
+interface:
+  display_name: "Git Archaeologist Manager"
+  short_description: "作業開始前整理と Member 割り当てを行います。"
+  default_prompt: "Git Archaeologist の作業開始前整理、Issue 分解、依存関係確認、並列化可否判定、Member 割り当てを進めてください。"

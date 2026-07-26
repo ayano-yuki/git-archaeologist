@@ -1,114 +1,33 @@
-# Git Archaeologist オーケストレーション
+# Git Archaeologist ルーティング補助
 
-この reference は、Git Archaeologist を Codex Manager / Member で並列開発するための運用手順をまとめる。詳細なルールは `.codex/rules/git-archaeologist-development.md` と `.codex/hooks/` を優先する。
+この reference は、`git-archaeologist-dev` が役割を選ぶときだけ読む。詳細ルールは `.codex/rules/`、実作業は role skill を優先する。
 
-## 運用モデル
+## 標準フロー
 
-- 人間: 親 Issue、子 Issue 案、PR 作成前の設計ズレ、人間レビュー、マージ判断を担当する。
-- Manager Codex: Issue 分解、子 Issue 作成準備、Member 割り当て、PR 一次レビュー、レビュー指摘の再割り当てを担当する。
-- Member Codex: 割り当てられた Issue の実装、テスト、コミット、PR 作成を担当する。
+1. Dev Router が依頼を受ける。
+2. Manager が作業内容を整理する。
+3. Manager が Issue、phase、受け入れ条件、依存関係、機能領域、base branch を確認する。
+4. 未 Issue 化の作業は Manager が Issue 作成案を作る。
+5. 実装可能な Issue は Member に渡す。
+6. 独立した Issue は複数 Member で並列に進める。
+7. PR 作成後は Reviewer が一次レビューする。
+8. PR merge 後は Cleanup が後始末する。
 
-## 親 Issue
+## Role 選択
 
-- 親 PBI: `ayano-yuki/ayano-yuki-pbi#58`
-- 子 Issue タイトル形式: `【git-archaeologist 】 <title>`
-- 親 PBI #58 直下には phase Issue を置く。phase Issue タイトル形式は `【git-archaeologist 】 phaseNN` とする。
-- phase 内で実施する子 Issue は、対応する phase Issue の GitHub sub-issue として作成する。
+- Manager: 整理、Issue 分解、親子関係修復、Member 割り当て。
+- Member: 単一 Issue の実装、テスト、commit、push、PR 作成。
+- Reviewer: PR topology、受け入れ条件、テスト、危険操作の確認。
+- Cleanup: merge 済み PR の branch / worktree 削除。
 
-## 全体フロー
+## 並列化メモ
 
-1. Manager Codex が親 Issue、`docs/plan.md`、`docs/Todo.md` を読む。
-2. Manager Codex が対応する phase Issue を確認し、なければ phase Issue 作成案を準備する。
-3. Manager Codex が `.codex/orchestration/templates/child-issue.md` で phase Issue 配下の子 Issue 案を作る。
-4. Manager Codex が `.codex/orchestration/templates/issue-batch-plan.md` で一括作成計画を作る。
-5. Manager Codex が `.codex/hooks/issue-create-gate.md` で停止する。
-6. 人間が一括作成計画を修正または承認する。
-7. Manager Codex が phase Issue は `gh issue create --parent 58`、実施 Issue は `gh issue create --parent <phase-issue-number>` で準備または実行する。
-8. Manager Codex が作成済み Issue の sub-issue 関係を確認し、抜けがあれば `gh issue edit <issue-number> --parent <phase-issue-number>` で修復する。
-9. Manager Codex が各 Issue を Member Codex へ割り当てる。
-10. Member Codex が Issue 専用の `git worktree` を作る。
-11. Member Codex が実装、テスト、コミットを行う。
-12. Member Codex が `.codex/orchestration/templates/pr.md` で PR 本文を作る。
-13. Member Codex が `.codex/hooks/pr-create-gate.md` で停止する。
-14. 人間が Issue 設計からズレていないかを確認する。
-15. Member Codex が feature ブランチを push し、PR を作成する。push だけで停止した状態は未完了とする。
-16. Manager Codex が push 済み feature ブランチと open PR の対応を確認し、PR 作成漏れがあれば作成する。
-17. Manager Codex が人間レビュー前の一次レビューを行う。
-18. 人間が PR をレビューする。
-19. Manager Codex がレビュー指摘を元 Member または別 Member へ再割り当てする。
+並列化できるのは、Issue の受け入れ条件、主要ファイル、機能領域、依存関係が衝突しない場合だけ。説明できない並列化はしない。
 
-## ブランチモデル
+## 禁止
 
-ブランチ階層は次を使う。
-
-```text
-main
-phase/1-mvp
-project/<function-area>
-feature/<issue-number>-<short-title>
-```
-
-PR の向き先は隣接階層だけに限定する。
-
-- `project/<function-area>` から `main`。
-- `feature/<issue-number>-<short-title>` から対応する `project/<function-area>`。
-- `feature` から `main`、`feature` から別 `feature`、`project` から `feature` への PR は作らない。
-
-使える機能領域:
-
-- `collector`
-- `normalizer`
-- `search`
-- `rag`
-- `chat`
-- `evaluation`
-
-## 開発配置
-
-- Python 開発は `uv` を使う。
-- 証明書エラーで `uv run` が失敗する環境では `uv --system-certs run ...` を使う。
-- コードは `src/` 配下に置く。
-- パッケージコードは `src/git_archaeologist/` 配下に置く。
-- 学習・評価・実験用データは `data/` 配下に置く。
-- `data/` 配下はモデルごとに `data/<model-name>/` で分ける。
-- モデル別データの詳細構造は `data/README.md` に従う。
-
-## 人間確認ゲート
-
-次の操作前には必ず停止する。
-
-- 子 Issue の作成。
-- PR 作成。
-- 依存関係の追加。
-- CI/CD、GitHub Actions、認証、秘密情報、権限、データ保存先の変更。
-- 破壊的 git 操作。
-- 大量の削除、移動、リネーム。
-- `docs/plan.md` または `docs/Todo.md` のロードマップ範囲変更。
-
-分割済みの hook reference:
-
-- `.codex/hooks/issue-create-gate.md`
-- `.codex/hooks/pr-create-gate.md`
-- `.codex/hooks/dangerous-operation-gate.md`
-
-## Manager 一次レビュー
-
-人間レビュー前に Manager Codex は次を確認する。
-
-- PR が Issue の受け入れ条件を満たしている。
-- push 済み feature ブランチに対応する PR が作成されている。
-- 差分が Issue の範囲内に収まっている。
-- テストが Issue のテスト方針と合っている。
-- ブランチ、PR の向き先、コミット、PR タイトル、PR 本文が規約に合っている。
-- 危険操作が人間確認ゲートを通っている。
-- 変更が `docs/plan.md` または `docs/Todo.md` と矛盾していない。
-
-## レビュー指摘のトリアージ
-
-レビュー指摘が来たら次の順で扱う。
-
-1. コメントとチェック結果を読む。
-2. 必要な修正単位で指摘をまとめる。
-3. 元 Member に戻すか、別 Member に割り当てるかを決める。
-4. 設計変更を伴う指摘は人間確認ゲートで止める。
-5. 追加コミットまたは追加 PR が元 Issue を参照していることを確認する。
+- Manager のまま実装する。
+- Member が複数 Issue を束ねる。
+- `feature -> main` PR を作る。
+- `feature -> feature` stacked PR を作る。
+- merge 確認前に branch / worktree を削除する。

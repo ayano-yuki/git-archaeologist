@@ -127,3 +127,25 @@ gh pr create `
 gh pr view <pr-number> --repo ayano-yuki/git-archaeologist
 gh pr checks <pr-number> --repo ayano-yuki/git-archaeologist
 ```
+
+## merge 後 cleanup 確認
+
+cleanup は `git-archaeologist-cleanup` と `.codex/hooks/post-merge-cleanup-gate.md` に従う。実行前に PR が merge 済みであることを確認する。
+
+```powershell
+gh pr view <pr-number> `
+  --repo ayano-yuki/git-archaeologist `
+  --json number,title,state,mergedAt,baseRefName,headRefName,headRepositoryOwner
+
+git worktree list
+git status --short --branch
+```
+
+削除対象は PR head branch に限定する。
+
+```powershell
+git worktree remove "<worktree-path>"
+git branch -d "<head-branch>"
+git push origin --delete "<head-branch>"
+git fetch --prune origin
+```

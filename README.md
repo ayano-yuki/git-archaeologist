@@ -73,6 +73,7 @@ scheduler は設定内容をレポートするだけで、OS の常駐ジョブ�
 ## FT / QLoRA 動作確認
 
 Answer / Judge LLM の回答規律を SFT する場合は、先に構成全体の smoke を実行します。
+学習から adapter 作成、post-FT 評価、モデル利用入口までの詳細手順は `docs/model-training-and-runtime.md` にまとめています。
 
 ```powershell
 uv --system-certs run python -m git_archaeologist.evaluation.system_smoke

@@ -529,37 +529,37 @@ CI失敗、不具合報告、修正、Revert、再適用を一つの時系列と
   - 完了条件: 新しいPRやReviewが同期後の検索結果へ反映される。
   - 状態: #109 で `git_archaeologist.ops.sync` を追加し、`--status` で repository / index version / synced_at / watermarks、`--plan` で selected / skipped artifact updates、scheduler設定を表示できる。
 
-- [ ] **必須: データ保護と削除手順を整備する**
+- [x] **必須: データ保護と削除手順を整備する**
   - 目的: private Repositoryの履歴、モデル入力、ログをローカルで適切に管理する。
   - 方法: 保存場所、アクセス権、ログredaction、保持期間、Repository切り替え時の削除範囲を定義する。
   - 成果物: データ管理方針、削除・バックアップ手順。
   - 完了条件: 対象Repository由来のデータを列挙し、選択的に削除できる。
-  - 状態: `ProtectedDataInventory` でデータroot、削除境界、保護パターンは列挙可能。選択削除CLI、バックアップ手順、ドキュメントは #110 で対応する。
+  - 状態: #110 で `git_archaeologist.ops.data_protection` を追加し、`--inventory` / `--backup-plan` / `--delete-plan` / `--delete-plan --execute --confirm-repository-id` で対象Repository由来データの列挙、backup plan、dry-run削除計画、確認付き選択削除を実行できる。`data/README.md` に削除・バックアップ手順を記載し、secret-like field 検出時は値を表示せず plan を block する。
 
 ### 5.3 性能最適化
 
-- [ ] **必須: エンドツーエンド性能を計測する**
+- [x] **必須: エンドツーエンド性能を計測する**
   - 目的: どの処理が利用者の待ち時間と資源消費を支配しているか把握する。
   - 方法: 対象解決、検索、Rerank、LLM生成、引用検証の時間、CPU・GPU・RAM・VRAM使用量を計測する。
   - 成果物: performance profile、改善優先順位。
   - 完了条件: 主要なbottleneckを数値で説明できる。
-  - 状態: runtime profile とローカル運用手順はあり。チャットE2Eの段階別計測、比較レポート、改善優先順位は #111 で対応する。
+  - 状態: #111 で `git_archaeologist.evaluation.phase5_performance` を追加し、`target_resolution` / `search` / `rerank` / `answer_generation` / `citation_verification` の段階別 latency、CPU、RAM、GPU / VRAM を `QueryTrace` へ記録できる。JSON report と summary markdown に bottleneck と改善優先順位を出力できる。
 
-- [ ] **必須: モデルと索引を最適化する**
+- [x] **必須: モデルと索引を最適化する**
   - 目的: 品質を保ちながら、対象ハードウェアで現実的な速度にする。
   - 方法: 量子化、context圧縮、batching、Embedding cache、候補数、Rerank範囲を比較する。
   - 成果物: 推奨runtime profile、品質と速度の比較。
   - 完了条件: 品質基準を下回らず、設定した応答時間目標を満たす。
-  - 状態: QLoRA plan と post-SFT評価導線はあり。モデル・索引設定の比較実験、自動レポート、推奨profile確定は #112 で対応する。
+  - 状態: #112 で `RuntimeOptimizationProfile` と `git_archaeologist.evaluation.optimization_report` を追加し、量子化、context長、batch size、Embedding cache、候補数、Rerank範囲を含む profile を品質指標と速度指標で比較できる。品質基準を満たす measured profile だけを推奨 runtime profile として選び、棄却理由を JSON / markdown report に残せる。
 
 ### 5.4 最終品質保証
 
-- [ ] **必須: 全機能の回帰評価を自動化する**
+- [x] **必須: 全機能の回帰評価を自動化する**
   - 目的: モデル、検索、prompt、schemaの変更による品質低下を検出する。
   - 方法: 対象解決、検索、説明、リスク、障害、lineage、引用、棄権、性能の評価を一つのsuiteで実行する。
   - 成果物: regression suite、比較レポート、合否判定。
   - 完了条件: version変更ごとに同じ評価を再実行できる。
-  - 状態: `RegressionSuitePlan` と `tests/test_chat_routing.py` で suite 仕様は固定済み。評価ケースの一括実行CLI、比較レポート、合否判定出力は #113 で対応する。
+  - 状態: #113 で `git_archaeologist.evaluation.phase5_regression` を追加し、対象解決、検索、回答、引用、棄権、障害、lineage、性能を `phase5-regression-suite-v1` として一括評価できる。CLI は `phase5-regression.json` / `.md` を出力し、baseline比較で regression を検出して合否判定する。
 
 - [x] **必須: 人手による受け入れ評価を行う**
   - 目的: 自動指標だけでは測れない説明の有用性と警告疲れを確認する。
